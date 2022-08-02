@@ -1,0 +1,42 @@
+image:
+  # also update version in manifests/chainspec.yml
+  repository: purestake/moonbeam
+  tag: latest
+  pullPolicy: IfNotPresent
+
+initContainer:
+  debug: true
+
+node:
+  dataVolumeSize: 2Gi
+  chain: moonbase
+  role: collator
+  replicas: 2
+  command: "/moonbeam/moonbeam"
+  # manifests/chainspec.yml
+  forceDownloadChainspec: true
+  customChainspecUrl:  "http://chainspec.rococo/moonbase.json"
+  customChainspecPath: "/data/moonbase.json"
+  collator:
+    isParachain: true
+    # manifests/chainspec.yml
+    relayChainCustomChainspecUrl: "http://chainspec.rococo/rococo-local.json"
+  persistGeneratedNodeKey: true
+  perNodeServices:
+    relayP2pService:
+      enabled: true
+      type: NodePort
+    paraP2pService:
+      enabled: true
+      type: NodePort
+  flags:
+    - "--unsafe-rpc-external"
+    - "--unsafe-ws-external"
+    - "--rpc-methods=unsafe"
+    - "--rpc-cors=all"
+    - "--allow-private-ipv4"
+
+extraLabels:
+  paraId: "1001"
+
+storageClass: "standard"

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ network_name.capitalize() }} Parachains</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>{{ network_name.capitalize() }} : {{ paras_count }} Paras: {{ parachain_count }} Parachains, {{ parathread_count }} Parathreads, {{ paras_count -  parachain_count - parathread_count }} Others</h3>
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>ParaID</th>
+        <th>Name</th>
+        <th>Lifecycle</th>
+        <th>Location</th>
+        <th>Leases</th>
+        <th>Actions</th>
+        <th>Head</th>
+        <th>CurrentCodeHash</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for para_id in parachains %}
+        <tr>
+            <td><a href="/collators/{{ para_id }}">{{ para_id }}</a></td>
+            <td>{{ parachains[para_id]['name'] }} {% if parachains[para_id]['location'] == 'in_cluster' %}<a target="_blank" href="https://grafana.parity-mgmt.parity.io/explore?orgId=1&left=%5B%22now-1h%22,%22now%22,%22loki.parity-testnet%22,%7B%22refId%22:%22A%22,%22expr%22:%22%7Bchain%3D%5C%22{{ parachains[para_id]['name'] }}%5C%22%7D%22%7D%5D">🔎</a>{%  endif %}</td>
+            <td>{{ parachains[para_id]['lifecycle'] | default('')}}</td>
+            <td>{{ parachains[para_id]['location'] | default('')}}</td>
+            <td>{{ parachains[para_id]['leases_count'] | default('') }}</td>
+            <td>
+                {# When there are no leases_count, ie. the chain has not been onboarded yet, display the onboard button #}
+                {% if not 'leases_count' in parachains[para_id] %}
+                <button onclick="onboardParachain(this, {{ para_id }})">Onboard</button>
+                {% endif %}
+                {% if request.query_params['isAdmin'] %}
+                <button onclick="offboardParachain(this, {{ para_id }})">Offboard</button>
+                {% endif %}
+            </td>
+            <td style="width: 5%">
+                {% if parachains[para_id]['head'] %}
+                <details>
+                    <summary style="list-style:none">*️⃣</summary>
+                    <p>
+                        {{ parachains[para_id]['head'] | default('') }}
+                    </p>
+                </details>
+                {% endif %}
+            </td>
+            <td style="width: 5%">
+                {% if parachains[para_id]['current_code_hash'] %}
+                <details>
+                    <summary style="list-style:none">#️⃣</summary>
+                    <p>
+                        {{ parachains[para_id]['current_code_hash'] | default('') }}
+                    </p>
+                </details>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        window.onboardParachain = (element, parachainId) => {
+            element.disabled = true
+            fetch(`/api/onboard_parachain/${parachainId}`, {method: "POST"})
+                .then(() => {
+                    element.textContent = "Onboarding in progress"
+                    element.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    element.textContent = "Onboarding Failed: " + error
+                    element.style.backgroundColor = 'red'
+                });
+        }
+        window.offboardParachain = (element, parachainId) => {
+            if (window.confirm(`Deregister Parachain #${parachainId}`)) {
+                element.disabled = true
+                fetch(`/api/offboard_parachain/${parachainId}`, {method: "POST"})
+                    .then(() => {
+                        element.textContent = "Offboarding in progress"
+                        element.style.backgroundColor = 'lightgreen'
+                    })
+                    .catch(error => {
+                        element.textContent = "Offboarding Failed: " + error
+                        element.style.backgroundColor = 'red'
+                    });
+            }
+        }
+    });
+</script>
+</body>
+</html>

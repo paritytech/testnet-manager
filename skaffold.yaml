@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: testnet-manager
+build:
+  artifacts:
+    - image: local/testnet-manager
+      docker:
+        dockerfile: Dockerfile
+  local:
+    push: false
+    useDockerCLI: true
+deploy:
+  helm:
+    releases:
+    - name: testnet-manager
+      namespace: rococo
+      chartPath: helm/testnet-manager
+      artifactOverrides:
+        image: local/testnet-manager
+      imageStrategy:
+        helm: {}
+      valuesFiles:
+        - local-kubernetes/charts/values-testnet-manager.yml
+portForward:
+- resourceType: service
+  resourceName: testnet-manager
+  namespace: rococo
+  port: 80
+  localPort: 8080

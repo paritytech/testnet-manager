@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ network_name }} Nodes</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>{{ nodes_count }} {{ network_name.capitalize() }} Nodes:  <a href="/validators">{{ validator_count }} Validators</a>, {{ collator_count }} Collators, {{ full_nodes_count }} Full nodes</h3>
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Chain</th>
+        <th>Role</th>
+        <th>Uptime</th>
+        <th>Image</th>
+        <th>Args</th>
+        <th>Labels</th>
+        <th>Logs</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for node in nodes %}
+        <tr>
+            <td><a href="/nodes/{{ node.name }}">{{ node.name }}</a></td>
+            <td>{{ node.chain }}</td>
+            <td>{{ node.role }}</td>
+            <td>{{ node.uptime }}</td>
+            <td>{{ node.image }}</td>
+            <td>
+                <details>
+                    <summary style="list-style:none">⚙️</summary>
+                    <p>
+                        <ul>
+                            {% for arg in node.args %}
+                            <li><pre><code>{{ arg }}</code></pre></li>
+                            {% endfor%}
+                        </ul>
+                    </p>
+                </details>
+            </td>
+            <td>
+                <details>
+                    <summary style="list-style:none">🏷️</summary>
+                    <p>
+                        <table>
+                            {% for label,value in node.labels.items() %}
+                            <tr>
+                                <td>{{ label }}</td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor%}
+                        </table>
+                    </p>
+                </details>
+            </td>
+            <td><a target="_blank" href="{{ node_logs_link | replace('{node}',node.name) }}">🔎</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+    });
+</script>
+</body>
+</html>

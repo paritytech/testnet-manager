@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ node.name }}</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>{{ node.name }}</h3>
+{% if node.role == "authority" %}
+{% if node.validator_status %}
+<button id="deregisterValidator"> Deregister Validator</button>
+{% else %}
+<button id="registerValidator">Register Validator</button>
+{% endif %}
+{% endif %}
+{% if node.role == "collator" %}
+{% if node.collator_status %}
+<button id="deregisterCollator">Deregister Collator</button>
+{% else %}
+<button id="registerCollator">Register Collator</button>
+{% endif %}
+{% endif %}
+{% if node.validator_status %}
+<button id="rotateSessionKeys">Rotate session keys</button>
+{% endif %}
+
+<table id="table" class="display compact">
+    <thead>
+    <tr>
+        <th>Keys</th>
+        <th>Values</th>
+    </tr>
+    </thead>
+    <tbody>
+{% if node.validator_account %}
+    <tr>
+        <td>Validator Account</td>
+        <td>{{ node.validator_account }}</td>
+    </tr>
+    <tr>
+        <td>Validator Active</td>
+        <td>{{ node.validator_status }}</td>
+    </tr>
+{% endif %}
+{% if node.collator_account %}
+    <tr>
+        <td>Para ID</td>
+        <td>{{ node.para_id }}</td>
+    </tr>
+    <tr>
+        <td>Collator Account</td>
+        <td>{{ node.collator_account }}</td>
+    </tr>
+    <tr>
+        <td>Collator Status</td>
+        <td>{{ node.collator_status }}</td>
+    </tr>
+{% endif %}
+    <tr>
+        <td>Chain</td>
+        <td>{{ node.chain }}</td>
+    </tr>
+    <tr>
+        <td>Roles</td>
+        <td>{{ node.nodeRoles | join(", ") }}</td>
+    </tr>
+    <tr>
+        <td>Peer ID</td>
+        <td>{{ node.peerId }}</td>
+    </tr>
+    <tr>
+        <td>Image</td>
+        <td>{{ node.image }}</td>
+    </tr>
+    <tr>
+        <td>Version</td>
+        <td>{{ node.version }}</td>
+    </tr>
+    <tr>
+        <td>Ready</td>
+        <td>{{ node.ready }}</td>
+    </tr>
+    <tr>
+        <td>Substrate Status</td>
+        <td>{{ node.status }}</td>
+    </tr>
+    <tr>
+        <td>Uptime</td>
+        <td>{{ node.uptime }}</td>
+    </tr>
+    <tr>
+        <td>Sync State</td>
+        <td>{{ node.syncState }}</td>
+    </tr>
+    <tr>
+        <td>Is Syncing</td>
+        <td>{{ node.health.isSyncing }}</td>
+    </tr>
+    <tr>
+        <td>Properties</td>
+        <td>{{ node.properties }}</td>
+    </tr>
+    <tr>
+        <td>Args</td>
+        <td>
+            <details>
+                <summary style="list-style:none">⚙️</summary>
+                <p>
+                <ul>
+                    {% for arg in node['args'] %}
+                    <li>
+                        <pre><code>{{ arg }}</code></pre>
+                    </li>
+                    {% endfor %}
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    <tr>
+        <td>Labels</td>
+        <td>
+            <details>
+                <summary style="list-style:none">🏷</summary>
+                <p>
+                <ul>
+                    {% for key,value in node.labels.items() %}
+                    <li>{{ key }}: {{ value }}</li>
+                    {% endfor %}
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    <tr>
+        <td>Peers Count</td>
+        <td>{{ node.health.peers }}</td>
+    </tr>
+    {% if node.peers %}
+    <tr>
+        <td>Peers</td>
+        <td>
+            <details>
+                <summary style="list-style:none">👋</summary>
+                <p>
+                <table>
+                    <tr>
+                        <th>Peer ID</th>
+                        <th>Roles</th>
+                        <th>Best Hash</th>
+                        <th>Best Number</th>
+                    </tr>
+                    {% for peer in node.peers %}
+                    <tr>
+                        <td>{{ peer.peerId }}</td>
+                        <td>{{ peer.roles }}</td>
+                        <td>{{ peer.bestHash }}</td>
+                        <td>{{ peer.bestNumber }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td>Local Listen Addresses</td>
+        <td>
+            <details>
+                <summary style="list-style:none">📃</summary>
+                <p>
+                <ul>
+                    {% for address in node.localListenAddresses %}
+                    <li>{{ address }}</li>
+                    {% endfor %}
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[-1], ["All"]]
+        });
+        {% if node.role == "authority" %}
+        {% if node.validator_status %}
+        const deregisterValidatorButton = document.querySelector("#deregisterValidator");
+        document.querySelector("#deregisterValidator").addEventListener("click", () => {
+            deregisterValidatorButton.disabled = true
+            fetch("/api/deregister_validators?node={{ node.name }}", {method: "POST"})
+                .then(() => {
+                    deregisterValidatorButton.textContent = "Deregistration in progress"
+                    deregisterValidatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterValidatorButton.textContent = "Deregistration Failed: " + error
+                    deregisterValidatorButton.style.backgroundColor = 'red'
+                });
+        });
+        {% else %}
+        const registerValidatorButton = document.querySelector("#registerValidator");
+        document.querySelector("#registerValidator").addEventListener("click", () => {
+            registerValidatorButton.disabled = true
+            fetch("/api/register_validators?node={{ node.name }}", {method: "POST"})
+                .then(() => {
+                    registerValidatorButton.textContent = "Registration in progress"
+                    registerValidatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerValidatorButton.textContent = "Registration Failed: " + error
+                    registerValidatorButton.style.backgroundColor = 'red'
+                });
+        });
+        {% endif %}
+        {% endif %}
+
+        {% if node.role == "collator" %}
+        {% if node.collator_status %}
+        const deregisterCollatorButton = document.querySelector("#deregisterCollator");
+        document.querySelector("#deregisterCollator").addEventListener("click", () => {
+            deregisterCollatorButton.disabled = true
+            fetch("/api/deregister_collators/{{ node.para_id }}?node={{ node.name }}", {method: "POST"})
+                .then(() => {
+                    deregisterCollatorButton.textContent = "Deregistration in progress"
+                    deregisterCollatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterCollatorButton.textContent = "Deregistration Failed: " + error
+                    deregisterCollatorButton.style.backgroundColor = 'red'
+                });
+        });
+        {% else %}
+        const registerCollatorButton = document.querySelector("#registerCollator");
+        document.querySelector("#registerCollator").addEventListener("click", () => {
+            registerCollatorButton.disabled = true
+            fetch("/api/register_collators/{{ node.para_id }}?node={{ node.name }}", {method: "POST"})
+                .then(() => {
+                    registerCollatorButton.textContent = "Registration in progress"
+                    registerCollatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerCollatorButton.textContent = "Registration Failed: " + error
+                    registerCollatorButton.style.backgroundColor = 'red'
+                });
+        });
+        {% endif %}
+        {% endif %}
+        {% if node.validator_status %}
+        const rotateSessionKeysButton = document.querySelector("#rotateSessionKeys");
+        document.querySelector("#rotateSessionKeys").addEventListener("click", () => {
+            rotateSessionKeysButton.disabled = true
+            fetch("/api/rotate_session_keys?node={{ node.name }}", {method: "POST"})
+                .then(() => {
+                    rotateSessionKeysButton.textContent = "rotateSessionKeys in progress"
+                    rotateSessionKeysButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    rotateSessionKeysButton.textContent = "rotateSessionKeys Failed: " + error
+                    rotateSessionKeysButton.style.backgroundColor = 'red'
+                });
+        });
+        {% endif %}
+    });
+</script>
+</body>
+</html>

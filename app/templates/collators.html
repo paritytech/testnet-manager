@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ network_name.capitalize() }} Para #{{ para_id }} Collators</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>{{ parachain_name.capitalize() }} [{{ network_name.capitalize() }} Para #{{ para_id }}] Collators : {{ external_collator_count }} External / {{ active_collator_count }} Active in K8S {% if inactive_collator_count %}/ {{ inactive_collator_count }} Inactive in K8S {% endif %}{% if deleted_collator_count %}/ {{ deleted_collator_count }} Deleted in K8S{% endif %}</h3>
+<h4>Runtime: {{ runtime }}, Status: {{ 'off-boarded' if  parachain_status == None else parachain_status }}{{ ', Desired number of candidates: ' + desired_candidates if desired_candidates != 'None' }}</h4>
+<select onchange="location = '/collators/{{ para_id }}?statefulset=' + this.value">
+    <option value="" {% if selected_stateful_set == '' %}selected{% endif %}>all</option>
+    {% for collator_stateful_set_name in collator_stateful_sets %}
+    <option value="{{ collator_stateful_set_name }}" {% if selected_stateful_set == collator_stateful_set_name %}selected{% endif %}>{{ collator_stateful_set_name }}</option>
+    {% endfor %}
+</select>
+{% if selected_stateful_set %}
+<button id="register">Register</button>
+<button id="deregister">Deregister</button>
+{% endif %}
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Logs</th>
+        <th>Account</th>
+        <th>PodStatus</th>
+        <th>CollatorStatus</th>
+        <th>Image</th>
+        <th>Location</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for collator in collators %}
+        <tr>
+            <td><a href="/nodes/{{ collator.name }}">{{ collator.name }}</a></td>
+            <td><a target="_blank" href="{{ node_logs_link | replace('{node}',collator.name) }}">🔎</a></td>
+            <td>{{ collator.account }}</td>
+            <td>{{ collator.pod_status }}</td>
+            <td>{{ collator.status }}</td>
+            <td>{{ collator.image }}</td>
+            <td>{{ collator.location }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        const registerButton = document.querySelector("#register")
+        document.querySelector("#register").addEventListener("click", () => {
+            registerButton.disabled = true
+            fetch("/api/register_collators/{{ para_id }}?statefulset={{ selected_stateful_set }}", {method: "POST"})
+                .then(() => {
+                    registerButton.textContent = "Registration in progress"
+                    registerButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerButton.textContent = "Registration Failed: " + error
+                    registerButton.style.backgroundColor = 'red'
+                });
+        });
+
+        const deregisterButton = document.querySelector("#deregister")
+        document.querySelector("#deregister").addEventListener("click", () => {
+            deregisterButton.disabled = true
+            fetch("/api/deregister_collators/{{ para_id }}?statefulset={{ selected_stateful_set }}", {method: "POST"})
+                .then(() => {
+                    deregisterButton.textContent = "Deregistration in progress"
+                    deregisterButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterButton.textContent = "Deregistration Failed: " + error
+                    deregisterButton.style.backgroundColor = 'red'
+                });
+        });
+    });
+</script>
+</body>
+</html>

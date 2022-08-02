@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ network_name.capitalize() }} Validators</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+{% if name_filter or address_filter or version_filter or location_filter or is_validator_filter %}
+<h3>Filter params: name={{ name_filter }}, address={{ address_filter }}, version={{ version_filter }}, location={{ location_filter }},is_validator={{ is_validator_filter }}</h3>
+{% else %}
+<h3>{{ network_name.capitalize() }} Validators : {{ external_validator_count }} Active in VM / {{ active_validator_count }} Active in K8S {% if inactive_validator_count %}/ {{ inactive_validator_count }} Inactive in K8S {% endif %}{% if deleted_validator_count %}/ {{ deleted_validator_count }} Deleted in K8S {% endif %}</h3>
+{% endif %}
+<select id="statefulset_selection">
+    <option value="/validators" {% if selected_stateful_set == '' %}selected{% endif %}>all</option>
+    {% for validator_stateful_set_name in validator_stateful_sets %}
+    <option value="/validators?statefulset={{ validator_stateful_set_name }}" {% if selected_stateful_set == validator_stateful_set_name %}selected{% endif %}>{{ validator_stateful_set_name }}</option>
+    {% endfor %}
+</select>
+
+<button id="registerValidators" {% if selected_stateful_set == '' %}style="display: none"{% endif %}>Register</button>
+<button id="deregisterValidators" {% if selected_stateful_set == '' %}style="display: none"{% endif %}>Deregister</button>
+<button id="rotateSessionKeys">Rotate session keys</button>
+{% if deleted_validator_addresses %}
+<button id="deregisterDeletedValidators">Deregister Deleted validators</button>
+{% endif %}
+
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Logs</th>
+        <th>Address</th>
+        <th>Subscan</th>
+        <th>Version</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Validator</th>
+        <th>Keys</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for validator in validators %}
+        <tr>
+            {% if validator.location == 'in_cluster' %}
+            <td><a href="/nodes/{{ validator.name }}">{{ validator.name }}</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td><a target="_blank" href="{{ node_logs_link | replace('{node}',validator.name) }}">🔎</a></td>
+            <td>{{ validator.address }}</td>
+            <td><a target="_blank" href="https:/.subscan.io/account/{{ validator.address }}">🔗</a></td>
+            <td>{{ validator.version }}</td>
+            <td>{{ validator.status }}</td>
+            <td>{{ validator.location }}</td>
+            <td>{{ validator.is_validator }}</td>
+            <td>
+                <details>
+                    <summary style="list-style:none">🔑</summary>
+                    <p>
+                        <ul>
+                            {% for k,v in validator['keys'].items() %}
+                            <li>{{ k }}: {{ v }}</li>
+                            {% endfor%}
+                        </ul>
+                    </p>
+                </details>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        $('#statefulset_selection').on('change', function () {
+            var url = $(this).val();
+            if (url) {
+                window.location = url;
+            }
+            return false;
+        });
+
+        const registerButton = document.querySelector("#registerValidators");
+        document.querySelector("#registerValidators").addEventListener("click", () => {
+            registerButton.disabled = true
+            fetch("/api/register_validators?statefulset={{ selected_stateful_set }}", {method: "POST"})
+                .then(() => {
+                    registerButton.textContent = "Registration in progress"
+                    registerButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerButton.textContent = "Registration Failed: " + error
+                    registerButton.style.backgroundColor = 'red'
+                });
+        });
+
+        const deregisterButton = document.querySelector("#deregisterValidators");
+        document.querySelector("#deregisterValidators").addEventListener("click", () => {
+            deregisterButton.disabled = true
+            fetch("/api/deregister_validators?statefulset={{ selected_stateful_set }}", {method: "POST"})
+                .then(() => {
+                    deregisterButton.textContent = "Deregistration in progress"
+                    deregisterButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterButton.textContent = "Deregistration Failed: " + error
+                    deregisterButton.style.backgroundColor = 'red'
+                });
+        });
+
+        const rotateKeysButton = document.querySelector("#rotateSessionKeys");
+        document.querySelector("#rotateSessionKeys").addEventListener("click", () => {
+            if (window.confirm(`Are you sure you want to rotate {{ selected_stateful_set or 'all validators' }} session keys ?`)) {
+                rotateKeysButton.disabled = true
+                fetch("/api/rotate_session_keys?{{ 'statefulset=' + selected_stateful_set if selected_stateful_set != '' else 'all=true' }}", {method: "POST"})
+                    .then(() => {
+                        rotateKeysButton.textContent = "Rotation in progress"
+                        rotateKeysButton.style.backgroundColor = 'lightgreen'
+                    })
+                    .catch(error => {
+                        rotateKeysButton.textContent = "Rotation Failed: " + error
+                        rotateKeysButton.style.backgroundColor = 'red'
+                    });
+            }
+        });
+
+        {% if deleted_validator_addresses %}
+        const deregisterDeletedValidatorsButton = document.querySelector("#deregisterDeletedValidators");
+        document.querySelector("#deregisterDeletedValidators").addEventListener("click", () => {
+            if (window.confirm(`Are you sure you want to deregister the following validators:\n{{ deleted_validator_addresses | join('\n') }}`)) {
+                deregisterDeletedValidatorsButton.disabled = true
+                fetch("/api/deregister_validators?address={{ deleted_validator_addresses | join('&address=') }}", {method: "POST"})
+                    .then(() => {
+                        deregisterDeletedValidatorsButton.textContent = "Deregistration in progress"
+                        deregisterDeletedValidatorsButton.style.backgroundColor = 'lightgreen'
+                    })
+                    .catch(error => {
+                        deregisterDeletedValidatorsButton.textContent = "Deregistration Failed: " + error
+                        deregisterDeletedValidatorsButton.style.backgroundColor = 'red'
+                    });
+            }
+        });
+        {% endif %}
+    });
+</script>
+</body>
+</html>

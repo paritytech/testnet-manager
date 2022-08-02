@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  chainspec:
+    image: &polkadotimage parity/polkadot:latest
+    volumes: &chainspec
+      - "chainspec-data:/chainspec"
+    entrypoint: ''
+    user: "0"
+    command: bash -c '/usr/bin/polkadot build-spec --chain rococo-local --disable-default-bootnode --raw > /chainspec/rococo-local.json'
+
+  node_alice:
+    image: *polkadotimage
+    ports:
+      - "9944"
+    volumes: *chainspec
+    depends_on: &depends_on_chainspec
+      - chainspec
+    command: >
+      --chain=/chainspec/rococo-local.json
+      --ws-port 9944
+      --rpc-cors all
+      --ws-external
+      --alice
+      --tmp
+
+  node_bob:
+    image: *polkadotimage
+    volumes: *chainspec
+    depends_on: *depends_on_chainspec
+    command: --chain=/chainspec/rococo-local.json --bob --tmp
+
+  collator:
+    image: parity/polkadot-collator:latest
+    volumes: *chainspec
+    ports:
+      - "9944"
+    depends_on: *depends_on_chainspec
+    command: >
+      --chain shell
+      --unsafe-ws-external
+      --rpc-cors=all
+      --tmp
+      --
+      --chain /chainspec/rococo-local.json
+      --tmp
+
+volumes:
+  chainspec-data:
