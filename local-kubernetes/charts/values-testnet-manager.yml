@@ -1,0 +1,33 @@
+image:
+  repository: "local/testnet-manager"
+  tag: latest
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  #name: validator-manager
+  # Annotations to add to the service account
+  annotations: {}
+
+initContainer:
+  debug: true
+
+secret:
+  # 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a is  //Alice
+  SUDO_SEED: "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
+  VALIDATORS_ROOT_SEED: "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
+
+configmap:
+  LOG_LEVEL: DEBUG
+  WS_ENDPOINT: "ws://localrococo-validator-alice-node.rococo:9944"
+  NODE_HTTP_PATTERN: "http://NODE_NAME.rococo:9933"
+  NODE_WS_PATTERN: "ws://NODE_NAME.rococo:9944"
+  HEALTHY_MIN_PEER_COUNT: "1"
+  TASKS_CRON_SCHEDULE: "0 0 30 2 *" # Every February 30th aka never
+
+tolerations: null
+affinity: null
+
+ingress:
+  enabled: false

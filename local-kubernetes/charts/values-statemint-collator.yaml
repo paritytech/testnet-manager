@@ -1,0 +1,41 @@
+image:
+  # also update version in kube-setup/chainspec.yml
+  repository: paritypr/polkadot-parachain-debug
+  tag: v0.9.230-ec1786ca
+  pullPolicy: IfNotPresent
+
+initContainer:
+  debug: true
+
+node:
+  dataVolumeSize: 2Gi
+  chain: statemint
+  role: collator
+  replicas: 1
+  command: "/usr/local/bin/polkadot-parachain"
+  # manifests/chainspec.yml
+  forceDownloadChainspec: true
+  customChainspecUrl:  "http://chainspec.rococo/statemint.json"
+  collator:
+    isParachain: true
+    # manifests/chainspec.yml
+    relayChainCustomChainspecUrl: "http://chainspec.rococo/rococo-local.json"
+  persistGeneratedNodeKey: true
+  perNodeServices:
+    relayP2pService:
+      enabled: true
+      type: NodePort
+    paraP2pService:
+      enabled: true
+      type: NodePort
+  flags:
+    - "--unsafe-rpc-external"
+    - "--unsafe-ws-external"
+    - "--rpc-methods=unsafe"
+    - "--rpc-cors=all"
+
+extraLabels:
+  paraId: "1003"
+  ss58Format: "0" # Polkadot
+
+storageClass: "standard"

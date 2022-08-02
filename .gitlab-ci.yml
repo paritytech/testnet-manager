@@ -1,0 +1,27 @@
+variables:
+  IMAGE_NAME:             "paritytech/testnet-manager"
+
+stages:
+  - test
+
+test:
+  stage: test
+  image:
+    name: python:3.10
+  services:
+    - docker:dind
+  variables:
+    # Instruct Testcontainers to use the daemon of DinD.
+    DOCKER_HOST: "tcp://docker:2375"
+    # Instruct Docker not to start over TLS.
+    DOCKER_TLS_CERTDIR: ""
+  tags:
+    - kubernetes-parity-build-privileged
+  script:
+    - pip install docker-compose poetry
+    - poetry config virtualenvs.in-project true
+    - poetry install --no-interaction --no-ansi
+    - source .venv/bin/activate
+    - python -m pytest
+
+## TODO publish docker image

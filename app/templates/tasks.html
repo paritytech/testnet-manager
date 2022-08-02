@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ network_name.capitalize() if network_name else 'All' }} Tasks</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>CRON</th>
+        <th>Next Run</th>
+        <th>Timezone</th>
+        <th>Execute</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+        <tr>
+            <td>{{ task['id'] }}</td>
+            <td>{{ task['name'] }}</td>
+            <td>{{ task['cron'] }}</td>
+            <td>{{ task['nextRun'] }}</td>
+            <td>{{ task['timeZone'] }}</td>
+            <td>
+                <button onclick="executeTask(this, '{{ task['id'] }}')">Execute</button>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        window.executeTask = (element, jobId) => {
+            element.disabled = true
+            fetch(`/tasks/execute/${jobId}`, {method: "POST"})
+                .then(() => {
+                    element.textContent = "Execution triggered"
+                    element.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    element.textContent = "Execution triggered failed " + error
+                    element.style.backgroundColor = 'red'
+                });
+        }
+    });
+</script>
+</body>
+</html>

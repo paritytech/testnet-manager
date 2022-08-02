@@ -1,0 +1,29 @@
+image:
+  # also update version in manifests/chainspec.yml
+  repository: parity/polkadot
+  tag: latest
+  pullPolicy: IfNotPresent
+
+initContainer:
+  debug: true
+
+node:
+  chain: rococo-local
+  role: authority
+  replicas: 2
+  dataVolumeSize: 2Gi
+  perNodeServices:
+    relayP2pService:
+      enabled: true
+      type: NodePort
+  pruning: 1000
+  podManagementPolicy: Parallel
+  flags:
+    - "--unsafe-rpc-external"
+    - "--unsafe-ws-external"
+    - "--rpc-methods=unsafe"
+    - "--rpc-cors=all"
+  # kube-setup/chainspec.yml
+  customChainspecUrl: http://chainspec.rococo/rococo-local.json
+  forceDownloadChainspec: true
+storageClass: "standard"

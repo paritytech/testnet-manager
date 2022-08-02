@@ -1,0 +1,144 @@
+repositories:
+  - name: parity
+    url: https://paritytech.github.io/helm-charts/
+
+helmDefaults:
+  createNamespace: false
+  waitForJobs: true
+
+releases:
+## relay chain Rococo ##
+  - name: localrococo-validator-alice
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - ./values-localrococo-validator-a.yaml
+      - node:
+          replicas: 1
+          flags:
+            - "--alice"
+            - "--unsafe-rpc-external"
+            - "--unsafe-ws-external"
+            - "--rpc-methods=unsafe"
+            - "--rpc-cors=all"
+        extraLabels:
+          validatorAccount: "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY" # Alice address
+
+  - name: localrococo-validator-bob
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - ./values-localrococo-validator-a.yaml
+      - node:
+          replicas: 1
+          flags:
+            - "--bob"
+            - "--unsafe-rpc-external"
+            - "--unsafe-ws-external"
+            - "--rpc-methods=unsafe"
+            - "--rpc-cors=all"
+        extraLabels:
+          validatorAccount: "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc" # Alice address
+  - name: localrococo-validator-a
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - ./values-localrococo-validator-a.yaml
+
+# validator-manager ##
+  - name: testnet-manager
+    namespace: rococo
+    chart: ../../helm/testnet-manager
+    values:
+      - ./values-testnet-manager.yml
+
+## Para chain Shell ##
+  - name: localrococo-shell-collator
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-shell-collator.yaml
+
+## Para chain Statemint ##
+  - name: localrococo-statemint-alice
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-statemint-collator.yaml
+      - node:
+          flags:
+            - "--unsafe-rpc-external"
+            - "--unsafe-ws-external"
+            - "--rpc-methods=unsafe"
+            - "--rpc-cors=all"
+            - "--alice"
+        extraLabels:
+          paraId: "1003"
+          ss58Format: "0"
+          collatorAccount: "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5" # Alice Polkadot address
+  - name: localrococo-statemint-bob
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-statemint-collator.yaml
+      - node:
+          flags:
+            - "--unsafe-rpc-external"
+            - "--unsafe-ws-external"
+            - "--rpc-methods=unsafe"
+            - "--rpc-cors=all"
+            - "--bob"
+        extraLabels:
+          paraId: "1003"
+          ss58Format: "0"
+          collatorAccount: "14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3" # Bob Polkadot address
+  - name: localrococo-statemint-c
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-statemint-collator.yaml
+
+
+## Para chain Moonbase ##
+  - name: localrococo-moonbase-alice
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-moonbase-collator.yml
+      - node:
+          replicas: 1
+          flags:
+            - "--unsafe-rpc-external"
+            - "--unsafe-ws-external"
+            - "--rpc-methods=unsafe"
+            - "--rpc-cors=all"
+            - "--allow-private-ipv4"
+            - "--alice"
+        extraLabels:
+          paraId: "1001"
+          collatorAccount: "0xf24ff3a9cf04c71dbc94d0b566f7a27b94566cac"
+  # collators
+  - name: localrococo-moonbase-collator
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-moonbase-collator.yml
+
+## Para chain Tick ##
+  - name: localrococo-tick-collator
+    namespace: rococo
+    chart: parity/node
+    version: 2.6.2
+    values:
+      - values-tick-collator.yml
+
+## Parachain Statemint

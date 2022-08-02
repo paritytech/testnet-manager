@@ -1,0 +1,14 @@
+*.iml
+.iam
+venv
+.venv
+.gitignore
+.gitlab-ci.yml
+.git
+.pytest_cache
+README.md
+docker-compose.yml
+helm
+local-kubernetes
+scripts
+tests

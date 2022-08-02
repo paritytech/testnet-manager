@@ -1,0 +1,121 @@
+## nginx which hosts `polkadot build-spec` command output
+apiVersion: v1
+kind: Service
+metadata:
+  name: chainspec
+  labels:
+    run: chainspec
+  namespace: rococo
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    run: chainspec
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chainspec
+  namespace: rococo
+spec:
+  selector:
+    matchLabels:
+      run: chainspec
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: chainspec
+    spec:
+      containers:
+      - name: chainspec
+        image: nginx:stable
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: dir
+          mountPath: /usr/share/nginx/html
+      initContainers:
+      - name: create-chainspec-rococolocal
+        image: parity/polkadot:latest
+        imagePullPolicy: IfNotPresent
+        command: [ "/bin/sh" ]
+        args:
+          - -c
+          - /usr/bin/polkadot build-spec --chain rococo-local --disable-default-bootnode --raw  > /dir/rococo-local.json
+        volumeMounts:
+        - name: dir
+          mountPath: /dir
+      - name: create-chainspec-shell
+        image: paritypr/polkadot-parachain-debug:master-4bb9b610
+        command: [ "/bin/sh" ]
+        args:
+          - -c
+          - polkadot-parachain build-spec --chain shell --disable-default-bootnode --raw  > /dir/shell.json
+        volumeMounts:
+        - name: dir
+          mountPath: /dir
+      - name: create-chainspec-statemint
+        image: paritypr/polkadot-parachain-debug:v0.9.230-ec1786ca
+        command: [ "/bin/sh" ]
+        args:
+          - -c
+          - >
+            set -xe;
+            polkadot-parachain build-spec --chain statemint-local --disable-default-bootnode > /dir/statemint-plain.json;
+            sed 's/"para_id": 1000/"para_id": 1003/' -i /dir/statemint-plain.json;
+            sed 's/"parachainId": 1000/"parachainId": 1003/' -i /dir/statemint-plain.json;
+            echo "make 5CRmqmsiNFExV6VbdmPJViVxrWmkaXXvBrSX8oqBT8R9vmWk (_VALIDATORS_ROOT_SEED) rich";
+            sed 's/5CRmqmsiNFExV6VbdmPJViVxrWmkaXXvBrSX8oqBT8R9vmWk/5DfhGyQdFobKM8NsWvEeAKk5EQQgYe9AydgJ7rMB6E1EqRzV/' -i /dir/statemint-plain.json;
+            polkadot-parachain build-spec --chain /dir/statemint-plain.json --disable-default-bootnode --raw  > /dir/statemint.json;
+        volumeMounts:
+        - name: dir
+          mountPath: /dir
+      - name: create-chainspec-moonbase
+        image: purestake/moonbeam:latest
+        imagePullPolicy: IfNotPresent
+        command: [ "/bin/sh" ]
+        args:
+          - -c
+          - >
+            set -xe;
+            /moonbeam/moonbeam build-spec --chain moonbase-dev > /dir/moonbase-dev-plain.json;
+            sed 's/"id": "moonbase_dev"/"id": "moonbase"/' -i /dir/moonbase-dev-plain.json;
+            sed 's/"chainType": "Development"/"chainType": "Live"/' -i /dir/moonbase-dev-plain.json;
+            sed 's/"relayChain": "dev-service"/"relayChain": "rococo"/' -i /dir/moonbase-dev-plain.json;
+            sed 's/"paraId": 0/"paraId": 1001/' -i /dir/moonbase-dev-plain.json;
+            sed 's/"parachainId": 0/"parachainId": 1001/' -i /dir/moonbase-dev-plain.json;
+            /moonbeam/moonbeam build-spec --chain /dir/moonbase-dev-plain.json --raw > /dir/moonbase.json;
+        volumeMounts:
+          - name: dir
+            mountPath: /dir
+      - name: create-chainspec-tick
+        image: paritypr/polkadot-parachain-debug:master-4bb9b610
+        command: [ "/bin/sh" ]
+        args:
+          - -c
+          - >
+            set -xe;
+            polkadot-parachain build-spec --chain staging > /dir/tick-dev-plain.json;
+            sed 's/Staging Testnet/Tick/' -i /dir/tick-dev-plain.json;
+            sed 's/staging_testnet/tick/' -i /dir/tick-dev-plain.json;
+            sed 's/"relay_chain": "westend"/"relay_chain": "rococo"/' -i /dir/tick-dev-plain.json;
+            sed 's/"para_id": 1000/"para_id": 1002/' -i /dir/tick-dev-plain.json;
+            sed 's/"parachainId": 1000/"parachainId": 1002/' -i /dir/tick-dev-plain.json;
+            sed 's/5FeyRQmjtdHoPH56ASFW76AJEP1yaQC1K9aEMvJTF9nzt9S9/5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY/' -i /dir/tick-dev-plain.json;
+            sed 's/5FvikUCHt9tQa98Auqa6mXGuhs3zBs6VsBv1JqfqziS252Ja/5GZLfxPNpdhekBR2ypF73rUeAAqDtgmZ7wpfwpLT3LuF6J5X/' -i /dir/tick-dev-plain.json;
+            sed 's/5GsHTRwWBzPixrft2FVYG7SvjFjj3jsBB1Kx6zhEDzgZvczS/5EFYJgCCFgCiPq6Sp2bLVaVp7hrvkihBmBot4JUkBoaiZiqz/' -i /dir/tick-dev-plain.json;
+            polkadot-parachain build-spec --chain /dir/tick-dev-plain.json --raw > /dir/tick.json;
+        # 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY - SEED//Alice
+        # 5GZLfxPNpdhekBR2ypF73rUeAAqDtgmZ7wpfwpLT3LuF6J5X - SEED//collator//localrococo-tick-collator-node-0
+        # 5EFYJgCCFgCiPq6Sp2bLVaVp7hrvkihBmBot4JUkBoaiZiqz - SEED//collator//localrococo-tick-collator-node-1
+        volumeMounts:
+          - name: dir
+            mountPath: /dir
+        securityContext:
+          runAsUser: 0
+      volumes:
+      - name: dir
+        emptyDir: {}
