@@ -58,6 +58,8 @@ test:
     - poetry install --no-interaction --no-ansi
     - source .venv/bin/activate
     - python -m pytest
+  tags:
+    - linux-docker
 
 build-docker-bot:
   stage:                           build
