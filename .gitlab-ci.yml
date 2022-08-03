@@ -46,7 +46,7 @@ test:
   services:
     - name:                        quay.io/podman/stable:latest
       alias:                       docker
-      command:                     ["podman system service", "--time=0", "tcp://0.0.0.0:2375"]
+      command:                     ["podman", "system", "service", "--time=0", "tcp://0.0.0.0:2375"]
   variables:
     # Instruct Testcontainers to use the daemon of DinD.
     DOCKER_HOST:                   "tcp://docker:2375"
