@@ -43,10 +43,6 @@ variables:
 .test:
   stage:                           test
   image:                           python:3.10
-  services:
-    - name:                        quay.io/podman/stable:latest
-      alias:                       docker
-      command:                     ["podman", "system", "service", "--time=0", "tcp://0.0.0.0:2375"]
   variables:
     # Instruct Testcontainers to use the daemon of DinD.
     DOCKER_HOST:                   "tcp://docker:2375"
@@ -66,8 +62,7 @@ build-docker-bot:
 
 build-push-image:
   stage:                           publish
-  # <<:                              *publish-refs
-  <<:                              *test-refs
+  <<:                              *publish-refs
   image:                           quay.io/buildah/stable
   variables:
     DOCKER_USER:                   $Docker_Hub_User_Parity
