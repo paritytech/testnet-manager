@@ -60,7 +60,6 @@ test:
 build-docker-bot:
   stage:                           build
   <<:                              *test-refs
-  <<:                              *kubernetes-env
   <<:                              *build-only-docker-image
 
 build-push-image:
