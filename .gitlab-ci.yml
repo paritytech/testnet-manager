@@ -40,16 +40,20 @@ variables:
 
 # TODO: make tests work with podman
 # Requires DIND
-.test:
+test:
   stage:                           test
-  image:                           python:3.10
+  image:                           quay.io/podman/stable
   variables:
     # Instruct Testcontainers to use the daemon of DinD.
-    DOCKER_HOST:                   "tcp://docker:2375"
+    DOCKER_HOST:                   "tcp://localhost:2375"
     # Instruct Docker not to start over TLS.
     DOCKER_TLS_CERTDIR:            ""
   script:
-    - pip install docker-compose poetry
+    - dnf install python3-pip -y
+    - pip install podman-compose poetry
+    - ln -s /usr/pin/podman /usr/bin/docker
+    - ln -s /usr/local/bin/podman-compose /usr/local/bin/docker-compose
+    - podman system service --time=0 $DOCKER_HOST &
     - poetry config virtualenvs.in-project true
     - poetry install --no-interaction --no-ansi
     - source .venv/bin/activate
