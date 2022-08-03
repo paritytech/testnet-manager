@@ -40,7 +40,7 @@ variables:
 
 # TODO: make tests work with podman
 # Requires DIND
-test:
+.test:
   stage:                           test
   image:                           python:3.10
   services:
@@ -58,8 +58,6 @@ test:
     - poetry install --no-interaction --no-ansi
     - source .venv/bin/activate
     - python -m pytest
-  tags:
-    - linux-docker
 
 build-docker-bot:
   stage:                           build
