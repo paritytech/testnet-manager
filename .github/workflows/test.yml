@@ -18,10 +18,10 @@ jobs:
           pip install podman-compose poetry
           poetry config virtualenvs.in-project true
           poetry install --no-interaction --no-ansi
-          ls -la
-          pwd
-          cd ../../_temp
-          ls -la
-          cat *.sh
-          source .venv/bin/activate
+          # ls -la
+          # pwd
+          # cd ../../_temp
+          # ls -la
+          # cat *.sh
+          # source .venv/bin/activate
           python -m pytest
