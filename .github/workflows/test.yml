@@ -15,13 +15,8 @@ jobs:
 
       - name: Run tests
         run : |
-          pip install podman-compose poetry
+          pip install docker-compose poetry
           poetry config virtualenvs.in-project true
           poetry install --no-interaction --no-ansi
-          # ls -la
-          # pwd
-          # cd ../../_temp
-          # ls -la
-          # cat *.sh
           # source .venv/bin/activate
           poetry run python -m pytest
