@@ -40,7 +40,7 @@ variables:
 
 # TODO: make tests work with podman
 # Requires DIND
-test:
+.test:
   stage:                           test
   image:                           quay.io/podman/stable
   variables:

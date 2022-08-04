@@ -1,0 +1,19 @@
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    needs: [test]
+    container:
+      image: python:3.10
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run : |
+          pip install podman-compose poetry
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-ansi
+          source .venv/bin/activate
+          python -m pytest
