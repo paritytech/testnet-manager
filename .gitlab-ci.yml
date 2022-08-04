@@ -49,7 +49,7 @@ test:
     # Instruct Docker not to start over TLS.
     DOCKER_TLS_CERTDIR:            ""
   script:
-    - dnf install python3-pip gcc -y
+    - dnf install python3-pip gcc python3-devel -y
     - pip install podman-compose poetry
     - ln -s /usr/pin/podman /usr/bin/docker
     - ln -s /usr/local/bin/podman-compose /usr/local/bin/docker-compose
