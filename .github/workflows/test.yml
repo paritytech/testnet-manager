@@ -22,5 +22,6 @@ jobs:
           pwd
           cd ../../_temp
           ls -la
+          cat *.sh
           source .venv/bin/activate
           python -m pytest
