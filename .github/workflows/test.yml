@@ -20,5 +20,7 @@ jobs:
           poetry install --no-interaction --no-ansi
           ls -la
           pwd
+          cd ../../_temp
+          ls -la
           source .venv/bin/activate
           python -m pytest
