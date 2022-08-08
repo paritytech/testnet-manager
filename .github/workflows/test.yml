@@ -21,4 +21,5 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install --no-interaction --no-ansi
           # source .venv/bin/activate
+          docker-compose version
           poetry run python -m pytest
