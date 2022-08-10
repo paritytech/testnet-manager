@@ -38,23 +38,6 @@ variables:
       --tag "$IMAGE_NAME:latest"
       --file "$DOCKERFILE" .
 
-# TODO: make tests work with podman
-# Requires DIND
-.test:
-  stage:                           test
-  image:                           python:3.10
-  variables:
-    # Instruct Testcontainers to use the daemon of DinD.
-    DOCKER_HOST:                   "tcp://docker:2375"
-    # Instruct Docker not to start over TLS.
-    DOCKER_TLS_CERTDIR:            ""
-  script:
-    - pip install docker-compose poetry
-    - poetry config virtualenvs.in-project true
-    - poetry install --no-interaction --no-ansi
-    - source .venv/bin/activate
-    - python -m pytest
-
 build-docker-bot:
   stage:                           build
   <<:                              *test-refs

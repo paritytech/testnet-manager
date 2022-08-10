@@ -1,0 +1,25 @@
+name: Run tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    container:
+      image: python:3.10
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+    env:
+      TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run : |
+          pip install docker-compose poetry
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-ansi
+          # source .venv/bin/activate
+          docker-compose version
+          poetry run python -m pytest
