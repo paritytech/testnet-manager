@@ -3,20 +3,13 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  #name: validator-manager
-  # Annotations to add to the service account
-  annotations: {}
-
 initContainer:
   debug: true
 
 secret:
   # 0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a is  //Alice
   SUDO_SEED: "0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a"
-  VALIDATORS_ROOT_SEED: "bottom drive obey lake curtain smoke basket hold race lonely fit walk"
+  VALIDATORS_ROOT_SEED: "test test test test test test test test test test test junk"
 
 configmap:
   LOG_LEVEL: DEBUG

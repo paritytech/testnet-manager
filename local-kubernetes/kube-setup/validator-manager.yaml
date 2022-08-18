@@ -2,7 +2,7 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: validator-manager
+  name: testnet-manager
 ---
 kind: Namespace
 apiVersion: v1

@@ -6,7 +6,7 @@ The **testnet-manager** let you view the following information about nodes runni
 
 - List Substrate nodes running in Kubernetes and query their status over RPC
 - List Validators running in Kubernetes
-- List Parachains
+- List Parachains and collator nodes
 
 When provided with the relay-chain Sudo account, the **testnet-manager** can perform the following actions:
 
@@ -15,7 +15,14 @@ When provided with the relay-chain Sudo account, the **testnet-manager** can per
 - Onboard/Offboard a parachain
 - Register/Deregister parachain collators
 
+## Running tests
+
+    python -m pytest
+
 ## Running locally
+
+Note that running with those commands will fail to connect to your Kubernetes cluster and running nodes without adapting them to your setup.
+As such, it is recommended to refer to the next section for instructions to run a complete local stack in Kubernetes.
 
 Setup the local environment:
 
@@ -32,19 +39,15 @@ Set environment variables, eg:
     NODE_HTTP_PATTERN: "http://NODE_NAME.rococo:9933"
     NODE_WS_PATTERN: "ws://NODE_NAME.rococo:9944"
     HEALTHY_MIN_PEER_COUNT: "1"
-    VALIDATORS_ROOT_SEED=***
     SUDO_SEED=***
+    VALIDATORS_ROOT_SEED=***
 
 Start the app:
 
-    # Local Dev
+    # Dev
     python -m uvicorn main:app --reload
     # Prod
     python -m gunicorn -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:5000 --timeout=3600 --capture-output --enable-stdio-inheritance --workers 4
-
-## Running tests
-
-    python -m pytest
 
 ## Running in a Local Kubernetes cluster
 
@@ -57,10 +60,11 @@ make setup
 make install
 ```
 
-Remark: Wait for the "setup" step (chainspec building) to complete before installing to prevent the node from failing to pull chainspecs files.
+Remark: Wait for the "setup" step (chainspec building) to complete before installing to prevent the nodes from failing to pull chainspecs files.
 For more information see [helm/minikube/README.md](local-kubernetes/README.md)
 
-Continuous deploy to Kubernetes with [Skaffold](https://skaffold.dev/):
+Continuously deploy to Kubernetes with [Skaffold](https://skaffold.dev/):
+
 ```shell
 skaffold dev
 ```
