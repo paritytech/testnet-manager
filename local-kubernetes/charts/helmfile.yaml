@@ -7,11 +7,19 @@ helmDefaults:
   waitForJobs: true
 
 releases:
+## testnet-manager ##
+  - name: testnet-manager
+    namespace: rococo
+    chart: testnet-manager
+    version: 1.1.0
+    values:
+      - ./values-testnet-manager.yml
+
 ## relay chain Rococo ##
   - name: localrococo-validator-alice
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - ./values-localrococo-validator-a.yaml
       - node:
@@ -28,7 +36,7 @@ releases:
   - name: localrococo-validator-bob
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - ./values-localrococo-validator-a.yaml
       - node:
@@ -44,22 +52,15 @@ releases:
   - name: localrococo-validator-a
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - ./values-localrococo-validator-a.yaml
-
-# testnet-manager ##
-  - name: testnet-manager
-    namespace: rococo
-    chart: ../../helm/testnet-manager
-    values:
-      - ./values-testnet-manager.yml
 
 ## Para chain Shell ##
   - name: localrococo-shell-collator
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-shell-collator.yaml
 
@@ -67,7 +68,7 @@ releases:
   - name: localrococo-statemint-alice
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-statemint-collator.yaml
       - node:
@@ -84,7 +85,7 @@ releases:
   - name: localrococo-statemint-bob
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-statemint-collator.yaml
       - node:
@@ -101,16 +102,15 @@ releases:
   - name: localrococo-statemint-c
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-statemint-collator.yaml
-
 
 ## Para chain Moonbase ##
   - name: localrococo-moonbase-alice
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-moonbase-collator.yml
       - node:
@@ -129,7 +129,7 @@ releases:
   - name: localrococo-moonbase-collator
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-moonbase-collator.yml
 
@@ -137,8 +137,6 @@ releases:
   - name: localrococo-tick-collator
     namespace: rococo
     chart: parity/node
-    version: 2.6.2
+    version: 2.11.4
     values:
       - values-tick-collator.yml
-
-## Parachain Statemint
