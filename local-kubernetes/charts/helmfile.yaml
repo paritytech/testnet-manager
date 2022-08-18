@@ -48,7 +48,7 @@ releases:
     values:
       - ./values-localrococo-validator-a.yaml
 
-# validator-manager ##
+# testnet-manager ##
   - name: testnet-manager
     namespace: rococo
     chart: ../../helm/testnet-manager
