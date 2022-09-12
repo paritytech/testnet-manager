@@ -15,7 +15,8 @@ deploy:
     releases:
     - name: testnet-manager
       namespace: rococo
-      chartPath: helm/testnet-manager
+      repo: https://paritytech.github.io/helm-charts/
+      remoteChart: testnet-manager
       artifactOverrides:
         image: local/testnet-manager
       imageStrategy:

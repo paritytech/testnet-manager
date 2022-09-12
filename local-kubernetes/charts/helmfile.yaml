@@ -8,12 +8,12 @@ helmDefaults:
 
 releases:
 ## testnet-manager ##
-  - name: testnet-manager
-    namespace: rococo
-    chart: testnet-manager
-    version: 1.1.0
-    values:
-      - ./values-testnet-manager.yml
+#  - name: testnet-manager
+#    namespace: rococo
+#    chart: testnet-manager
+#    version: 1.1.0
+#    values:
+#      - ./values-testnet-manager.yml
 
 ## relay chain Rococo ##
   - name: localrococo-validator-alice
