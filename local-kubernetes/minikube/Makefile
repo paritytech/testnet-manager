@@ -49,6 +49,10 @@ rpc:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer'
 	@kubectl port-forward service/localrococo-validator-alice-node 9944:9944 -n ${CHAIN_NAMESPACE}
 
+rpc-woc:
+	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9945#/explorer'
+	@kubectl port-forward localwococo-bootnode-1-0 9945:9944 -n wococo
+
 para-shell:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9948#/explorer'
 	@kubectl port-forward service/localrococo-shell-collator-node 9948:9944 -n ${CHAIN_NAMESPACE}
@@ -57,6 +61,9 @@ para-moon:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9949#/explorer'
 	@kubectl port-forward service/localrococo-moonbase-collator-node 9949:9944 -n ${CHAIN_NAMESPACE}
 
+para-mint:
+	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9950#/explorer'
+	@kubectl port-forward service/localrococo-statemint-alice-node 9950:9944 -n ${CHAIN_NAMESPACE}
 web:
 	@xdg-open 'http://localhost:8080/'
 	@kubectl port-forward service/testnet-manager 8080:80 -n ${CHAIN_NAMESPACE}

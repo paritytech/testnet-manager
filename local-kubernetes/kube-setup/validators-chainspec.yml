@@ -28,6 +28,9 @@ spec:
       labels:
         run: chainspec
     spec:
+      volumes:
+      - name: dir
+        emptyDir: {}
       containers:
       - name: chainspec
         image: nginx:stable
@@ -116,6 +119,149 @@ spec:
             mountPath: /dir
         securityContext:
           runAsUser: 0
-      volumes:
-      - name: dir
-        emptyDir: {}
+      - name: create-chainspec-wococo
+        image: paritypr/polkadot-debug:6007
+        command: [ "/bin/bash" ]
+        env:
+          - name: OVERRIDE_JSON
+            # 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY - SEED (//Alice)
+            # export SECRET=//Alice
+            # export PREFIX=localwococo-bootnode-
+            # scripts/prepare-test-net.sh 4
+            value: |
+              {
+                "name": "Wococo",
+                "id": "wococo",
+                "chainType": "Live",
+                "genesis": {
+                  "runtime": {
+                    "balances": {
+                      "balances": [
+                        [
+                          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+                          1e+18
+                        ],
+                        [
+                          "5FP4H5GhCD6iB83A9EQm528QNb93emdjti5spTmspvzEEh2E",
+                          100000000000000
+                        ],
+                        [
+                          "5GWqcpUtykapwmp59NWEHWt2HxwcTrHAoqCfQ1wHQATG1du3",
+                          100000000000000
+                        ],
+                        [
+                          "5DLL4Zrg9GT19himcZLpQCkJwQ8nunhqFcdr49Dtt4rKLLtf",
+                          100000000000000
+                        ],
+                        [
+                          "5GUCqyV3R1C1WQHBgXYk4Gv4E3HuQ4q3WvJLSbqdfzuswE2J",
+                          100000000000000
+                        ]
+                      ]
+                    },
+                    "staking": {
+                      "invulnerables": [
+                        "5FP4H5GhCD6iB83A9EQm528QNb93emdjti5spTmspvzEEh2E",
+                        "5GWqcpUtykapwmp59NWEHWt2HxwcTrHAoqCfQ1wHQATG1du3",
+                        "5DLL4Zrg9GT19himcZLpQCkJwQ8nunhqFcdr49Dtt4rKLLtf",
+                        "5GUCqyV3R1C1WQHBgXYk4Gv4E3HuQ4q3WvJLSbqdfzuswE2J"
+                      ],
+                      "stakers": [
+                        [
+                          "5FP4H5GhCD6iB83A9EQm528QNb93emdjti5spTmspvzEEh2E",
+                          "5CkrSMkBMkNBYoqEQucscmMVaVdtpw8g5QeK21eDPpJRqnde",
+                          100000000000000,
+                          "Validator"
+                        ],
+                        [
+                          "5GWqcpUtykapwmp59NWEHWt2HxwcTrHAoqCfQ1wHQATG1du3",
+                          "5EWpu5bEAcoXHznJmYXmz61ZNtzVN5s4ca1fr9kxrJmb4st5",
+                          100000000000000,
+                          "Validator"
+                        ],
+                        [
+                          "5DLL4Zrg9GT19himcZLpQCkJwQ8nunhqFcdr49Dtt4rKLLtf",
+                          "5GRWxW9reoS4tCgc2AmkpyX4Ug6PqFczZxWSj7GaQS9NNRHN",
+                          100000000000000,
+                          "Validator"
+                        ],
+                        [
+                          "5GUCqyV3R1C1WQHBgXYk4Gv4E3HuQ4q3WvJLSbqdfzuswE2J",
+                          "5FUeuvyz2jAisiFyjrkNfB5xNpGhRMYksdjJNFpWxus3zYgm",
+                          100000000000000,
+                          "Validator"
+                        ]
+                      ]
+                    },
+                    "session": {
+                      "keys": [
+                        [
+                          "5FP4H5GhCD6iB83A9EQm528QNb93emdjti5spTmspvzEEh2E",
+                          "5FP4H5GhCD6iB83A9EQm528QNb93emdjti5spTmspvzEEh2E",
+                          {
+                            "grandpa": "5GFrg6TeorZUCVXjMrYA2FK81ZyyyM8eSdU2ETBvHLLBokMk",
+                            "babe": "5D5Xap53RjLMBRSF64QBA6sKS1BZCW17y2P7ENs7neDChm4i",
+                            "im_online": "5CtVQnfak4tbkoSNhcXBZ6BGH7K5jHSUChLs6nWgtRAVE753",
+                            "para_validator": "5HVafaUiHD1myRGc8xchzorrojoPBbnMmUrwmkEQtcZvzamd",
+                            "para_assignment": "5D7K3hak6WwHxoyKVwPhSLPHJhQLv5LQjGECmRcvmCAjJQE3",
+                            "authority_discovery": "5CJCGWxHBCZuoU43JfcVkbwbiMHgzPUTLSzLpE7yLTfTz3Py"
+                          }
+                        ],
+                        [
+                          "5GWqcpUtykapwmp59NWEHWt2HxwcTrHAoqCfQ1wHQATG1du3",
+                          "5GWqcpUtykapwmp59NWEHWt2HxwcTrHAoqCfQ1wHQATG1du3",
+                          {
+                            "grandpa": "5GQCyJWr1jMRzrztiB6pfLguwS9gQeu99169B8Wjp7YoQGAs",
+                            "babe": "5HYvw4VjYqtKe4A97gibttmnYa5aQB6ynsUUTFcVWAbCJiP5",
+                            "im_online": "5FKYuG1gySpdYdfZVq7aieb3wwoyujyhKbp26NNQouwpDBBT",
+                            "para_validator": "5CXfeaC62uxArRTebf4rjoBPuUzEKmNXvgaiWPDahC9RF6G4",
+                            "para_assignment": "5DpymiaSK3hxbLMErdt3vXw58fThRGgMc7HE7gojv8YqfYWf",
+                            "authority_discovery": "5GEzgyB2Lp1hk6nHQF5uS74qJg2qY2H8og6egnJjkxSgvSbQ"
+                          }
+                        ],
+                        [
+                          "5DLL4Zrg9GT19himcZLpQCkJwQ8nunhqFcdr49Dtt4rKLLtf",
+                          "5DLL4Zrg9GT19himcZLpQCkJwQ8nunhqFcdr49Dtt4rKLLtf",
+                          {
+                            "grandpa": "5HTwpfpeYMhjrxfv7brCbdogBbBZxJtB1MqcW6qGsfsBwa6s",
+                            "babe": "5CMLta8jGZS9Sjv5uNYUd1V5zeBhYaZKtZmvFdx25CpbFbiZ",
+                            "im_online": "5HTo4724gab8sMqdLUkMCN2nGzC6fhmqkxNRpR8Hjwit6PRx",
+                            "para_validator": "5FH6vPaBk7VjkXprk3RhRB94AzAet5hdMYwoMFppVNkgzLh1",
+                            "para_assignment": "5CFof8NYfSuG9XWWkb3jUUGrE6P5RjvtxGuf8KjQ7Pv3ry6J",
+                            "authority_discovery": "5GpvkK9o9hjjvmEvzEA1kWx3FmHZtgEeMSG9iYmEBWPQwzmi"
+                          }
+                        ],
+                        [
+                          "5GUCqyV3R1C1WQHBgXYk4Gv4E3HuQ4q3WvJLSbqdfzuswE2J",
+                          "5GUCqyV3R1C1WQHBgXYk4Gv4E3HuQ4q3WvJLSbqdfzuswE2J",
+                          {
+                            "grandpa": "5CMQkkRx4wyP5amDc8J3kRxCEZqo7hTgiK2cYPB9NDxiHXy6",
+                            "babe": "5DcSbEPQW8AsfcxNaJSeU5btk3k8jghMgq9T7NE9APytJabp",
+                            "im_online": "5EcowAyR8LJKXiEV9SSofSxrB8ba6vPmAvU3GUPkzzE8SFXm",
+                            "para_validator": "5GKKVdkeKLv4H4zKDkscZRKtzKP6FiGtc2oBtz4yhB5FXLsc",
+                            "para_assignment": "5DZp4xjv6S4WCujNmkGcL1gPNwq3xgQdC8rUoEp486qMu9Yf",
+                            "authority_discovery": "5FQoyWthkeUeYERUyjmx3gn4exPHTvwJvqBhCcvkFqjc3bKS"
+                          }
+                        ]
+                      ]
+                    },
+                    "sudo": {
+                      "key": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+                    }
+                  }
+                }
+              }
+        args:
+          - -c
+          - >
+            set -xe;
+            apt update; apt install -y jq;
+            polkadot build-spec --chain wococo-local --disable-default-bootnode > /dir/wococo-plain-source.json;
+            jq  -s '.[0] * .[1]'  /dir/wococo-plain-source.json <( echo $OVERRIDE_JSON) > /dir/wococo-plain.json;
+            sed 's/1e+18/1000000000000000000/' -i /dir/wococo-plain.json;
+            polkadot build-spec --chain /dir/wococo-plain.json --raw --disable-default-bootnode > /dir/wococo-local.json;
+        volumeMounts:
+          - name: dir
+            mountPath: /dir
+        securityContext:
+          runAsUser: 0
