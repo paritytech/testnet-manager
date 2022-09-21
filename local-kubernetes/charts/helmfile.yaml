@@ -152,9 +152,7 @@ releases:
 ### WOCOCO
   - name: localwococo-bootnode
     namespace: wococo
-    #chart: parity/node
-    # TODO
-    chart: /home/bulat/workdir/github/helm-charts/charts/node
-    version: 3.3.1
+    chart: parity/node
+    version: 3.4.1
     values:
       - ./values-localwococo-bootnode.yaml
