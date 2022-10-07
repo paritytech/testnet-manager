@@ -84,7 +84,7 @@ def find_network_rotate_session_keys():
 def register_network_inactive_validators():
     async def register_inactive_validators():
         log.info(f'Registering inactive validators for network={network}')
-        validator_stateful_sets = list_validator_stateful_sets(network)
+        validator_stateful_sets = list_validator_stateful_sets()
         for stateful_set in validator_stateful_sets:
             await register_statefulset_validators(stateful_set)
             print(stateful_set)
