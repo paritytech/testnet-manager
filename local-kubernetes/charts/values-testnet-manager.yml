@@ -18,6 +18,7 @@ configmap:
   NODE_WS_PATTERN: "ws://NODE_NAME.rococo:9944"
   HEALTHY_MIN_PEER_COUNT: "1"
   TASKS_CRON_SCHEDULE: "0 0 30 2 *" # Every February 30th aka never
+  TESTNET_MANAGER_CONSENSUS: poa
 
 tolerations: null
 affinity: null

@@ -22,14 +22,17 @@ def rotate_node_session_keys(node_http_endpoint):
         return ''
 
 
+def decode_session_key(substrate_client, session_key):
+    # decode session_key see: https://github.com/polkascan/py-substrate-interface/issues/205
+    type_id = substrate_client.get_metadata_call_function('Session', 'set_keys')['fields'][0]['type']
+    return substrate_client.decode_scale("scale_info::{}".format(type_id), session_key)
+
 # stash keypair account must have some funds
 def set_node_session_key(ws_endpoint, stash_seed, session_key):
     substrate_client = get_substrate_client(ws_endpoint)
 
     if type(session_key) == str:
-        # decode session_key see: https://github.com/polkascan/py-substrate-interface/issues/205
-        type_id = substrate_client.get_metadata_call_function('Session', 'set_keys')['fields'][0]['type']
-        session_key = substrate_client.decode_scale("scale_info::{}".format(type_id), session_key)
+        session_key = decode_session_key(substrate_client,session_key)
 
     keypair = Keypair.create_from_uri(stash_seed)
     call = substrate_client.compose_call(

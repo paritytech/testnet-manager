@@ -3,24 +3,17 @@ repositories:
     url: https://paritytech.github.io/helm-charts/
 
 helmDefaults:
-  createNamespace: false
+  createNamespace: true
   waitForJobs: true
 
 releases:
 ## testnet-manager ##
 #  - name: testnet-manager
 #    namespace: rococo
-#    chart: testnet-manager
-#    version: 1.1.0
+#    chart: parity/testnet-manager
+#    version: 1.1.1
 #    values:
 #      - ./values-testnet-manager.yml
-
-# validator-manager ##
-  - name: testnet-manager
-    namespace: rococo
-    chart: ../../helm/testnet-manager
-    values:
-      - ./values-testnet-manager.yml
 
 ## relay chain Rococo ##
 #  - name: localrococo-validator-alice
@@ -149,10 +142,32 @@ releases:
 #    values:
 #      - values-tick-collator.yml
 
-### WOCOCO
+#### WOCOCO
+  - name: testnet-manager
+    namespace: wococo
+    chart: parity/testnet-manager
+    version: 1.1.1
+    values:
+      - ./values-testnet-manager.yml
+      - configmap:
+          WS_ENDPOINT: "ws://localwococo-bootnode.wococo:9944"
+          NODE_HTTP_PATTERN: "http://NODE_NAME.wococo:9933"
+          NODE_WS_PATTERN: "ws://NODE_NAME.wococo:9944"
+          TESTNET_MANAGER_CONSENSUS: pos
+
   - name: localwococo-bootnode
     namespace: wococo
     chart: parity/node
-    version: 3.4.1
+    version: 3.5.0
     values:
       - ./values-localwococo-bootnode.yaml
+
+  - name: localwococo-validator-a
+    namespace: wococo
+    chart: parity/node
+    version: 3.5.0
+    values:
+      - ./values-localwococo-bootnode.yaml
+      - node:
+          replicas: 2
+          keys: []

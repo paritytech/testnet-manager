@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 
 from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_validators_root_seed, \
-    node_http_endpoint, get_network
+    node_http_endpoint, get_network, network_consensus
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_manager import get_derived_collator_account, get_collator_status, \
     collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status
@@ -21,7 +21,7 @@ from app.lib.session_keys import rotate_node_session_keys, set_node_session_key,
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
 from app.lib.validator_manager import get_validator_set, get_validators_to_add, get_validators_to_retire, \
-    deregister_validators, register_validators
+    deregister_validators, register_validators, setup_pos_validator, staking_chill
 
 log = logging.getLogger(__name__)
 
@@ -269,12 +269,15 @@ async def register_validator_pods(pods):
     log.info(f'registering validators pods')
 
     ws_endpoint = network_ws_endpoint()
+    substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     validator_set = get_validator_set(ws_endpoint)
     validators_to_add = get_validators_to_add(ws_endpoint)
     validators_to_retire = get_validators_to_retire(ws_endpoint)
     node_stash_accounts = []
     nodes_to_register = []
+    consensus = network_consensus()
+    validators_root_seed = network_validators_root_seed()
 
     for pod in pods:
         node = pod.metadata.name
@@ -286,18 +289,33 @@ async def register_validator_pods(pods):
             nodes_to_register.append(node)
 
     log.info(f'funding the following stash accounts: {node_stash_accounts}')
-    substrate_client = get_relay_chain_client()
     fund_accounts(substrate_client, node_stash_accounts, sudo_seed)
-    validator_session_keys_tasks = []
-    log.info(f'setting up session keys for the following nodes: {nodes_to_register}')
-    for node_to_register in nodes_to_register:
-        validator_session_keys_tasks.append(setup_validators_session_keys(node_to_register))
-    accounts_to_register = await asyncio.gather(*validator_session_keys_tasks)
-    # remove empty strings from list (ie. don't register nodes which failed to generate session keys)
-    accounts_to_register = list(filter(None, accounts_to_register))
+    if consensus == "poa":
+        validator_session_keys_tasks = []
+        log.info(f'setting up session keys for the following nodes: {nodes_to_register}')
+        for node_to_register in nodes_to_register:
+            validator_session_keys_tasks.append(setup_validators_session_keys(node_to_register))
+        accounts_to_register = await asyncio.gather(*validator_session_keys_tasks)
+        # remove empty strings from list (ie. don't register nodes which failed to generate session keys)
+        accounts_to_register = list(filter(None, accounts_to_register))
 
-    log.info(f'adding {len(accounts_to_register)} addresses to the validator set: {accounts_to_register}')
-    register_validator_addresses(accounts_to_register)
+        log.info(f'adding {len(accounts_to_register)} addresses to the validator set: {accounts_to_register}')
+        register_validator_addresses(accounts_to_register)
+    else:
+        for pod in pods:
+            node = pod.metadata.name
+            validator_stash_mnemonic = get_node_stash_account_mnemonic(validators_root_seed, node)
+
+            log.info(f'Rotate node session keys for {node}')
+            node_session_key = rotate_node_session_keys(node_http_endpoint(node))
+
+            log.info(f'Registering PoS Validator: {node}')
+            status = setup_pos_validator(ws_endpoint, node_session_key, validator_stash_mnemonic)
+            if status:
+                log.info(f'Successfully set up PoS Validator: {node}')
+            else:
+                log.error(f'Fail to set up PoS Validator: {node}')
+
 
 
 async def register_statefulset_validators(stateful_set_name):
@@ -326,8 +344,10 @@ async def deregister_validator_pods(pods):
     validator_set = get_validator_set(ws_endpoint)
     validators_to_add = get_validators_to_add(ws_endpoint)
     validators_to_retire = get_validators_to_retire(ws_endpoint)
+    consensus = network_consensus()
 
     accounts_to_deregister = []
+    pods_to_deregister = []
     for pod in pods:
         node = pod.metadata.name
         validator_account = get_validator_account_from_pod(pod)
@@ -340,10 +360,17 @@ async def deregister_validator_pods(pods):
         if validator_account_registration_status:
             log.debug(f'adding {node} (validatorAccount={validator_account}) to the nodes to deregister')
             accounts_to_deregister.append(validator_account)
+            pods_to_deregister.append(pod.metadata.name)
         else:
             log.debug(f'skipping {node} (validatorAccount={validator_account}) deregistration as it is not currently registered')
-    if accounts_to_deregister:
+    if accounts_to_deregister and consensus == "poa":
+        log.info(f'The following accounts will be deregister: {accounts_to_deregister}')
         await deregister_validator_addresses(accounts_to_deregister)
+    if pods_to_deregister and consensus == "pos":
+        log.info(f'The following validators will be deregister: {pods_to_deregister}')
+        for pod_name in pods_to_deregister:
+            validator_stash_mnemonic = get_node_stash_account_mnemonic(network_validators_root_seed(), pod_name)
+            staking_chill(ws_endpoint, validator_stash_mnemonic)
 
 
 async def deregister_validator_nodes(nodes):
