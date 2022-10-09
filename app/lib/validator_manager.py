@@ -44,8 +44,8 @@ def get_validators_to_add(ws_endpoint):
         return substrate_query_url(ws_endpoint, "ValidatorManager", "ValidatorsToAdd")
     else:
         active_validators = substrate_query_url(ws_endpoint, "Session", "Validators")
-        all_validators = staking_validators_set(ws_endpoint)
-        return list(set(all_validators) - set(active_validators))
+        staking_validators = staking_validators_set(ws_endpoint)
+        return list(set(staking_validators) - set(active_validators))
 
 
 def get_validators_to_retire(ws_endpoint):
@@ -53,8 +53,9 @@ def get_validators_to_retire(ws_endpoint):
     if network_consensus() == "poa":
         return substrate_query_url(ws_endpoint, "ValidatorManager", "ValidatorsToRetire")
     else:
-        # todo implement
-        return []
+        active_validators = substrate_query_url(ws_endpoint, "Session", "Validators")
+        staking_validators = staking_validators_set(ws_endpoint)
+        return list(set(active_validators) - set(staking_validators))
 
 
 def setup_pos_validator(ws_endpoint, session_key,  stash_seed, controller_seed=None):
