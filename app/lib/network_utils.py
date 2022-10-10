@@ -302,8 +302,7 @@ async def register_validator_pods(pods):
         log.info(f'adding {len(accounts_to_register)} addresses to the validator set: {accounts_to_register}')
         register_validator_addresses(accounts_to_register)
     else:
-        for pod in pods:
-            node = pod.metadata.name
+        for node in nodes_to_register:
             validator_stash_mnemonic = get_node_stash_account_mnemonic(validators_root_seed, node)
 
             log.info(f'Rotate node session keys for {node}')
