@@ -1,0 +1,58 @@
+image:
+  # also update version in manifests/chainspec.yml
+  repository: paritypr/polkadot-debug
+  tag: 6007
+  pullPolicy: IfNotPresent
+
+initContainer:
+  debug: true
+
+node:
+  chain: wococo-local
+  role: authority
+  replicas: 4
+  chainData:
+    volumeSize: 2Gi
+    storageClass: "standard"
+  chainKeystore:
+    mountInMemory:
+      enabled: true
+      sizeLimit: 10Mi
+    storageClass: "standard"
+  pruning: 1000
+  podManagementPolicy: Parallel
+  flags:
+    - "--unsafe-rpc-external"
+    - "--unsafe-ws-external"
+    - "--rpc-methods=unsafe"
+    - "--rpc-cors=all"
+    - "--allow-private-ipv4"
+   # - "--log=parachain=debug,parachain::chain-selection=trace,executor=trace,afg=trace,parachain::dispute-coordinator=trace"
+  customChainspecUrl: http://chainspec.rococo/wococo-local.json
+  forceDownloadChainspec: true
+  keys:
+    - type: "gran"
+      scheme: "ed25519"
+      # VALIDATORS_ROOT_SEED
+      seed: "test test test test test test test test test test test junk"
+      extraDerivation: "//${HOSTNAME}//grandpa"
+    - type: "babe"
+      scheme: "sr25519"
+      seed: "test test test test test test test test test test test junk"
+      extraDerivation: "//${HOSTNAME}//babe"
+    - type: "imon"
+      scheme: "sr25519"
+      seed: "test test test test test test test test test test test junk"
+      extraDerivation: "//${HOSTNAME}//im_online"
+    - type: "para"
+      scheme: "sr25519"
+      seed: "test test test test test test test test test test test junk"
+      extraDerivation: "//${HOSTNAME}//para_validator"
+    - type: "asgn"
+      scheme: "sr25519"
+      seed: "test test test test test test test test test test test junk"
+      extraDerivation: "//${HOSTNAME}//para_assignment"
+    - type: "audi"
+      scheme: "sr25519"
+      seed: "test test test test test test test test test test test junk"
+      extraDerivation: "//${HOSTNAME}//authority_discovery"

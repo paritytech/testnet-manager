@@ -54,3 +54,11 @@ def network_healthy_min_peer_count():
 
 def network_tasks_cron_schedule():
     return get_var_from_env('TASKS_CRON_SCHEDULE')
+
+
+def network_consensus():
+    # poa or pos (default id poa )
+    value = get_var_from_env('TESTNET_MANAGER_CONSENSUS')
+    if value is None:
+        value = "poa"
+    return value.lower()

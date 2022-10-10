@@ -81,6 +81,17 @@ def substrate_sudo_call(substrate_client, keypair, payload):
     return substrate_call(substrate_client, keypair, call)
 
 
+def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True):
+    call = substrate_client.compose_call(
+        call_module='Utility',
+        call_function='batch',
+        call_params={
+            'calls': batch_call
+        }
+    )
+    return substrate_call(substrate_client, keypair, call, wait)
+
+
 def substrate_query(substrate_client, module, function, params=[]):
     try:
         return substrate_client.query(module, function, params=params).value

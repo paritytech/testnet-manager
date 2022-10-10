@@ -41,6 +41,7 @@ Set environment variables, eg:
     HEALTHY_MIN_PEER_COUNT: "1"
     SUDO_SEED=***
     VALIDATORS_ROOT_SEED=***
+    TESTNET_MANAGER_CONSENSUS=poa
 
 Start the app:
 

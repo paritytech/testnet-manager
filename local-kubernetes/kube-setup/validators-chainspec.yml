@@ -28,6 +28,9 @@ spec:
       labels:
         run: chainspec
     spec:
+      volumes:
+      - name: dir
+        emptyDir: {}
       containers:
       - name: chainspec
         image: nginx:stable
@@ -116,6 +119,151 @@ spec:
             mountPath: /dir
         securityContext:
           runAsUser: 0
-      volumes:
-      - name: dir
-        emptyDir: {}
+      - name: create-chainspec-wococo
+        image: paritypr/polkadot-debug:6007
+        command: [ "/bin/bash" ]
+        env:
+          - name: OVERRIDE_JSON
+            # 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY - SEED (//Alice)
+            # export SUDO_SEED=0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
+            # export VALIDATORS_ROOT_SEED="test test test test test test test test test test test junk"
+            # export PREFIX=localwococo-bootnode-
+            # scripts/prepare-test-net.sh 4
+            value: |
+              {
+                "name": "Wococo",
+                "id": "wococo",
+                "chainType": "Live",
+                "genesis": {
+                  "runtime": {
+                    "balances": {
+                      "balances": [
+                        [
+                          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+                          1e+18
+                        ],
+                        [
+                          "5ENyKNtRnxZQwcfEAAVCTJAbpRSyJ9aYHMwkDcWt5vU4gpFc",
+                          100000000000000
+                        ],
+                        [
+                          "5ELY2Fa32fbKi4uZwAQQ23GVJfCfTs2SVyDEqCKw17r8rK7V",
+                          100000000000000
+                        ],
+                        [
+                          "5CXbZ1kk2AeqUcKwKb1R5DmCGAMEm1PaycsfNaSpsgSGTXo7",
+                          100000000000000
+                        ],
+                        [
+                          "5C8UKeQSHFXtjtRNDtRxD1JzCh6MazKWNxMmUTsnQSQ8E2QK",
+                          100000000000000
+                        ]
+                      ]
+                    },
+                    "staking": {
+                      "validatorCount": 10,
+                      "invulnerables": [
+                        "5ENyKNtRnxZQwcfEAAVCTJAbpRSyJ9aYHMwkDcWt5vU4gpFc",
+                        "5ELY2Fa32fbKi4uZwAQQ23GVJfCfTs2SVyDEqCKw17r8rK7V",
+                        "5CXbZ1kk2AeqUcKwKb1R5DmCGAMEm1PaycsfNaSpsgSGTXo7",
+                        "5C8UKeQSHFXtjtRNDtRxD1JzCh6MazKWNxMmUTsnQSQ8E2QK"
+                      ],
+                      "stakers": [
+                        [
+                          "5ENyKNtRnxZQwcfEAAVCTJAbpRSyJ9aYHMwkDcWt5vU4gpFc",
+                          "5CApF4xe6tfGQuwmmfDZsxL5EDYXhFwnE6PhUsi8MBnuLTBy",
+                          100000000000000,
+                          "Validator"
+                        ],
+                        [
+                          "5ELY2Fa32fbKi4uZwAQQ23GVJfCfTs2SVyDEqCKw17r8rK7V",
+                          "5HZ8SQNnu1n8ioMMYbRiBYkjBv2RcjZNhq1ZEyFRqr5DFBGL",
+                          100000000000000,
+                          "Validator"
+                        ],
+                        [
+                          "5CXbZ1kk2AeqUcKwKb1R5DmCGAMEm1PaycsfNaSpsgSGTXo7",
+                          "5CrQZyu8Z65BGR7C6PETPZHoUptwHeP24Ge7xwhaUwsfg5Hh",
+                          100000000000000,
+                          "Validator"
+                        ],
+                        [
+                          "5C8UKeQSHFXtjtRNDtRxD1JzCh6MazKWNxMmUTsnQSQ8E2QK",
+                          "5C5NkAkCLDGM1S9s8EKjf3t1FDybFeTrW6g4GXHVLWxsLSWT",
+                          100000000000000,
+                          "Validator"
+                        ]
+                      ]
+                    },
+                    "session": {
+                      "keys": [
+                        [
+                          "5ENyKNtRnxZQwcfEAAVCTJAbpRSyJ9aYHMwkDcWt5vU4gpFc",
+                          "5ENyKNtRnxZQwcfEAAVCTJAbpRSyJ9aYHMwkDcWt5vU4gpFc",
+                          {
+                            "grandpa": "5EDW9eXu3v7FRZsn4CBs1rz4oqd5dbMsjKLcifNBpnrNuoih",
+                            "babe": "5G1H27tM6m7JVYnU1sgfj632F7xQhXeuvp6ZFjKCWN6LGuak",
+                            "im_online": "5EwBqdgCcVMoHRFrbiQT8NwKMj7HEEM5g46no1Ai7FP3xwpS",
+                            "para_validator": "5FjsdBGXRw8bfAuKx9PZ5GjL48WJQKzGeZ4d3iKa9Z4gBaWU",
+                            "para_assignment": "5HpHzYbpiJqsJQptgtxvgYWxcppWvD77gzEWqvA3LjDazp4e",
+                            "authority_discovery": "5CAQqpYksUanA8PAG79P4AoWFD7sdG6qJQVcHneYcn6UgRcq"
+                          }
+                        ],
+                        [
+                          "5ELY2Fa32fbKi4uZwAQQ23GVJfCfTs2SVyDEqCKw17r8rK7V",
+                          "5ELY2Fa32fbKi4uZwAQQ23GVJfCfTs2SVyDEqCKw17r8rK7V",
+                          {
+                            "grandpa": "5GMp6dESSZ5RvWsPe6EkB8MBMBQJfPtrSzYLswXEFCj4Jd4Q",
+                            "babe": "5E2k8rRPevDExaATZcRPLyzEjMAZw5yit7xrnL3KUvYBa933",
+                            "im_online": "5F9QGWP5KB3BxeyskwESqVTkeGPYBVxC6XM317KL1cxGpj6E",
+                            "para_validator": "5Hn48pCkee8mzWvzHiziHvfR59e9xNG9ACW4qTpTQnFoa6sK",
+                            "para_assignment": "5CfQxtGykkTNbfc4WzSQ13st9xqNEhKhPFSeHwTndKgbkove",
+                            "authority_discovery": "5EccAKRak3cmxpkt9UAkWjVagKSu2mBBoNquaZu3tHSrz1Ah"
+                          }
+                        ],
+                        [
+                          "5CXbZ1kk2AeqUcKwKb1R5DmCGAMEm1PaycsfNaSpsgSGTXo7",
+                          "5CXbZ1kk2AeqUcKwKb1R5DmCGAMEm1PaycsfNaSpsgSGTXo7",
+                          {
+                            "grandpa": "5F6VWVUFUdbsXZg4GdjQNAd1BstvqoAYtfsuuLsf76PTcuh1",
+                            "babe": "5Dxysx6jngu9TZZzezHQWqiN1e1o4344m1N766ywkvsd9aZP",
+                            "im_online": "5EyS9ZveryeasJnPVTQXkPEmHwaMnrRFY2Y5qZizBWq4Eo28",
+                            "para_validator": "5EyVUUhdz4s1yqiaQb4jrWbVYCbqyMnH1Gjhw4Fj3XKr5ys3",
+                            "para_assignment": "5GdiEoFSnZ6Hh4WkniHsSK6VUYjsV3FPtkYfws7es5QXv1M4",
+                            "authority_discovery": "5CyWN39TYuy2HPNLgGp4K6wrA3D36fTqPPsF9GBGBRzf8tiJ"
+                          }
+                        ],
+                        [
+                          "5C8UKeQSHFXtjtRNDtRxD1JzCh6MazKWNxMmUTsnQSQ8E2QK",
+                          "5C8UKeQSHFXtjtRNDtRxD1JzCh6MazKWNxMmUTsnQSQ8E2QK",
+                          {
+                            "grandpa": "5FTVk3HfUqSNByviyuBbgDtf6V7XqmnZ5vt7DK3HndrsWzz1",
+                            "babe": "5F1iKbnutAGsSd3PjJzTrgz7aWn2XF48oSYKQyHvDK2srQ2P",
+                            "im_online": "5Fy4pA4dxUYTxKWeJKaMnfEW3a2NE2JNLfuTsu8WC2MY2XAD",
+                            "para_validator": "5FHp7XPoUrmno6xgnqiBaycQHWpEXTVYFSKmw4F9fyfbRUBX",
+                            "para_assignment": "5DvyYrciA2fjtq6Z8ASzBfhJW8xFKZ6zJCgS8kvy5e2LN1Tu",
+                            "authority_discovery": "5F7AcSkv2wUUfWTWCTKqfxxPJgfDYdFJTC6Y451quPXCrS6L"
+                          }
+                        ]
+                      ]
+                    },
+                    "sudo": {
+                      "key": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+                    }
+                  }
+                }
+              }
+        args:
+          - -c
+          - >
+            set -xe;
+            apt update; apt install -y jq;
+            polkadot build-spec --chain wococo-local --disable-default-bootnode > /dir/wococo-plain-source.json;
+            jq  -s '.[0] * .[1]'  /dir/wococo-plain-source.json <( echo $OVERRIDE_JSON) > /dir/wococo-plain.json;
+            sed 's/1e+18/1000000000000000000/' -i /dir/wococo-plain.json;
+            polkadot build-spec --chain /dir/wococo-plain.json --raw --disable-default-bootnode > /dir/wococo-local.json;
+        volumeMounts:
+          - name: dir
+            mountPath: /dir
+        securityContext:
+          runAsUser: 0
