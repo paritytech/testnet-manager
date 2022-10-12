@@ -3,8 +3,8 @@ import unittest
 from testcontainers.core.container import DockerContainer
 from substrateinterface import Keypair
 
-from app.lib.validator_manager import get_validator_set, register_validators, get_validators_to_add, deregister_validators, \
-    get_validators_to_retire
+from app.lib.validator_manager import get_validator_set, register_validators, get_validators_pending_addition, deregister_validators, \
+    get_validators_pending_deletion
 from tests.test_utils import wait_for_http_ready
 
 
@@ -49,14 +49,14 @@ class ValidatorManagerTest(unittest.TestCase):
     def test_register_validator(self):
         charlie_key = Keypair.create_from_uri('//Charlie', ss58_format=42)
         register_validators(self.alice_validator_rpc_ws_url, self.alice_key, [charlie_key.ss58_address])
-        validators_to_add = get_validators_to_add(self.alice_validator_rpc_ws_url)
+        validators_to_add = get_validators_pending_addition(self.alice_validator_rpc_ws_url)
         self.assertEqual(validators_to_add, [charlie_key.ss58_address], "Registered validator address successfully added to validators_to_add")
         print(validators_to_add)
 
     def test_deregister_validator(self):
         bob_key = Keypair.create_from_uri('//Bob', ss58_format=42)
         deregister_validators(self.alice_validator_rpc_ws_url, self.alice_key, [bob_key.ss58_address])
-        validators_to_retire = get_validators_to_retire(self.alice_validator_rpc_ws_url)
+        validators_to_retire = get_validators_pending_deletion(self.alice_validator_rpc_ws_url)
         self.assertEqual(validators_to_retire, [bob_key.ss58_address], "Deregistered validator address successfully added to validators_to_retire")
         print(validators_to_retire)
 
