@@ -1,0 +1,37 @@
+repositories:
+  - name: parity
+    url: https://paritytech.github.io/helm-charts/
+
+helmDefaults:
+  createNamespace: false
+  waitForJobs: true
+
+releases:
+  - name: testnet-manager
+    namespace: wococo
+    chart: parity/testnet-manager
+    version: # empty value is latest
+    values:
+      - ./values-testnet-manager.yml
+      - configmap:
+          WS_ENDPOINT: "ws://localwococo-bootnode.wococo:9944"
+          NODE_HTTP_PATTERN: "http://NODE_NAME.wococo:9933"
+          NODE_WS_PATTERN: "ws://NODE_NAME.wococo:9944"
+          TESTNET_MANAGER_CONSENSUS: pos
+
+  - name: localwococo-bootnode
+    namespace: wococo
+    chart: parity/node
+    version: 4.0.2
+    values:
+      - ./values-localwococo-bootnode.yaml
+
+  - name: localwococo-validator-a
+    namespace: wococo
+    chart: parity/node
+    version: 4.0.2
+    values:
+      - ./values-localwococo-bootnode.yaml
+      - node:
+          replicas: 2
+          keys: []

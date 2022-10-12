@@ -12,24 +12,19 @@ node:
   role: authority
   replicas: 4
   chainData:
+    pruning: 1000
     volumeSize: 2Gi
     storageClass: "standard"
   chainKeystore:
     mountInMemory:
       enabled: true
       sizeLimit: 10Mi
-    storageClass: "standard"
-  pruning: 1000
   podManagementPolicy: Parallel
-  flags:
-    - "--unsafe-rpc-external"
-    - "--unsafe-ws-external"
-    - "--rpc-methods=unsafe"
-    - "--rpc-cors=all"
-    - "--allow-private-ipv4"
-   # - "--log=parachain=debug,parachain::chain-selection=trace,executor=trace,afg=trace,parachain::dispute-coordinator=trace"
+  allowUnsafeRpcMethods: true
   customChainspecUrl: http://chainspec.rococo/wococo-local.json
   forceDownloadChainspec: true
+  flags:
+    - "--allow-private-ipv4"
   keys:
     - type: "gran"
       scheme: "ed25519"

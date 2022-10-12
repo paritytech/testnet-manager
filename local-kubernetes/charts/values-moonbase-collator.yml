@@ -8,35 +8,30 @@ initContainer:
   debug: true
 
 node:
-  dataVolumeSize: 2Gi
+  chainData: &chainData
+    volumeSize: 2Gi
+    storageClass: "standard"
+  chainKeystore: &chainKeystore
+    mountInMemory:
+      enabled: true
+      sizeLimit: 10Mi
   chain: moonbase
   role: collator
-  replicas: 2
+  replicas: 1
   command: "/moonbeam/moonbeam"
   # manifests/chainspec.yml
   forceDownloadChainspec: true
   customChainspecUrl:  "http://chainspec.rococo/moonbase.json"
-  customChainspecPath: "/data/moonbase.json"
-  collator:
-    isParachain: true
-    # manifests/chainspec.yml
-    relayChainCustomChainspecUrl: "http://chainspec.rococo/rococo-local.json"
+  customChainspecPath: "/chain-data/moonbase.json"
+  isParachain: true
+  collatorRelayChain:
+    customChainspecUrl: "http://chainspec.rococo/rococo-local.json"
+    chainData: *chainData
+    chainKeystore: *chainKeystore
   persistGeneratedNodeKey: true
-  perNodeServices:
-    relayP2pService:
-      enabled: true
-      type: NodePort
-    paraP2pService:
-      enabled: true
-      type: NodePort
+  allowUnsafeRpcMethods: true
   flags:
-    - "--unsafe-rpc-external"
-    - "--unsafe-ws-external"
-    - "--rpc-methods=unsafe"
-    - "--rpc-cors=all"
     - "--allow-private-ipv4"
 
 extraLabels:
   paraId: "1001"
-
-storageClass: "standard"
