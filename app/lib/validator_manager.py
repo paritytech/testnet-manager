@@ -123,7 +123,8 @@ def setup_pos_validator(ws_endpoint, stash_seed, session_key=None, controller_se
     result = substrate_batchall_call(substrate_client, stash_keypair, batch_call, wait=True)
     if result and result.is_success:
         if any(e.value['event_id'] == "BatchInterrupted" for e in result.triggered_events):
-            log.error("Batch call failed: BatchInterrupted for stash {}".format(stash_keypair.ss58_address))
+            log.error("Batch call failed: BatchInterrupted for stash {}, extrinsic_hash: {}, block_hash: {}".format(
+                stash_keypair.ss58_address, result.extrinsic_hash, result.block_hash))
             return False
         else:
             return True
