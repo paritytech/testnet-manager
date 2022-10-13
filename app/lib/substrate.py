@@ -16,9 +16,7 @@ def get_substrate_client(url):
         if ws_pool.network_connection_pool[url].websocket:
             try:
                 ws_pool.network_connection_pool[url].websocket.ping()
-            except (WebSocketConnectionClosedException, ConnectionRefusedError,
-                    WebSocketBadStatusException, BrokenPipeError, SubstrateRequestException,
-                    WebSocketTimeoutException) as e:
+            except Exception as e:
                 log.info("Fixing broken WebSocket connection {}, Msg: {}".format(url, e))
                 try:
                     ws_pool.network_connection_pool[url].connect_websocket()
@@ -34,7 +32,7 @@ def get_substrate_client(url):
             ws_pool.network_connection_pool[url] = SubstrateInterface(url=url)
             return ws_pool.network_connection_pool[url]
         except Exception as e:
-            log.error("unable to connect to substrate. url: {}, Error: {}".format(url, e))
+            log.error("Unable to connect to substrate. url: {}, Error: {}".format(url, e))
             return None
 
 
