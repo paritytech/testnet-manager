@@ -309,7 +309,7 @@ async def register_validator_pods(pods):
             node_session_key = rotate_node_session_keys(node_http_endpoint(node))
 
             log.info(f'Registering PoS Validator: {node}')
-            status = setup_pos_validator(ws_endpoint, node_session_key, validator_stash_mnemonic)
+            status = setup_pos_validator(ws_endpoint, validator_stash_mnemonic, node_session_key)
             if status:
                 log.info(f'Successfully set up PoS Validator: {node}')
             else:

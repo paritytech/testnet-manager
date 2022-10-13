@@ -1,6 +1,6 @@
 import logging
 from substrateinterface import Keypair
-from app.lib.substrate import substrate_query_url, substrate_sudo_call, get_substrate_client, substrate_call,\
+from app.lib.substrate import substrate_query_url, substrate_sudo_call, get_substrate_client, substrate_call, \
     substrate_batchall_call
 from app.config.network_configuration import network_consensus
 from app.lib.session_keys import decode_session_key
@@ -58,34 +58,44 @@ def get_validators_to_retire(ws_endpoint):
         return list(set(active_validators) - set(staking_validators))
 
 
-def setup_pos_validator(ws_endpoint, session_key,  stash_seed, controller_seed=None):
+def setup_pos_validator(ws_endpoint, stash_seed, session_key=None, controller_seed=None):
     batch_call = []
     substrate_client = get_substrate_client(ws_endpoint)
     stash_keypair = Keypair.create_from_uri(stash_seed)
 
-    batch_call.append(substrate_client.compose_call(
-            call_module='Staking',
-            call_function='bond',
-            call_params={
-                'controller': stash_keypair.ss58_address,
-                'value': 1 * 10 ** 11,
-                'payee': "Staked"
-            }
+    # 1. Bond
+    bonded = substrate_client.query('Staking', 'Bonded', params=[stash_keypair.ss58_address]).value
+    # If we already bond, skip this step
+    if not bonded or not (bonded in [stash_keypair.ss58_address, controller_seed]):
+        batch_call.append(
+            substrate_client.compose_call(
+                call_module='Staking',
+                call_function='bond',
+                call_params={
+                    'controller': stash_keypair.ss58_address,
+                    'value': 1 * 10 ** 11,
+                    'payee': "Staked"
+                }
+            )
         )
-    )
 
-    if type(session_key) == str:
-        session_key = decode_session_key(substrate_client,session_key)
-    batch_call.append(substrate_client.compose_call(
-            call_module='Session',
-            call_function='set_keys',
-            call_params={
-                'keys': session_key,
-                'proof': ''
-            }
+    # 2. Set session key. If a session key is not provided we assume what session key is already set ( Example: we are
+    # registering deregistered validator)
+    if session_key:
+        if type(session_key) == str:
+            session_key = decode_session_key(substrate_client, session_key)
+        batch_call.append(
+            substrate_client.compose_call(
+                call_module='Session',
+                call_function='set_keys',
+                call_params={
+                    'keys': session_key,
+                    'proof': ''
+                }
+            )
         )
-    )
 
+    # 3. Validate
     batch_call.append(substrate_client.compose_call(
             call_module='Staking',
             call_function='validate',
@@ -98,6 +108,7 @@ def setup_pos_validator(ws_endpoint, session_key,  stash_seed, controller_seed=N
         )
     )
 
+    # 4. Set collator account.
     if controller_seed:
         controller_keypair = Keypair.create_from_uri(controller_seed)
         batch_call.append(substrate_client.compose_call(
@@ -111,7 +122,11 @@ def setup_pos_validator(ws_endpoint, session_key,  stash_seed, controller_seed=N
 
     result = substrate_batchall_call(substrate_client, stash_keypair, batch_call, wait=True)
     if result and result.is_success:
-        return True
+        if any(e.value['event_id'] == "BatchInterrupted" for e in result.triggered_events):
+            log.error("Batch call failed: BatchInterrupted for stash {}".format(stash_keypair.ss58_address))
+            return False
+        else:
+            return True
     else:
         return False
 
