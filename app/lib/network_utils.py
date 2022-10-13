@@ -20,7 +20,7 @@ from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecy
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
-from app.lib.validator_manager import get_validator_set, get_validators_to_add, get_validators_to_retire, \
+from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, get_validators_pending_deletion, \
     deregister_validators, register_validators, setup_pos_validator, staking_chill
 
 log = logging.getLogger(__name__)
@@ -68,8 +68,8 @@ def list_validators(stateful_set_name=''):
     external_validators = get_external_validators_from_configmap()
     validator_pods = list_validator_pods(stateful_set_name)
     validator_set = get_validator_set(ws_endpoint)
-    validators_to_add = get_validators_to_add(ws_endpoint)
-    validators_to_retire = get_validators_to_retire(ws_endpoint)
+    validators_to_add = get_validators_pending_addition(ws_endpoint)
+    validators_to_retire = get_validators_pending_deletion(ws_endpoint)
     validators = []
 
     # Add missing validators to the list (only when not filtering on a statefulset)
@@ -194,8 +194,8 @@ def get_substrate_node(node_name):
     if node_info.get("role") == "authority":
         ws_endpoint = network_ws_endpoint()
         validator_set = get_validator_set(ws_endpoint)
-        validators_to_add = get_validators_to_add(ws_endpoint)
-        validators_to_retire = get_validators_to_retire(ws_endpoint)
+        validators_to_add = get_validators_pending_addition(ws_endpoint)
+        validators_to_retire = get_validators_pending_deletion(ws_endpoint)
         node_info['validator_account'] = get_validator_account_from_pod(pod)
         node_info['validator_status'] = get_validator_status(node_info['validator_account'], validator_set, validators_to_add,
                                                             validators_to_retire)
@@ -272,8 +272,8 @@ async def register_validator_pods(pods):
     substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     validator_set = get_validator_set(ws_endpoint)
-    validators_to_add = get_validators_to_add(ws_endpoint)
-    validators_to_retire = get_validators_to_retire(ws_endpoint)
+    validators_to_add = get_validators_pending_addition(ws_endpoint)
+    validators_to_retire = get_validators_pending_deletion(ws_endpoint)
     node_stash_accounts = []
     nodes_to_register = []
     consensus = network_consensus()
@@ -341,8 +341,8 @@ async def deregister_validator_pods(pods):
     log.info(f'deregistering validators pods on {relay_chain_network_name}')
     ws_endpoint = network_ws_endpoint()
     validator_set = get_validator_set(ws_endpoint)
-    validators_to_add = get_validators_to_add(ws_endpoint)
-    validators_to_retire = get_validators_to_retire(ws_endpoint)
+    validators_to_add = get_validators_pending_addition(ws_endpoint)
+    validators_to_retire = get_validators_pending_deletion(ws_endpoint)
     consensus = network_consensus()
 
     accounts_to_deregister = []

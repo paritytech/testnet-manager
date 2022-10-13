@@ -38,8 +38,7 @@ def deregister_validators(ws_endpoint, sudo_seed, stash_account_addresses):
     substrate_sudo_call(substrate_client, keypair, payload)
 
 
-def get_validators_to_add(ws_endpoint):
-    # todo rename function from get_validators_to_add -> get_validators_pending
+def get_validators_pending_addition(ws_endpoint):
     if network_consensus() == "poa":
         return substrate_query_url(ws_endpoint, "ValidatorManager", "ValidatorsToAdd")
     else:
@@ -48,8 +47,7 @@ def get_validators_to_add(ws_endpoint):
         return list(set(staking_validators) - set(active_validators))
 
 
-def get_validators_to_retire(ws_endpoint):
-    # todo rename function from get_validators_to_retire -> get_validators_to_remove
+def get_validators_pending_deletion(ws_endpoint):
     if network_consensus() == "poa":
         return substrate_query_url(ws_endpoint, "ValidatorManager", "ValidatorsToRetire")
     else:
