@@ -42,12 +42,12 @@ class ValidatorManagerTestPoS(unittest.TestCase):
         self.alice_validator.stop()
         self.bob_validator.stop()
 
-    def test_get_validator_set(self):
+    def test_get_pos_validator_set(self):
         validator_set = get_validator_set(self.bob_validator_rpc_ws_url)
         print(validator_set)
         self.assertTrue(validator_set, 'Validator set is present on the chain')
 
-    def test_register_validator(self):
+    def test_register_pos_validator(self):
         charlie_stash = Keypair.create_from_uri('//Charlie//stash', ss58_format=42)
         substrate_client = get_substrate_client(self.alice_validator_rpc_ws_url)
         session_key = substrate_client.rpc_request(method="author_rotateKeys", params=[])['result']
@@ -56,7 +56,7 @@ class ValidatorManagerTestPoS(unittest.TestCase):
         print(validators_to_add)
         self.assertEqual(validators_to_add, [charlie_stash.ss58_address], "Registered validator address successfully added to validators_to_add")
 
-    def test_deregister_validator(self):
+    def test_deregister_pos_validator(self):
         bob_stash = Keypair.create_from_uri("//Bob//stash", ss58_format=42)
         staking_chill(self.alice_validator_rpc_ws_url, "//Bob")  # //Bob - is controller
         validators_to_retire = get_validators_pending_deletion(self.alice_validator_rpc_ws_url)
