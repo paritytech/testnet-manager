@@ -3,32 +3,32 @@
 ### Magic version (minikube or rancher-desktop)
 > The minikube/rancher-desktop,helm and kubectl binaries should be in your path
 
+Edit `Makefile` and set desired option. Example:
+```
+KUBERNETES_CONTEXT = minikube
+CHAIN_NAMESPACE = rococo
+```
+
 Run:
 ```bash
 make all
 ```
 `make all` will perform the following operation: 
-1a. Start minikube 
+1. Start minikube or rancher-desktop depending on `KUBERNETES_CONTEXT` variable.
 ```bash
-make minikube
+make kube
 ```
-1b. Start the rancher-desktop application
-
-2. Build docker image inside `minikube` or `rancher-desktop` folders.
+2. Build docker image inside `minikube` or `rancher-desktop` cluster.
 ```bash
 make build
 ```
-2. Install app
+3. Install app
 ```bash
 make install
 ```
-3. Open dashboard
-```bash
-make dash
-```
 
 ### Normal version
-see `.gitlab-ci.yml` file
+see [testnet-manager](https://github.com/paritytech/helm-charts/tree/main/charts/testnet-manager) helm-chart.
 
 ## How-to: Access
 ### Alice RPC endpoint 
@@ -50,8 +50,6 @@ This command will open browser and port-forward the `8080` to k8s `80`
 
 To clean that was created in these steps:
 
-1. Remove charts but keep the data: `make uninstall`
+1. Remove charts but keep the namespace: `make uninstall`
 
-2. Remove charts and their data `make cleanup`
-
-3. *I'm done* (destroy minikube and everything in it) `make destroy`
+2. Remove charts, their data and namespace `make cleanup`

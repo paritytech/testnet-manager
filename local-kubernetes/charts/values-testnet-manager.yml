@@ -13,7 +13,7 @@ secret:
 
 configmap:
   LOG_LEVEL: DEBUG
-  WS_ENDPOINT: "ws://localrococo-validator-alice-node.rococo:9944"
+  WS_ENDPOINT: "ws://localrococo-bootnode.rococo:9944"
   NODE_HTTP_PATTERN: "http://NODE_NAME.rococo:9933"
   NODE_WS_PATTERN: "ws://NODE_NAME.rococo:9944"
   HEALTHY_MIN_PEER_COUNT: "1"

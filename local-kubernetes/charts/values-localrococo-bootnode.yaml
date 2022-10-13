@@ -10,20 +10,17 @@ initContainer:
 node:
   chain: rococo-local
   role: authority
-  replicas: 2
-  dataVolumeSize: 2Gi
-  perNodeServices:
-    relayP2pService:
+  replicas: 1
+  chainData:
+    pruning: 1000
+    volumeSize: 2Gi
+    storageClass: "standard"
+  chainKeystore:
+    mountInMemory:
       enabled: true
-      type: NodePort
-  pruning: 1000
+      sizeLimit: 10Mi
   podManagementPolicy: Parallel
-  flags:
-    - "--unsafe-rpc-external"
-    - "--unsafe-ws-external"
-    - "--rpc-methods=unsafe"
-    - "--rpc-cors=all"
+  allowUnsafeRpcMethods: true
   # kube-setup/chainspec.yml
   customChainspecUrl: http://chainspec.rococo/rococo-local.json
   forceDownloadChainspec: true
-storageClass: "standard"

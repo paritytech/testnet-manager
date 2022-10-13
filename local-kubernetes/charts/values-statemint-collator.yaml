@@ -8,7 +8,13 @@ initContainer:
   debug: true
 
 node:
-  dataVolumeSize: 2Gi
+  chainData: &chainData
+    volumeSize: 2Gi
+    storageClass: "standard"
+  chainKeystore: &chainKeystore
+    mountInMemory:
+      enabled: true
+      sizeLimit: 10Mi
   chain: statemint
   role: collator
   replicas: 1
@@ -16,26 +22,14 @@ node:
   # manifests/chainspec.yml
   forceDownloadChainspec: true
   customChainspecUrl:  "http://chainspec.rococo/statemint.json"
-  collator:
-    isParachain: true
-    # manifests/chainspec.yml
-    relayChainCustomChainspecUrl: "http://chainspec.rococo/rococo-local.json"
+  isParachain: true
+  collatorRelayChain:
+    customChainspecUrl: "http://chainspec.rococo/rococo-local.json"
+    chainData: *chainData
+    chainKeystore: *chainKeystore
   persistGeneratedNodeKey: true
-  perNodeServices:
-    relayP2pService:
-      enabled: true
-      type: NodePort
-    paraP2pService:
-      enabled: true
-      type: NodePort
-  flags:
-    - "--unsafe-rpc-external"
-    - "--unsafe-ws-external"
-    - "--rpc-methods=unsafe"
-    - "--rpc-cors=all"
+  allowUnsafeRpcMethods: true
 
 extraLabels:
   paraId: "1003"
   ss58Format: "0" # Polkadot
-
-storageClass: "standard"
