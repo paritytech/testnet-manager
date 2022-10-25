@@ -53,11 +53,11 @@ async def collator_register(chain, node_name):
     elif chain.startswith("tick") or chain.startswith("trick") or chain.startswith("track"):
         log.info('Detected that collators are tick-based {}'.format(chain))
         return register_tick_collator(node_name)
-    elif chain.endswith("statemint"):
+    elif chain.endswith("mint") or chain.endswith("mine"):
         log.info('Detected that collators are mint-based {}'.format(chain))
         return register_mint_collator(node_name)
     else:
-        log.error('Only registration of moon-based, tick, statemint chains are supported! Chain:{}'.format(chain))
+        log.error('Only registration of moon-based, tick, statemint, statemine chains are supported! Chain:{}'.format(chain))
         return None
 
 
@@ -71,9 +71,9 @@ async def collator_deregister(chain, node_name):
         log.info('Detected that collators are tick-based {}'.format(chain))
         log.error('NOT IMPLEMENTED')
         return None
-    elif chain.endswith("statemint"):
+    elif chain.endswith("mint") or chain.endswith("mine"):
         log.info('Detected that collators are mint-based {}'.format(chain))
         return deregister_mint_collator(node_name)
     else:
-        log.error('Only deregistration of moon-based, tick, statemint chains are supported! Chain:{}'.format(chain))
+        log.error('Only deregistration of moon-based, tick, statemint, statemine chains are supported! Chain:{}'.format(chain))
         return None
