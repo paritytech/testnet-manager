@@ -124,7 +124,8 @@ async def register_collators(
         asyncio.create_task(register_statefulset_collators(para_id, statefulset))
     if node:
         chain = get_substrate_node(node[0])["chain"]
-        asyncio.create_task(register_collator_nodes(chain, node))
+        ss58_format = get_substrate_node(node[0])["ss58_format"]
+        asyncio.create_task(register_collator_nodes(chain, node, ss58_format))
 
 
 @router.post("/deregister_collators/{para_id}")
@@ -137,4 +138,5 @@ async def deregister_collators(
         asyncio.create_task(deregister_statefulset_collators(para_id, statefulset))
     if node:
         chain = get_substrate_node(node[0])["chain"]
-        asyncio.create_task(deregister_collator_nodes(chain, node))
+        ss58_format = get_substrate_node(node[0])["ss58_format"]
+        asyncio.create_task(deregister_collator_nodes(chain, node, ss58_format))

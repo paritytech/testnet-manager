@@ -12,14 +12,14 @@ from app.lib.node_utils import inject_key
 log = logging.getLogger('collator_mint')
 
 
-def register_mint_collator(node_name, ss58_format=0, rotate_key=False):
+def register_mint_collator(node_name, ss58_format, rotate_key=False):
     try:
         # 1. Generating stash account keypair
         node_client = get_node_client(node_name)
         collator_root_seed = network_validators_root_seed()
         collator_aura_key = collator_root_seed + "//collator//" + node_name
-        keypair_rich = Keypair.create_from_uri(collator_root_seed, ss58_format=ss58_format)
-        keypair = Keypair.create_from_uri(collator_aura_key, ss58_format=ss58_format)
+        keypair_rich = Keypair.create_from_uri(collator_root_seed, ss58_format=int(ss58_format))
+        keypair = Keypair.create_from_uri(collator_aura_key, ss58_format=int(ss58_format))
         candidates = node_client.query('CollatorSelection', 'Candidates').value
 
         if not any(d['who'].lower() == keypair.ss58_address.lower() for d in candidates) or rotate_key:
@@ -93,11 +93,11 @@ def register_mint_collator(node_name, ss58_format=0, rotate_key=False):
         return None
 
 
-def deregister_mint_collator(node_name, ss58_format=0):
+def deregister_mint_collator(node_name, ss58_format):
     node_client = get_node_client(node_name)
     collator_root_seed = network_validators_root_seed()
     collator_aura_key = collator_root_seed + "//collator//" + node_name
-    keypair = Keypair.create_from_uri(collator_aura_key, ss58_format=ss58_format)
+    keypair = Keypair.create_from_uri(collator_aura_key, ss58_format=int(ss58_format))
     try:
         candidates = node_client.query('CollatorSelection', 'Candidates').value
         if any(d['who'].lower() == keypair.ss58_address.lower() for d in candidates):
