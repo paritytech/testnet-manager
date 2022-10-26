@@ -118,6 +118,7 @@ def get_node_info_from_pod(pod):
     node_name = pod.metadata.name
     node_labels = pod.metadata.labels
     node_chain = node_labels.get('chain')
+    node_ss58_format = node_labels.get('ss58Format', '42')
     node_role = node_labels.get('role')
     node_para_id = node_labels.get('paraId')
     node_status = pod.status.phase
@@ -129,6 +130,7 @@ def get_node_info_from_pod(pod):
         'name': node_name,
         'labels': node_labels,
         'chain': node_chain,
+        'ss58_format': node_ss58_format,
         'role': node_role,
         'para_id': node_para_id,
         'status': node_status,
@@ -587,19 +589,19 @@ def list_parachain_collators(para_id, stateful_set_name=''):
     return collators
 
 
-async def register_collator_nodes(chain, nodes):
+async def register_collator_nodes(chain, nodes, ss58_format):
     collators_register_tasks = []
     for node_name in nodes:
-        collators_register_tasks.append(collator_register(chain, node_name))
+        collators_register_tasks.append(collator_register(chain, node_name, ss58_format))
     accounts_to_register = await asyncio.gather(*collators_register_tasks)
     log.info('adding {} addresses to the collators set: {}'.format(len(accounts_to_register), accounts_to_register))
     return accounts_to_register
 
 
-async def deregister_collator_nodes(chain, nodes):
+async def deregister_collator_nodes(chain, nodes, ss58_format):
     collators_deregister_tasks = []
     for node_name in nodes:
-        collators_deregister_tasks.append(collator_deregister(chain, node_name))
+        collators_deregister_tasks.append(collator_deregister(chain, node_name, ss58_format))
     accounts_to_deregister = await asyncio.gather(*collators_deregister_tasks)
     log.info(
         'removing {} addresses from the collators set: {}'.format(len(accounts_to_deregister), accounts_to_deregister))
@@ -610,13 +612,15 @@ async def register_statefulset_collators(para_id, stateful_set_name):
     log.info('starting to register collators in statefulset {}'.format(stateful_set_name))
     collators_pods = list_collator_pods(para_id, stateful_set_name)
     chain = collators_pods[0].metadata.labels['chain']
+    ss58_format = collators_pods[0].metadata.labels.get('ss58Format', '42')
     collator_node_names = list(map(lambda pod: pod.metadata.name, collators_pods))
-    await register_collator_nodes(chain, collator_node_names)
+    await register_collator_nodes(chain, collator_node_names, ss58_format)
 
 
 async def deregister_statefulset_collators(para_id, stateful_set_name):
     log.info('starting to deregister collators in statefulset {}'.format(stateful_set_name))
     collators_pods = list_collator_pods(para_id, stateful_set_name)
     chain = collators_pods[0].metadata.labels['chain']
+    ss58_format = collators_pods[0].metadata.labels.get('ss58Format', '42')
     collator_node_names = list(map(lambda pod: pod.metadata.name, collators_pods))
-    await deregister_collator_nodes(chain, collator_node_names)
+    await deregister_collator_nodes(chain, collator_node_names, ss58_format)

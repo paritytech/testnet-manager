@@ -46,7 +46,7 @@ def get_collator_status(node_account, invulnerables, candidates):
 
 
 # map register function with network type
-async def collator_register(chain, node_name):
+async def collator_register(chain, node_name, ss58_format):
     if chain.startswith("moon"):
         log.info('Detected that collators are moon-based {}'.format(chain))
         return register_moon_collator(node_name)
@@ -55,13 +55,13 @@ async def collator_register(chain, node_name):
         return register_tick_collator(node_name)
     elif chain.endswith("mint") or chain.endswith("mine"):
         log.info('Detected that collators are mint-based {}'.format(chain))
-        return register_mint_collator(node_name)
+        return register_mint_collator(node_name, ss58_format)
     else:
         log.error('Only registration of moon-based, tick, statemint, statemine chains are supported! Chain:{}'.format(chain))
         return None
 
 
-async def collator_deregister(chain, node_name):
+async def collator_deregister(chain, node_name, ss58_format):
     if chain.startswith("moon"):
         log.info('Detected that collators are moon-based {}'.format(chain))
         # todo implement https://docs.moonbeam.network/node-operators/networks/collators/activities/#stop-collating
@@ -73,7 +73,7 @@ async def collator_deregister(chain, node_name):
         return None
     elif chain.endswith("mint") or chain.endswith("mine"):
         log.info('Detected that collators are mint-based {}'.format(chain))
-        return deregister_mint_collator(node_name)
+        return deregister_mint_collator(node_name, ss58_format)
     else:
         log.error('Only deregistration of moon-based, tick, statemint, statemine chains are supported! Chain:{}'.format(chain))
         return None
