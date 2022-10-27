@@ -6,20 +6,25 @@ namespace = get_namespace()
 
 
 def list_stateful_sets():
-    return kubernetes_client.CustomObjectsApi().list_namespaced_custom_object(group="apps", version="v1", plural="statefulsets", namespace=namespace)['items']
+    return kubernetes_client.CustomObjectsApi().list_namespaced_custom_object(group="apps", version="v1",
+                                                                              plural="statefulsets",
+                                                                              namespace=namespace)['items']
 
 
 def list_validator_stateful_sets(role='authority'):
     stateful_sets = list_stateful_sets()
-    validator_stateful_sets = list(filter(lambda sts: sts['spec']['template']['metadata']['labels']['role'] == role, stateful_sets))
+    validator_stateful_sets = list(
+        filter(lambda sts: sts['spec']['template']['metadata']['labels'].get('role') == role, stateful_sets))
     return list(map(lambda sts: sts['metadata']['name'], validator_stateful_sets))
 
 
 def list_parachain_collator_stateful_sets(para_id):
     stateful_sets = kubernetes_client.CustomObjectsApi().list_namespaced_custom_object(group="apps", version="v1", plural="statefulsets", namespace=namespace)
-    collator_stateful_sets = list(filter(lambda sts: sts['spec']['template']['metadata']['labels']['role'] == 'collator' and
-                                                     sts['spec']['template']['metadata']['labels']['paraId'] == para_id,
-                                         stateful_sets['items']))
+
+    collator_stateful_sets = list(
+        filter(lambda sts: sts['spec']['template']['metadata']['labels'].get('role') == 'collator' and
+                           sts['spec']['template']['metadata']['labels'].get('paraId') == para_id,
+               stateful_sets['items']))
     return list(map(lambda sts: sts['metadata']['name'], collator_stateful_sets))
 
 
