@@ -1,10 +1,11 @@
+import datetime
 import os
 import time
 import unittest
 
 from substrateinterface import SubstrateInterface
 from testcontainers.compose import DockerCompose
-
+from tests.test_utils import wait_for_http_ready
 from app.lib.parachain_manager import get_parachain_head, get_parachain_wasm, initialize_parachain, cleanup_parachain, \
     get_parachains_ids, \
     get_parathreads_ids, get_parachain_lifecycles, set_slot_lease, get_parachain_leases_count
@@ -15,7 +16,7 @@ class ParachainManagerTest(unittest.TestCase):
     def setUpClass(cls):
         cls.compose = DockerCompose(os.path.dirname(os.path.abspath(__file__)))
         cls.compose.start()
-        time.sleep(60)  # leave some time for the node to start
+
 
     @classmethod
     def tearDownClass(cls):
@@ -23,12 +24,12 @@ class ParachainManagerTest(unittest.TestCase):
 
     def setUp(self):
         self.compose = ParachainManagerTest.compose
-
-        self.relay_rpc_ws_url = 'ws://{}:{}'.format(self.compose.get_service_host("node_alice", 9944),
-                                                    self.compose.get_service_port("node_alice", 9944))
-        self.parachain_rpc_ws_url = 'ws://{}:{}'.format(self.compose.get_service_host("collator", 9944),
-                                                        self.compose.get_service_port("collator", 9944))
-
+        self.relay_rpc_ws_url = 'ws://172.17.0.1:{}'.format(self.compose.get_service_port("node_alice", 9944))
+        self.relay_rpc_http_url = 'http://172.17.0.1:{}'.format(self.compose.get_service_port("node_alice", 9933))
+        self.parachain_rpc_ws_url = 'ws://172.17.0.1:{}'.format(self.compose.get_service_port("collator", 9944))
+        self.parachain_rpc_http_url = 'http://172.17.0.1:{}'.format(self.compose.get_service_port("collator", 9933))
+        wait_for_http_ready(self.relay_rpc_http_url + '/health')
+        wait_for_http_ready(self.parachain_rpc_http_url + '/health')
         self.parachain_substrate = SubstrateInterface(url=self.parachain_rpc_ws_url)
         self.relay_substrate = SubstrateInterface(url=self.relay_rpc_ws_url)
         self.alice_key = '0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a'
