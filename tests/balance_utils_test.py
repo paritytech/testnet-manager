@@ -21,7 +21,7 @@ class BalanceUtilsTest(unittest.TestCase):
 
         # Start Bob validator
         self.bob_validator = DockerContainer('parity/polkadot:latest')
-        self.bob_validator.with_command('--chain rococo-local --validator --bob --unsafe-ws-external --rpc-cors=all')
+        self.bob_validator.with_command('--chain rococo-local --validator --bob --unsafe-rpc-external --rpc-cors=all')
         self.bob_validator.with_exposed_ports(9933)
         self.bob_validator.start()
         self.bob_validator_http_url = 'http://{}:{}'.format(self.bob_validator.get_container_host_ip(),
