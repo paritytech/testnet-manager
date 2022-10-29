@@ -31,7 +31,7 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
             if account_info['data']['free'] < candidacy_bond + 0.1 * 10 ** 9:
                 print("Funding {}".format(keypair.ss58_address))
                 # candidacyBond + 1 tx fee
-                result = transfer_funds(node_client, keypair_rich, keypair.ss58_address, candidacy_bond + 1 * 10 ** 9)
+                result = transfer_funds(node_client, keypair_rich, [keypair.ss58_address], candidacy_bond + 1 * 10 ** 9)
                 if result == None:
                     # exit, failed to fund account
                     log.error("Unable fund account: {}, node: {}".format(
