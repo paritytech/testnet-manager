@@ -29,4 +29,4 @@ def get_account_funds(ws_endpoint, account_address):
 def fund_account(ws_endpoint, funding_account_seed, target_account_address):
     substrate_client = get_substrate_client(ws_endpoint)
     keypair = Keypair.create_from_seed(funding_account_seed)
-    transfer_funds(substrate_client, keypair, target_account_address, 1 * 10 ** 12)
+    transfer_funds(substrate_client, keypair, [target_account_address], 1 * 10 ** 12)

@@ -50,7 +50,7 @@ def register_moon_collator(node_name, rotate_key=False):
         if account_info.value['data']['free'] < 1101 * 10 ** 18:
             log.info("Funding {}".format(keypair.ss58_address))
             # 1000 bound, 100 security deposit, 1 tx fee
-            transfer_funds(node_client, keypair_rich, keypair.ss58_address, 1101 * 10 ** 18)
+            transfer_funds(node_client, keypair_rich, [keypair.ss58_address], 1101 * 10 ** 18)
 
 
         # Join the Candidate Pool
