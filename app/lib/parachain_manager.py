@@ -1,7 +1,7 @@
 import logging
 from math import floor
 
-from app.lib.substrate import substrate_sudo_call, get_node_client
+from app.lib.substrate import substrate_sudo_call, substrate_batchall_call, get_node_client
 from substrateinterface import Keypair
 
 log = logging.getLogger('collator_manager')
@@ -128,9 +128,10 @@ def get_permanent_slot_lease_period_length(substrate_client):
     return substrate_client.get_constant("AssignedSlots", "PermanentSlotLeasePeriodLength").value
 
 
-def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm):
+def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, lease_period_count=0):
+    batch_call = []
     keypair = Keypair.create_from_seed(sudo_seed)
-    payload = substrate_client.compose_call(
+    batch_call.append(substrate_client.compose_call(
         call_module='ParasSudoWrapper',
         call_function='sudo_schedule_para_initialize',
         call_params={
@@ -141,28 +142,23 @@ def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm):
                 'parachain': True
             }
         }
-    )
-    return substrate_sudo_call(substrate_client, keypair, payload)
-
-
-def set_slot_lease(substrate_client, sudo_seed, para_id, lease_period_count):
-    lease_period_duration = get_lease_period_duration(substrate_client)
-    block_height = substrate_client.get_block()['header']['number']
-    current_lease_period_number = floor(block_height / lease_period_duration)
-
-    keypair = Keypair.create_from_seed(sudo_seed)
-    payload = substrate_client.compose_call(
-        call_module='Slots',
-        call_function='force_lease',
-        call_params={
-            'para': para_id,
-            'leaser': keypair.ss58_address,
-            'amount': 0,
-            'period_begin': current_lease_period_number,
-            'period_count': lease_period_count
-        }
-    )
-    return substrate_sudo_call(substrate_client, keypair, payload)
+    ))
+    if lease_period_count != 0:
+        lease_period_duration = get_lease_period_duration(substrate_client)
+        block_height = substrate_client.get_block()['header']['number']
+        current_lease_period_number = floor(block_height / lease_period_duration)
+        batch_call.append(substrate_client.compose_call(
+            call_module='Slots',
+            call_function='force_lease',
+            call_params={
+                'para': para_id,
+                'leaser': keypair.ss58_address,
+                'amount': 0,
+                'period_begin': current_lease_period_number,
+                'period_count': lease_period_count
+            }
+        ))
+    return substrate_batchall_call(substrate_client, keypair, batch_call, True, True)
 
 
 def cleanup_parachain(substrate_client, sudo_seed, para_id):

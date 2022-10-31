@@ -16,7 +16,7 @@ from app.lib.node_utils import is_node_ready, \
 from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecycles, \
     initialize_parachain, cleanup_parachain, get_parachain_wasm, get_parachain_head, get_parathreads_ids, \
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
-    get_permanent_slot_lease_period_length, set_slot_lease, get_all_parachain_heads
+    get_permanent_slot_lease_period_length, get_all_parachain_heads
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
@@ -470,13 +470,10 @@ async def onboard_parachain_by_id(para_id):
         wasm = get_parachain_wasm(para_node_client)
 
         if state and wasm:
-            log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}'.format(para_id, state, wasm[0:64], wasm[-64:]))
-            initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm)
             permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
-            log.info(
-                'Setting slot lease for parachain #{} to be valid for {} lease periods (permanent_slot_lease_period_length)'.format(
-                    para_id, permanent_slot_lease_period_length))
-            set_slot_lease(relay_chain_client, sudo_seed, para_id, permanent_slot_lease_period_length)
+            log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
+                para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
+            initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length)
         else:
             log.error(
                 'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(
