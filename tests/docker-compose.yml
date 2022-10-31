@@ -12,6 +12,7 @@ services:
     image: *polkadotimage
     ports:
       - "9944"
+      - "9933"
     volumes: *chainspec
     depends_on: &depends_on_chainspec
       - chainspec
@@ -20,6 +21,7 @@ services:
       --ws-port 9944
       --rpc-cors all
       --ws-external
+      --unsafe-rpc-external
       --alice
       --tmp
 
@@ -34,10 +36,12 @@ services:
     volumes: *chainspec
     ports:
       - "9944"
+      - "9933"
     depends_on: *depends_on_chainspec
     command: >
       --chain shell
       --unsafe-ws-external
+      --unsafe-rpc-external
       --rpc-cors=all
       --tmp
       --
