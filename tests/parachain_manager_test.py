@@ -1,4 +1,3 @@
-import datetime
 import os
 import time
 import unittest
@@ -8,7 +7,7 @@ from testcontainers.compose import DockerCompose
 from tests.test_utils import wait_for_http_ready
 from app.lib.parachain_manager import get_parachain_head, get_parachain_wasm, initialize_parachain, cleanup_parachain, \
     get_parachains_ids, \
-    get_parathreads_ids, get_parachain_lifecycles, set_slot_lease, get_parachain_leases_count
+    get_parathreads_ids, get_parachain_lifecycles, get_parachain_leases_count
 
 
 class ParachainManagerTest(unittest.TestCase):
@@ -16,7 +15,6 @@ class ParachainManagerTest(unittest.TestCase):
     def setUpClass(cls):
         cls.compose = DockerCompose(os.path.dirname(os.path.abspath(__file__)))
         cls.compose.start()
-
 
     @classmethod
     def tearDownClass(cls):
@@ -78,8 +76,7 @@ class ParachainManagerTest(unittest.TestCase):
 
     def test_set_force_slot_lease(self):
         para_id = 102
-        initialize_parachain(self.relay_substrate, self.alice_key, para_id, '0x11', '0x11')
-        set_slot_lease(self.relay_substrate, self.alice_key, para_id, 1)
+        initialize_parachain(self.relay_substrate, self.alice_key, para_id, '0x11', '0x11', 1)
         leases_count = get_parachain_leases_count(self.relay_substrate, para_id)
         self.assertEquals(leases_count, 1, 'Slot lease set')
 

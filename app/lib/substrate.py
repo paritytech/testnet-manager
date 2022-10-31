@@ -68,7 +68,7 @@ def substrate_call(substrate_client, keypair, call, wait=True):
         return False
 
 
-def substrate_sudo_call(substrate_client, keypair, payload):
+def substrate_sudo_call(substrate_client, keypair, payload, wait=True):
     call = substrate_client.compose_call(
         call_module='Sudo',
         call_function='sudo',
@@ -76,10 +76,10 @@ def substrate_sudo_call(substrate_client, keypair, payload):
             'call': payload.value,
         }
     )
-    return substrate_call(substrate_client, keypair, call)
+    return substrate_call(substrate_client, keypair, call, wait)
 
 
-def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True):
+def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True, sudo=False):
     call = substrate_client.compose_call(
         call_module='Utility',
         call_function='batch',
@@ -87,7 +87,10 @@ def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True):
             'calls': batch_call
         }
     )
-    return substrate_call(substrate_client, keypair, call, wait)
+    if sudo:
+        return substrate_sudo_call(substrate_client, keypair, call, wait)
+    else:
+        return substrate_call(substrate_client, keypair, call, wait)
 
 
 def substrate_query(substrate_client, module, function, params=[]):
