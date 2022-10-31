@@ -22,7 +22,8 @@ def get_namespace():
 def get_node_logs_link():
     node_logs_link = get_var_from_env('NODE_LOGS_LINK')
     if node_logs_link is None:
-        return []
+        # If unset set, use the link to the internal node logs endpoint
+        return '/api/nodes/{node}/logs'
     else:
         return node_logs_link
 
