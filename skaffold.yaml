@@ -5,11 +5,10 @@ metadata:
 build:
   artifacts:
     - image: local/testnet-manager
-      docker:
-        dockerfile: Dockerfile
+      docker: {}
   local:
+    useBuildkit: true
     push: false
-    useDockerCLI: true
 deploy:
   helm:
     releases:

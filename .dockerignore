@@ -8,7 +8,6 @@ venv
 .pytest_cache
 README.md
 docker-compose.yml
-helm
 local-kubernetes
 scripts
 tests

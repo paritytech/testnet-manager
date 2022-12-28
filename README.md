@@ -26,6 +26,11 @@ As such, it is recommended to refer to the next section for instructions to run 
 
 Setup the local environment:
 
+Setup python version 3.10
+```shell
+pyenv install 3.10.5
+```
+
 ```shell
 poetry install
 poetry shell
@@ -54,12 +59,10 @@ Start the app:
 
 Install either [Minikube](https://minikube.sigs.k8s.io/docs/start/) or [Rancher-Desktop](https://rancherdesktop.io/).
 Then, start your Kubernetes cluster in a VM and run:
-
 ```shell
-cd local-kubernetes/minikube # cd local-kubernetes/rancher-desktop
+cd local-kubernetes
 make setup
 make install
-```
 
 Remark: Wait for the "setup" step (chainspec building) to complete before installing to prevent the nodes from failing to pull chainspecs files.
 For more information see [helm/minikube/README.md](local-kubernetes/README.md)
