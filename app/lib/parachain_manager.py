@@ -139,7 +139,8 @@ def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, leas
             'genesis': {
                 'genesis_head': state,
                 'validation_code': wasm,
-                'parachain': True
+                'parachain': True, # legacy param
+                'para_kind': True # new param introduced in https://github.com/paritytech/polkadot/pull/6198
             }
         }
     ))
