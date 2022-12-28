@@ -10,7 +10,7 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     rotate_nodes_session_keys, register_statefulset_collators, onboard_parachain_by_id, \
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
-    deregister_collator_nodes
+    deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators
 
 log = logging.getLogger('router_apis')
 
@@ -126,6 +126,7 @@ async def register_collators(
         chain = get_substrate_node(node[0])["chain"]
         ss58_format = get_substrate_node(node[0])["ss58_format"]
         asyncio.create_task(register_collator_nodes(chain, node, ss58_format))
+    return PlainTextResponse('OK')
 
 
 @router.post("/deregister_collators/{para_id}")
@@ -140,3 +141,26 @@ async def deregister_collators(
         chain = get_substrate_node(node[0])["chain"]
         ss58_format = get_substrate_node(node[0])["ss58_format"]
         asyncio.create_task(deregister_collator_nodes(chain, node, ss58_format))
+    return PlainTextResponse('OK')
+
+
+@router.post("/collators/{para_id}/add_invulnerables")
+async def add_invulnerables(
+    para_id: str = Path(description="Parachain ID"),
+    addresses: list[str] = Query(default=[], description="Address(es) to be added as invulnerables"),
+    nodes: list[str] = Query(default=[], description="Collator node(s) be added as invulnerables on the parachain")
+):
+    if nodes or addresses:
+        asyncio.create_task(add_invulnerable_collators(para_id, nodes, addresses))
+    return PlainTextResponse('OK')
+
+
+@router.post("/collators/{para_id}/remove_invulnerables")
+async def remove_invulnerables(
+    para_id: str = Path(description="Parachain ID"),
+    addresses: list[str] = Query(default=[], description="Address(es) to removed from invulnerables"),
+    nodes: list[str] = Query(default=[], description="Collator node(s) to be removed as invulnerables on the parachain")
+):
+    if nodes or addresses:
+        asyncio.create_task(remove_invulnerable_collators(para_id, nodes, addresses))
+    return PlainTextResponse('OK')

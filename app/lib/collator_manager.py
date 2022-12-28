@@ -5,6 +5,8 @@ from app.lib.collator_moonbeam import get_moon_node_collator_uri, get_moon_keypa
 from app.config.network_configuration import network_validators_root_seed
 from app.lib.collator_tick import register_tick_collator
 from app.lib.collator_mint import register_mint_collator, deregister_mint_collator
+from app.lib.kubernetes_client import list_collator_pods
+from app.lib.substrate import substrate_sudo_relay_xcm_call, get_node_client
 
 log = logging.getLogger('collator_manager')
 
@@ -76,4 +78,37 @@ async def collator_deregister(chain, node_name, ss58_format):
         return deregister_mint_collator(node_name, ss58_format)
     else:
         log.error('Only deregistration of moon-based, tick, statemint, statemine chains are supported! Chain:{}'.format(chain))
+        return None
+
+
+def get_parachain_rpc_client(para_id):
+    collator_pods = list_collator_pods(para_id)
+    for collator in collator_pods:
+        parachain_client = get_node_client(collator.metadata.name)
+        if parachain_client:
+            return parachain_client
+
+
+def get_collator_selection_invulnerables(para_id):
+    node_client = get_parachain_rpc_client(para_id)
+    return node_client.query('CollatorSelection', 'Invulnerables').value
+
+
+async def set_collator_selection_invulnerables(para_id, invulnerables):
+    log.info(f'Set the collatorSelection Invulnerables list to {invulnerables} for para #{para_id}')
+    node_client = get_parachain_rpc_client(para_id)
+    call = node_client.compose_call(
+        call_module='CollatorSelection',
+        call_function='set_invulnerables',
+        call_params={
+            'new': invulnerables
+        }
+    )
+    encoded_call = call.encode()
+    log.info(call)
+    receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call)
+    if receipt and receipt.is_success:
+        log.info(f'✅ Success: new invulnerable list send via XCM to para #{para_id}')
+    else:
+        log.error(f'Failed to run xcm call para_id {para_id}, message: {encoded_call}, err: {invulnerables}')
         return None
