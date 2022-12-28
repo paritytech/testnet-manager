@@ -48,7 +48,7 @@ build_minikube:
 	cd ../. && minikube image build . -t local/testnet-manager
 
 build_rancher-desktop:
-	cd ../. && nerdctl -n k8s.io image build -t local/testnet-manager:latest .
+	cd ../. && docker image build -t local/testnet-manager:latest .
 
 # ============================================================================================
 

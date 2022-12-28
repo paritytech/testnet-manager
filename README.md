@@ -26,11 +26,6 @@ As such, it is recommended to refer to the next section for instructions to run 
 
 Setup the local environment:
 
-Setup python version 3.10
-```shell
-pyenv install 3.10.5
-```
-
 ```shell
 poetry install
 poetry shell
@@ -62,7 +57,7 @@ Then, start your Kubernetes cluster in a VM and run:
 ```shell
 cd local-kubernetes
 make setup
-make install
+make apply
 
 Remark: Wait for the "setup" step (chainspec building) to complete before installing to prevent the nodes from failing to pull chainspecs files.
 For more information see [helm/minikube/README.md](local-kubernetes/README.md)
