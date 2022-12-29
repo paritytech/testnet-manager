@@ -5,6 +5,7 @@ from fastapi import APIRouter, Path, Query, HTTPException
 from starlette.responses import JSONResponse, PlainTextResponse
 
 from app.lib.kubernetes_client import list_validator_stateful_sets
+from app.lib.log_utils import get_node_pod_logs
 from app.lib.network_utils import list_substrate_nodes, list_validators, list_parachains, list_parachain_collators, \
     register_statefulset_validators, deregister_statefulset_validators, deregister_validator_addresses, \
     rotate_nodes_session_keys, register_statefulset_collators, onboard_parachain_by_id, \
@@ -29,6 +30,14 @@ async def get_nodes(
     node_name: str = Path(description="Name of the node"),
 ):
     return JSONResponse(get_substrate_node(node_name))
+
+
+@router.get("/nodes/{node_name}/logs", response_class=PlainTextResponse, )
+async def get_node_logs(
+    node_name: str = Path(description="Name of the node"),
+):
+    node_logs = await get_node_pod_logs(node_name)
+    return PlainTextResponse(node_logs)
 
 
 @router.get("/validators")

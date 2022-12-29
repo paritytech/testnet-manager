@@ -65,3 +65,7 @@ def get_external_validators_from_configmap():
         return external_validator_configmap.data if external_validator_configmap.data is not None else {}
     except Exception:
         return {}
+
+
+def get_pod_logs(name, namespace):
+    return kubernetes_client.CoreV1Api().read_namespaced_pod_log(name=name, namespace=namespace)
