@@ -231,7 +231,7 @@
         const deregisterCollatorButton = document.querySelector("#deregisterCollator");
         document.querySelector("#deregisterCollator").addEventListener("click", () => {
             deregisterCollatorButton.disabled = true
-            fetch("/api/deregister_collators/{{ node.para_id }}?node={{ node.name }}", {method: "POST"})
+            fetch("/api/collators/{{ node.para_id }}/deregister?node={{ node.name }}", {method: "POST"})
                 .then(() => {
                     deregisterCollatorButton.textContent = "Deregistration in progress"
                     deregisterCollatorButton.style.backgroundColor = 'lightgreen'
@@ -245,7 +245,7 @@
         const registerCollatorButton = document.querySelector("#registerCollator");
         document.querySelector("#registerCollator").addEventListener("click", () => {
             registerCollatorButton.disabled = true
-            fetch("/api/register_collators/{{ node.para_id }}?node={{ node.name }}", {method: "POST"})
+            fetch("/api/collators/{{ node.para_id }}/register?node={{ node.name }}", {method: "POST"})
                 .then(() => {
                     registerCollatorButton.textContent = "Registration in progress"
                     registerCollatorButton.style.backgroundColor = 'lightgreen'

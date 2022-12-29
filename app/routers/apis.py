@@ -114,7 +114,7 @@ async def offboard_parachain(
     return PlainTextResponse('OK')
 
 
-@router.post("/register_collators/{para_id}")
+@router.post("/collators/{para_id}/register")
 async def register_collators(
     para_id: str = Path(description="Parachain ID on which to register collators"),
     statefulset: str = Query(default=None, description="Name of the StatefulSet to register"),
@@ -129,7 +129,7 @@ async def register_collators(
     return PlainTextResponse('OK')
 
 
-@router.post("/deregister_collators/{para_id}")
+@router.post("/collators/{para_id}/deregister")
 async def deregister_collators(
     para_id: str = Path(description="Parachain ID on which to deregister collators"),
     statefulset: str = Query(default=None, description="Name of the StatefulSet to deregister"),
