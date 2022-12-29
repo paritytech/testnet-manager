@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 
 from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_validators_root_seed, \
-    node_http_endpoint, get_network, network_consensus
+    node_http_endpoint, get_network, network_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_manager import get_derived_collator_account, get_collator_status, \
     collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status, \
@@ -21,8 +21,9 @@ from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecy
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
-from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, get_validators_pending_deletion, \
-    deregister_validators, register_validators, setup_pos_validator, staking_chill
+from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, \
+    get_validators_pending_deletion, \
+    deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys
 
 log = logging.getLogger(__name__)
 
@@ -202,8 +203,12 @@ def get_substrate_node(node_name):
         node_info['validator_account'] = get_validator_account_from_pod(pod)
         node_info['validator_status'] = get_validator_status(node_info['validator_account'], validator_set, validators_to_add,
                                                             validators_to_retire)
+        node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['validator_account'])
+
     if node_info.get("role") == "collator":
         node_info['collator_account'] = get_collator_account_from_pod(pod)
+        ws_endpoint = node_ws_endpoint(node_name)
+        node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
         chain = pod.metadata.labels['chain']
         node_client = get_node_client(node_name)
         if chain.startswith("moon"):
@@ -463,7 +468,6 @@ async def onboard_parachain_by_id(para_id):
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     parachain_pods = list_collator_pods(para_id)
-    #
     para_node_client = get_node_client(parachain_pods[0].metadata.name)
     node_para_id = get_parachain_id(parachain_pods[0])
     if node_para_id == para_id:
