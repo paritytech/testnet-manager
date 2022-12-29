@@ -51,7 +51,7 @@ async def get_collators(
     return JSONResponse(list_parachain_collators(para_id, statefulset))
 
 
-@router.post("/register_validators")
+@router.post("/validators/register")
 async def register_validators(
     statefulset: str = Query(default=None, description="Name of the StatefulSet containing the nodes to be registered"),
     address: list[str] = Query(default=[], description="Address(es) to be deregistered"),
@@ -66,7 +66,7 @@ async def register_validators(
     return PlainTextResponse('OK')
 
 
-@router.post("/deregister_validators")
+@router.post("/validators/deregister")
 async def deregister_validators(
     statefulset: str = Query(default=None, description="Name of the StatefulSet containing the nodes to be deregistered"),
     address: list[str] = Query(default=None, description="Address(es) to be deregistered"),

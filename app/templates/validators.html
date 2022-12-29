@@ -93,7 +93,7 @@
         const registerButton = document.querySelector("#registerValidators");
         document.querySelector("#registerValidators").addEventListener("click", () => {
             registerButton.disabled = true
-            fetch("/api/register_validators?statefulset={{ selected_stateful_set }}", {method: "POST"})
+            fetch("/api/validators/register?statefulset={{ selected_stateful_set }}", {method: "POST"})
                 .then(() => {
                     registerButton.textContent = "Registration in progress"
                     registerButton.style.backgroundColor = 'lightgreen'
@@ -107,7 +107,7 @@
         const deregisterButton = document.querySelector("#deregisterValidators");
         document.querySelector("#deregisterValidators").addEventListener("click", () => {
             deregisterButton.disabled = true
-            fetch("/api/deregister_validators?statefulset={{ selected_stateful_set }}", {method: "POST"})
+            fetch("/api/validators/deregister?statefulset={{ selected_stateful_set }}", {method: "POST"})
                 .then(() => {
                     deregisterButton.textContent = "Deregistration in progress"
                     deregisterButton.style.backgroundColor = 'lightgreen'
@@ -139,7 +139,7 @@
         document.querySelector("#deregisterDeletedValidators").addEventListener("click", () => {
             if (window.confirm(`Are you sure you want to deregister the following validators:\n{{ deleted_validator_addresses | join('\n') }}`)) {
                 deregisterDeletedValidatorsButton.disabled = true
-                fetch("/api/deregister_validators?address={{ deleted_validator_addresses | join('&address=') }}", {method: "POST"})
+                fetch("/api/validators/deregister?address={{ deleted_validator_addresses | join('&address=') }}", {method: "POST"})
                     .then(() => {
                         deregisterDeletedValidatorsButton.textContent = "Deregistration in progress"
                         deregisterDeletedValidatorsButton.style.backgroundColor = 'lightgreen'

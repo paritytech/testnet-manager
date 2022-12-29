@@ -199,7 +199,7 @@
         const deregisterValidatorButton = document.querySelector("#deregisterValidator");
         document.querySelector("#deregisterValidator").addEventListener("click", () => {
             deregisterValidatorButton.disabled = true
-            fetch("/api/deregister_validators?node={{ node.name }}", {method: "POST"})
+            fetch("/api/validators/deregister?node={{ node.name }}", {method: "POST"})
                 .then(() => {
                     deregisterValidatorButton.textContent = "Deregistration in progress"
                     deregisterValidatorButton.style.backgroundColor = 'lightgreen'
@@ -213,7 +213,7 @@
         const registerValidatorButton = document.querySelector("#registerValidator");
         document.querySelector("#registerValidator").addEventListener("click", () => {
             registerValidatorButton.disabled = true
-            fetch("/api/register_validators?node={{ node.name }}", {method: "POST"})
+            fetch("/api/validators/register?node={{ node.name }}", {method: "POST"})
                 .then(() => {
                     registerValidatorButton.textContent = "Registration in progress"
                     registerValidatorButton.style.backgroundColor = 'lightgreen'
