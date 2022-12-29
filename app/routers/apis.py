@@ -102,8 +102,11 @@ async def rotate_session_keys(
 async def onboard_parachains(
     para_id: list[str] = Query(description="Parachain ID(s) to onboard")
 ):
+    parachains = list_parachains()
     for id in para_id:
-        asyncio.create_task(onboard_parachain_by_id(id))
+        # Onboard parachain if not currently active
+        if not parachains.has_key(id):
+            asyncio.create_task(onboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
 
@@ -111,8 +114,11 @@ async def onboard_parachains(
 async def offboard_parachains(
     para_id: list[str] = Query(description="Parachain ID(s) to offboard")
 ):
+    parachains = list_parachains()
     for id in para_id:
-        asyncio.create_task(offboard_parachain_by_id(id))
+        # Offboard parachain if currently active
+        if parachains.has_key(id):
+            asyncio.create_task(offboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
 
