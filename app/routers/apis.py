@@ -149,20 +149,20 @@ async def deregister_collators(
 @router.post("/collators/{para_id}/add_invulnerables")
 async def add_invulnerables(
     para_id: str = Path(description="Parachain ID"),
-    addresses: list[str] = Query(default=[], description="Address(es) to be added as invulnerables"),
-    nodes: list[str] = Query(default=[], description="Collator node(s) be added as invulnerables on the parachain")
+    address: list[str] = Query(default=[], description="Address(es) to be added as invulnerables"),
+    node: list[str] = Query(default=[], description="Collator node(s) be added as invulnerables on the parachain")
 ):
-    if nodes or addresses:
-        asyncio.create_task(add_invulnerable_collators(para_id, nodes, addresses))
+    if node or address:
+        asyncio.create_task(add_invulnerable_collators(para_id, node, address))
     return PlainTextResponse('OK')
 
 
 @router.post("/collators/{para_id}/remove_invulnerables")
 async def remove_invulnerables(
     para_id: str = Path(description="Parachain ID"),
-    addresses: list[str] = Query(default=[], description="Address(es) to removed from invulnerables"),
-    nodes: list[str] = Query(default=[], description="Collator node(s) to be removed as invulnerables on the parachain")
+    address: list[str] = Query(default=[], description="Address(es) to removed from invulnerables"),
+    node: list[str] = Query(default=[], description="Collator node(s) to be removed as invulnerables on the parachain")
 ):
-    if nodes or addresses:
-        asyncio.create_task(remove_invulnerable_collators(para_id, nodes, addresses))
+    if node or address:
+        asyncio.create_task(remove_invulnerable_collators(para_id, node, address))
     return PlainTextResponse('OK')
