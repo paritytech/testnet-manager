@@ -59,7 +59,7 @@
         const registerButton = document.querySelector("#register")
         document.querySelector("#register").addEventListener("click", () => {
             registerButton.disabled = true
-            fetch("/api/register_collators/{{ para_id }}?statefulset={{ selected_stateful_set }}", {method: "POST"})
+            fetch("/api/collators/{{ para_id }}/register?statefulset={{ selected_stateful_set }}", {method: "POST"})
                 .then(() => {
                     registerButton.textContent = "Registration in progress"
                     registerButton.style.backgroundColor = 'lightgreen'
@@ -73,7 +73,7 @@
         const deregisterButton = document.querySelector("#deregister")
         document.querySelector("#deregister").addEventListener("click", () => {
             deregisterButton.disabled = true
-            fetch("/api/deregister_collators/{{ para_id }}?statefulset={{ selected_stateful_set }}", {method: "POST"})
+            fetch("/api/collators/{{ para_id }}/deregister?statefulset={{ selected_stateful_set }}", {method: "POST"})
                 .then(() => {
                     deregisterButton.textContent = "Deregistration in progress"
                     deregisterButton.style.backgroundColor = 'lightgreen'

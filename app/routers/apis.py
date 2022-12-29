@@ -60,7 +60,7 @@ async def get_collators(
     return JSONResponse(list_parachain_collators(para_id, statefulset))
 
 
-@router.post("/register_validators")
+@router.post("/validators/register")
 async def register_validators(
     statefulset: str = Query(default=None, description="Name of the StatefulSet containing the nodes to be registered"),
     address: list[str] = Query(default=[], description="Address(es) to be deregistered"),
@@ -75,7 +75,7 @@ async def register_validators(
     return PlainTextResponse('OK')
 
 
-@router.post("/deregister_validators")
+@router.post("/validators/deregister")
 async def deregister_validators(
     statefulset: str = Query(default=None, description="Name of the StatefulSet containing the nodes to be deregistered"),
     address: list[str] = Query(default=None, description="Address(es) to be deregistered"),
@@ -107,23 +107,31 @@ async def rotate_session_keys(
         raise HTTPException(status_code=404, detail="Feature not implemented yet")
 
 
-@router.post("/onboard_parachain/{para_id}")
-async def onboard_parachain(
-    para_id: str = Path(description="Parachain ID to onboard")
+@router.post("/parachains/onboard")
+async def onboard_parachains(
+    para_id: list[str] = Query(description="Parachain ID(s) to onboard")
 ):
-    asyncio.create_task(onboard_parachain_by_id(para_id))
+    parachains = list_parachains()
+    for id in para_id:
+        # Onboard parachain if not currently active
+        if not parachains.has_key(id):
+            asyncio.create_task(onboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
 
-@router.post("/offboard_parachain/{para_id}")
-async def offboard_parachain(
-    para_id: str = Path(description="Parachain ID to offboard")
+@router.post("/parachains/offboard")
+async def offboard_parachains(
+    para_id: list[str] = Query(description="Parachain ID(s) to offboard")
 ):
-    asyncio.create_task(offboard_parachain_by_id(para_id))
+    parachains = list_parachains()
+    for id in para_id:
+        # Offboard parachain if currently active
+        if parachains.has_key(id):
+            asyncio.create_task(offboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
 
-@router.post("/register_collators/{para_id}")
+@router.post("/collators/{para_id}/register")
 async def register_collators(
     para_id: str = Path(description="Parachain ID on which to register collators"),
     statefulset: str = Query(default=None, description="Name of the StatefulSet to register"),
@@ -138,7 +146,7 @@ async def register_collators(
     return PlainTextResponse('OK')
 
 
-@router.post("/deregister_collators/{para_id}")
+@router.post("/collators/{para_id}/deregister")
 async def deregister_collators(
     para_id: str = Path(description="Parachain ID on which to deregister collators"),
     statefulset: str = Query(default=None, description="Name of the StatefulSet to deregister"),
@@ -156,20 +164,20 @@ async def deregister_collators(
 @router.post("/collators/{para_id}/add_invulnerables")
 async def add_invulnerables(
     para_id: str = Path(description="Parachain ID"),
-    addresses: list[str] = Query(default=[], description="Address(es) to be added as invulnerables"),
-    nodes: list[str] = Query(default=[], description="Collator node(s) be added as invulnerables on the parachain")
+    address: list[str] = Query(default=[], description="Address(es) to be added as invulnerables"),
+    node: list[str] = Query(default=[], description="Collator node(s) be added as invulnerables on the parachain")
 ):
-    if nodes or addresses:
-        asyncio.create_task(add_invulnerable_collators(para_id, nodes, addresses))
+    if node or address:
+        asyncio.create_task(add_invulnerable_collators(para_id, node, address))
     return PlainTextResponse('OK')
 
 
 @router.post("/collators/{para_id}/remove_invulnerables")
 async def remove_invulnerables(
     para_id: str = Path(description="Parachain ID"),
-    addresses: list[str] = Query(default=[], description="Address(es) to removed from invulnerables"),
-    nodes: list[str] = Query(default=[], description="Collator node(s) to be removed as invulnerables on the parachain")
+    address: list[str] = Query(default=[], description="Address(es) to removed from invulnerables"),
+    node: list[str] = Query(default=[], description="Collator node(s) to be removed as invulnerables on the parachain")
 ):
-    if nodes or addresses:
-        asyncio.create_task(remove_invulnerable_collators(para_id, nodes, addresses))
+    if node or address:
+        asyncio.create_task(remove_invulnerable_collators(para_id, node, address))
     return PlainTextResponse('OK')
