@@ -15,7 +15,9 @@ class ValidatorManagerTestPoS(unittest.TestCase):
     def setUp(self):
         # Start Alice validator
         self.alice_validator = DockerContainer('parity/polkadot:latest')
-        self.alice_validator.with_command('--chain westend-local --validator --alice --unsafe-ws-external --rpc-cors=all')
+        self.alice_validator.with_command("""
+            --chain westend-local --validator --alice --unsafe-ws-external --rpc-cors=all --rpc-methods=unsafe
+        """)
         self.alice_validator.with_exposed_ports(9944, 10333)
         self.alice_validator.start()
 
@@ -26,7 +28,7 @@ class ValidatorManagerTestPoS(unittest.TestCase):
         self.bob_validator = DockerContainer('parity/polkadot:latest')
         self.bob_validator.with_command("""
             --chain westend-local --validator --bob --unsafe-ws-external --unsafe-rpc-external --rpc-cors=all \
-            --bootnodes /ip4/127.0.0.1/tcp/{}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6
+            --rpc-methods=unsafe --bootnodes /ip4/127.0.0.1/tcp/{}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6
         """.format(self.alice_validator.get_exposed_port(10333)))
         self.bob_validator.with_exposed_ports(9933, 9944)
         self.bob_validator.start()
