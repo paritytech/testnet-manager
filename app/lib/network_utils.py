@@ -8,7 +8,8 @@ from app.config.network_configuration import network_ws_endpoint, network_sudo_s
     node_http_endpoint, get_network, network_consensus
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_manager import get_derived_collator_account, get_collator_status, \
-    collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status
+    collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status, \
+    set_collator_selection_invulnerables, get_collator_selection_invulnerables
 from app.lib.kubernetes_client import list_validator_pods, get_external_validators_from_configmap, \
     list_collator_pods, get_pod, list_substrate_node_pods
 from app.lib.node_utils import is_node_ready, \
@@ -621,3 +622,31 @@ async def deregister_statefulset_collators(para_id, stateful_set_name):
     ss58_format = collators_pods[0].metadata.labels.get('ss58Format', '42')
     collator_node_names = list(map(lambda pod: pod.metadata.name, collators_pods))
     await deregister_collator_nodes(chain, collator_node_names, ss58_format)
+
+
+async def add_invulnerable_collators(para_id, nodes=[], addresses=[]):
+    log.info(f'Adding invulnerables collators to parachain #{para_id}; nodes={nodes} and addresses={addresses}')
+    current_invulnerables = get_collator_selection_invulnerables(para_id)
+    invulnerables_to_add = []
+    for node_name in nodes:
+        node_collator_account = get_substrate_node(node_name).get("collator_account")
+        if node_collator_account:
+            invulnerables_to_add.append(node_collator_account)
+    for account_address in addresses:
+        invulnerables_to_add.append(account_address)
+    invulnerables = list(set(current_invulnerables).union(set(invulnerables_to_add)))
+    await set_collator_selection_invulnerables(para_id, invulnerables)
+
+
+async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
+    log.info(f'Removing invulnerables collators to parachain #{para_id}; nodes={nodes} and addresses={addresses}')
+    current_invulnerables = get_collator_selection_invulnerables(para_id)
+    invulnerables_to_remove = []
+    for node_name in nodes:
+        node_collator_account = get_substrate_node(node_name).get("collator_account")
+        if node_collator_account:
+            invulnerables_to_remove.append(node_collator_account)
+    for account_address in addresses:
+        invulnerables_to_remove.append(account_address)
+    invulnerables = list(set(current_invulnerables).intersection(set(invulnerables_to_remove)))
+    await set_collator_selection_invulnerables(para_id, invulnerables)
