@@ -98,19 +98,21 @@ async def rotate_session_keys(
         raise HTTPException(status_code=404, detail="Feature not implemented yet")
 
 
-@router.post("/onboard_parachain/{para_id}")
-async def onboard_parachain(
-    para_id: str = Path(description="Parachain ID to onboard")
+@router.post("/parachains/onboard")
+async def onboard_parachains(
+    para_id: list[str] = Query(description="Parachain ID(s) to onboard")
 ):
-    asyncio.create_task(onboard_parachain_by_id(para_id))
+    for id in para_id:
+        asyncio.create_task(onboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
 
-@router.post("/offboard_parachain/{para_id}")
-async def offboard_parachain(
-    para_id: str = Path(description="Parachain ID to offboard")
+@router.post("/parachains/offboard")
+async def offboard_parachains(
+    para_id: list[str] = Query(description="Parachain ID(s) to offboard")
 ):
-    asyncio.create_task(offboard_parachain_by_id(para_id))
+    for id in para_id:
+        asyncio.create_task(offboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
 

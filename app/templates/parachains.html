@@ -75,7 +75,7 @@
 
         window.onboardParachain = (element, parachainId) => {
             element.disabled = true
-            fetch(`/api/onboard_parachain/${parachainId}`, {method: "POST"})
+            fetch(`/api/parachains/onboard?para_id${parachainId}`, {method: "POST"})
                 .then(() => {
                     element.textContent = "Onboarding in progress"
                     element.backgroundColor = 'lightgreen'
@@ -88,7 +88,7 @@
         window.offboardParachain = (element, parachainId) => {
             if (window.confirm(`Deregister Parachain #${parachainId}`)) {
                 element.disabled = true
-                fetch(`/api/offboard_parachain/${parachainId}`, {method: "POST"})
+                fetch(`/api/parachains/offboard?para_id=${parachainId}`, {method: "POST"})
                     .then(() => {
                         element.textContent = "Offboarding in progress"
                         element.style.backgroundColor = 'lightgreen'
