@@ -197,23 +197,21 @@
                         <tr>
                             <th>Type</th>
                             <th>Public Key</th>
-                            <th>In keystore</th>
+                            <th>In Keystore</th>
+                            <th>On Chain</th>
                         </tr>
                         {% for keyType,keyValue in node.session_keys.items() %}
                         <tr>
                             <td style="font-weight: bold">{{ keyType }}</td>
                             <td>{{ keyValue }}</td>
-                            <td>{{ node.has_session_keys[keyType] }}</td>
+                            <td>{{ '✅' if node.has_session_keys and node.has_session_keys[keyType] else '❌' }}</td>
+                            <td>{{ '✅' if node.session_keys[keyType] == node.on_chain_session_keys[keyType] else '❌' }}</td>
                         </tr>
                         {% endfor %}
                     </table>
                 </p>
             </details>
         </td>
-    </tr>
-    <tr>
-        <td>Session Keys (on node)</td>
-        <td></td>
     </tr>
     {% endif %}
     </tbody>

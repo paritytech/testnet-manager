@@ -1,6 +1,6 @@
 import logging
 
-from substrateinterface import Keypair
+from substrateinterface import Keypair, KeypairType
 from app.lib.collator_moonbeam import get_moon_node_collator_uri, get_moon_keypair_from_uri, register_moon_collator
 from app.config.network_configuration import network_validators_root_seed
 from app.lib.collator_tick import register_tick_collator
@@ -15,6 +15,14 @@ def get_derived_collator_account(node_name, ss58_format):
     key_seed = network_validators_root_seed()
     keypair = Keypair.create_from_uri(key_seed + "//collator//" + node_name, ss58_format=int(ss58_format))
     return keypair.ss58_address
+
+
+def get_derived_collator_session_keys(node_name):
+    key_seed = network_validators_root_seed()
+    keypair = Keypair.create_from_uri(key_seed + "//collator//" + node_name, crypto_type=KeypairType.SR25519)
+    return {
+        'aura': '0x' + keypair.public_key.hex()
+    }
 
 
 def get_derived_moon_collator_account(node_name):

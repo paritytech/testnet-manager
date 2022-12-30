@@ -1,8 +1,8 @@
 import logging
-from substrateinterface import Keypair
+from substrateinterface import Keypair, KeypairType
 from app.lib.substrate import substrate_query_url, substrate_sudo_call, get_substrate_client, substrate_call, \
     substrate_batchall_call
-from app.config.network_configuration import network_consensus
+from app.config.network_configuration import network_consensus, network_validators_root_seed
 from app.lib.session_keys import decode_session_key
 
 log = logging.getLogger('validator_manager')
@@ -151,3 +151,19 @@ def staking_validators_set(ws_endpoint):
     for validator in all_validators:
         result.append(validator[0].value)
     return result
+
+
+def get_derived_validator_session_keys(node_name):
+    key_seed = network_validators_root_seed()
+    sr_public_key = Keypair.create_from_uri(key_seed + "//validator//" + node_name, crypto_type=KeypairType.SR25519).public_key.hex()
+    # FIXME after https://github.com/polkascan/py-substrate-interface/issues/284
+    #ed_public_key = Keypair.create_from_uri(key_seed + "//validator//" + node_name, crypto_type=KeypairType.ED25519).public_key.hex()
+    return {
+        #'grandpa': '0x' + ed_public_key,
+        'babe': '0x' + sr_public_key,
+        'im_online': '0x' + sr_public_key,
+        'para_validator': '0x' + sr_public_key,
+        'para_assignment': '0x' + sr_public_key,
+        'authority_discovery': '0x' + sr_public_key,
+        'beefy': '0x' + sr_public_key,
+    }

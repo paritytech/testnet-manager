@@ -9,7 +9,7 @@ from app.config.network_configuration import network_ws_endpoint, network_sudo_s
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_manager import get_derived_collator_account, get_collator_status, \
     collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status, \
-    set_collator_selection_invulnerables, get_collator_selection_invulnerables
+    set_collator_selection_invulnerables, get_collator_selection_invulnerables, get_derived_collator_session_keys
 from app.lib.kubernetes_client import list_validator_pods, get_external_validators_from_configmap, \
     list_collator_pods, get_pod, list_substrate_node_pods
 from app.lib.node_utils import is_node_ready, \
@@ -24,7 +24,8 @@ from app.lib.stash_accounts import get_derived_node_stash_account_address, get_n
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
 from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, \
     get_validators_pending_deletion, \
-    deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys
+    deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys, \
+    get_derived_validator_session_keys
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +126,10 @@ def get_node_info_from_pod(pod):
     node_role = node_labels.get('role')
     node_para_id = node_labels.get('paraId')
     node_status = pod.status.phase
-    node_uptime = str(timedelta(seconds=int(datetime.now().timestamp() - pod.status.start_time.timestamp())))
+    if pod.status.start_time:
+        node_uptime = str(timedelta(seconds=int(datetime.now().timestamp() - pod.status.start_time.timestamp())))
+    else:
+        node_update = '?'
     node_image = pod.spec.containers[0].image
     node_args = pod.spec.containers[0].args
 
@@ -204,19 +208,27 @@ def get_substrate_node(node_name):
         node_info['validator_account'] = get_validator_account_from_pod(pod)
         node_info['validator_status'] = get_validator_status(node_info['validator_account'], validator_set, validators_to_add,
                                                             validators_to_retire)
-        node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['validator_account'])
-        if node_info['session_keys']:
-            node_client = get_node_client(node_name)
-            node_info['has_session_keys'] = check_has_session_keys(node_client,  node_info['session_keys'])
+        node_info['on_chain_session_keys'] = get_account_session_keys(ws_endpoint, node_info['validator_account'])
+        if node_info['on_chain_session_keys']:
+            node_info['session_keys'] = node_info['on_chain_session_keys']
+        else:
+            node_info['session_keys'] = get_derived_validator_session_keys(node_name)
+        node_client = get_node_client(node_name)
+        node_info['has_session_keys'] = check_has_session_keys(node_client, node_info['session_keys'])
 
     if node_info.get("role") == "collator":
         node_info['collator_account'] = get_collator_account_from_pod(pod)
         chain = pod.metadata.labels['chain']
         ws_endpoint = node_ws_endpoint(node_name)
         node_client = get_node_client(node_name)
-        node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
-        if node_info['session_keys']:
-            node_info['has_session_keys'] = check_has_session_keys(ws_endpoint, node_info['session_keys'])
+        node_info['on_chain_session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
+        # If not present in on-chain state, get derived session keys
+        if node_info['on_chain_session_keys']:
+            node_info['session_keys'] = node_info['on_chain_session_keys']
+        else:
+            node_info['session_keys'] = get_derived_collator_session_keys(node_name)
+            log.info(node_info['session_keys'])
+        node_info['has_session_keys'] = check_has_session_keys(node_client, node_info['session_keys'])
         if chain.startswith("moon"):
             selected_candidates = node_client.query('ParachainStaking', 'SelectedCandidates', params=[]).value
             candidate_pool = node_client.query('ParachainStaking', 'CandidatePool', params=[]).value

@@ -1,4 +1,5 @@
 KEY_TYPE_SHORT_NAMES = {
+    'aura': 'aura',
     'grandpa': 'gran',
     'babe': 'babe',
     'im_online': 'imon',
