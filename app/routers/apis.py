@@ -114,7 +114,7 @@ async def onboard_parachains(
     parachains = list_parachains()
     for id in para_id:
         # Onboard parachain if not currently active
-        if not parachains.has_key(id):
+        if id not in parachains:
             asyncio.create_task(onboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
@@ -126,7 +126,7 @@ async def offboard_parachains(
     parachains = list_parachains()
     for id in para_id:
         # Offboard parachain if currently active
-        if parachains.has_key(id):
+        if id in parachains:
             asyncio.create_task(offboard_parachain_by_id(id))
     return PlainTextResponse('OK')
 
