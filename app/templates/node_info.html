@@ -104,10 +104,10 @@
         <td>{{ node.properties }}</td>
     </tr>
     <tr>
-        <td>Args</td>
+        <td>Flags</td>
         <td>
             <details>
-                <summary style="list-style:none">⚙️</summary>
+                <summary style="list-style:none">⚙️ View</summary>
                 <p>
                 <ul>
                     {% for arg in node['args'] %}
@@ -124,7 +124,7 @@
         <td>Labels</td>
         <td>
             <details>
-                <summary style="list-style:none">🏷</summary>
+                <summary style="list-style:none">🏷 View</summary>
                 <p>
                 <ul>
                     {% for key,value in node.labels.items() %}
@@ -146,7 +146,7 @@
         <td>Peers</td>
         <td>
             <details>
-                <summary style="list-style:none">👋 {{ node.peers }}</summary>
+                <summary style="list-style:none">View 👋</summary>
                 <p>
                 <table>
                     <tr>
@@ -174,7 +174,7 @@
         <td>Local Listen Addresses</td>
         <td>
             <details>
-                <summary style="list-style:none">📃</summary>
+                <summary style="list-style:none">📃 View</summary>
                 <p>
                 <ul>
                     {% for address in node.localListenAddresses %}
@@ -191,19 +191,29 @@
         <td>Session Keys</td>
         <td>
             <details>
-                <summary style="list-style:none">🔑</summary>
-                <p>
+            <p>
+                <summary style="list-style:none">🔑 View</summary>
                     <table>
-                        {% for k,v in node.session_keys.items() %}
                         <tr>
-                            <td style="font-weight: bold">{{ k }}</td>
-                            <td>{{ v }}</td>
+                            <th>Type</th>
+                            <th>Public Key</th>
+                            <th>In keystore</th>
+                        </tr>
+                        {% for keyType,keyValue in node.session_keys.items() %}
+                        <tr>
+                            <td style="font-weight: bold">{{ keyType }}</td>
+                            <td>{{ keyValue }}</td>
+                            <td>{{ node.has_session_keys[keyType] }}</td>
                         </tr>
                         {% endfor %}
                     </table>
                 </p>
             </details>
         </td>
+    </tr>
+    <tr>
+        <td>Session Keys (on node)</td>
+        <td></td>
     </tr>
     {% endif %}
     </tbody>

@@ -13,7 +13,8 @@ from app.lib.collator_manager import get_derived_collator_account, get_collator_
 from app.lib.kubernetes_client import list_validator_pods, get_external_validators_from_configmap, \
     list_collator_pods, get_pod, list_substrate_node_pods
 from app.lib.node_utils import is_node_ready, \
-    get_last_runtime_upgrade, has_pod_node_role_label
+    get_last_runtime_upgrade, has_pod_node_role_label, \
+    check_has_session_keys
 from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecycles, \
     initialize_parachain, cleanup_parachain, get_parachain_wasm, get_parachain_head, get_parathreads_ids, \
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
@@ -204,13 +205,18 @@ def get_substrate_node(node_name):
         node_info['validator_status'] = get_validator_status(node_info['validator_account'], validator_set, validators_to_add,
                                                             validators_to_retire)
         node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['validator_account'])
+        if node_info['session_keys']:
+            node_client = get_node_client(node_name)
+            node_info['has_session_keys'] = check_has_session_keys(node_client,  node_info['session_keys'])
 
     if node_info.get("role") == "collator":
         node_info['collator_account'] = get_collator_account_from_pod(pod)
-        ws_endpoint = node_ws_endpoint(node_name)
-        node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
         chain = pod.metadata.labels['chain']
+        ws_endpoint = node_ws_endpoint(node_name)
         node_client = get_node_client(node_name)
+        node_info['session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
+        if node_info['session_keys']:
+            node_info['has_session_keys'] = check_has_session_keys(ws_endpoint, node_info['session_keys'])
         if chain.startswith("moon"):
             selected_candidates = node_client.query('ParachainStaking', 'SelectedCandidates', params=[]).value
             candidate_pool = node_client.query('ParachainStaking', 'CandidatePool', params=[]).value
@@ -322,7 +328,6 @@ async def register_validator_pods(pods):
                 log.info(f'Successfully set up PoS Validator: {node}')
             else:
                 log.error(f'Fail to set up PoS Validator: {node}')
-
 
 
 async def register_statefulset_validators(stateful_set_name):

@@ -15,6 +15,7 @@ def get_validator_set(ws_endpoint):
 def get_account_session_keys(ws_endpoint, account):
     return substrate_query_url(ws_endpoint, "Session", "NextKeys", [account])
 
+
 def register_validators(ws_endpoint, sudo_seed, stash_account_addresses):
     substrate_client = get_substrate_client(ws_endpoint)
     keypair = Keypair.create_from_seed(sudo_seed)
