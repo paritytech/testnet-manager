@@ -1,7 +1,7 @@
 image:
   # also update version in manifests/chainspec.yml
-  repository: paritypr/polkadot-debug
-  tag: 6007
+  repository: parity/polkadot
+  tag: latest
   pullPolicy: IfNotPresent
 
 initContainer:
@@ -51,3 +51,11 @@ node:
       scheme: "sr25519"
       seed: "test test test test test test test test test test test junk"
       extraDerivation: "//${HOSTNAME}//authority_discovery"
+
+extraInitContainers:
+  - name: dump-session-keys
+    image: docker.io/paritytech/substrate-session-keys-grabber:d17032f1-20221202
+    args: ["/keystore"]
+    volumeMounts:
+      - mountPath: /keystore
+        name: chain-keystore

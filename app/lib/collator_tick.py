@@ -1,10 +1,9 @@
 import logging
 import traceback
 
-from substrateinterface import Keypair
-from app.lib.substrate import get_node_client
-from app.config.network_configuration import network_validators_root_seed
+from app.lib.collator_account import get_derived_collator_keypair
 from app.lib.node_utils import inject_key
+from app.lib.substrate import get_node_client
 
 log = logging.getLogger('collator_tick')
 
@@ -13,11 +12,9 @@ log = logging.getLogger('collator_tick')
 def register_tick_collator(node_name):
     try:
         node_client = get_node_client(node_name)
-        collator_root_seed = network_validators_root_seed()
-        collator_aura_key = collator_root_seed + "//collator//" + node_name
-        keypair = Keypair.create_from_uri(collator_aura_key)
-        inject_key(node_client, collator_aura_key)
-        return keypair.ss58_address
+        collator_keypair = get_derived_collator_keypair(node_name)
+        inject_key(node_client, collator_keypair)
+        return collator_keypair.ss58_address
 
     except Exception as e:
         log.error("Unable to register_tick_collator. Error: {}, stacktrace:\n".format(e, traceback.print_exc()))

@@ -1,15 +1,16 @@
-# List validators to setup (not in set
-#
 import asyncio
 import logging
 from datetime import datetime, timedelta
 
-from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_validators_root_seed, \
+from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_root_seed, \
     node_http_endpoint, get_network, network_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
-from app.lib.collator_manager import get_derived_collator_account, get_collator_status, \
-    collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status, \
-    set_collator_selection_invulnerables, get_collator_selection_invulnerables, get_derived_collator_session_keys
+from app.lib.collator_account import get_derived_moon_collator_account, get_derived_collator_account, \
+    get_derived_collator_session_keys
+from app.lib.collator_manager import get_collator_status, \
+    collator_register, collator_deregister, get_moon_collator_status, \
+    set_collator_selection_invulnerables, get_collator_selection_invulnerables
+from app.lib.collator_mint import collator_set_keys
 from app.lib.kubernetes_client import list_validator_pods, get_external_validators_from_configmap, \
     list_collator_pods, get_pod, list_substrate_node_pods
 from app.lib.node_utils import is_node_ready, \
@@ -38,7 +39,7 @@ def get_validator_account_from_pod(pod):
     if validator_account:
         return validator_account
     else:
-        return get_derived_node_stash_account_address(network_validators_root_seed(), node_name)
+        return get_derived_node_stash_account_address(network_root_seed(), node_name)
 
 
 def get_collator_account_from_pod(pod):
@@ -249,7 +250,7 @@ def get_substrate_node(node_name):
 async def setup_validators_session_keys(node_name):
     log.info("Setting up validator session key for {}".format(node_name))
     ws_endpoint = network_ws_endpoint()
-    validators_root_seed = network_validators_root_seed()
+    validators_root_seed = network_root_seed()
 
     # Rotate session keys
     node_endpoint = node_http_endpoint(node_name)
@@ -303,7 +304,7 @@ async def register_validator_pods(pods):
     node_stash_accounts = []
     nodes_to_register = []
     consensus = network_consensus()
-    validators_root_seed = network_validators_root_seed()
+    validators_root_seed = network_root_seed()
 
     for pod in pods:
         node = pod.metadata.name
@@ -393,7 +394,7 @@ async def deregister_validator_pods(pods):
     if pods_to_deregister and consensus == "pos":
         log.info(f'The following validators will be deregister: {pods_to_deregister}')
         for pod_name in pods_to_deregister:
-            validator_stash_mnemonic = get_node_stash_account_mnemonic(network_validators_root_seed(), pod_name)
+            validator_stash_mnemonic = get_node_stash_account_mnemonic(network_root_seed(), pod_name)
             staking_chill(ws_endpoint, validator_stash_mnemonic)
 
 
@@ -671,3 +672,11 @@ async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
         invulnerables_to_remove.append(account_address)
     invulnerables = list(set(current_invulnerables).intersection(set(invulnerables_to_remove)))
     await set_collator_selection_invulnerables(para_id, invulnerables)
+
+
+async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
+    for node_name in nodes:
+        collator_set_keys(node_name, para_id)
+    #if statefulset:
+        #get statefulset node list
+        #collator_set_keys()

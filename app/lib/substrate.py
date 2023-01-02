@@ -1,7 +1,5 @@
 import logging
 from substrateinterface import SubstrateInterface, Keypair
-from substrateinterface.exceptions import SubstrateRequestException
-from websocket import WebSocketConnectionClosedException, WebSocketBadStatusException, WebSocketTimeoutException
 from app.config.network_configuration import network_ws_endpoint, node_ws_endpoint, network_sudo_seed
 from app.config import ws_pool
 

@@ -42,11 +42,21 @@ def node_ws_endpoint(node_name):
     return node_ws_pattern.replace("NODE_NAME", node_name)
 
 
-def network_validators_root_seed():
+def network_root_seed():
     return get_var_from_env('VALIDATORS_ROOT_SEED')
+
 
 def network_sudo_seed():
     return get_var_from_env('SUDO_SEED')
+
+
+def get_network_ss58_format():
+    network_ss58_format = get_var_from_env('NETWORK_SS58_FORMAT')
+    if network_ss58_format is None:
+        # If unset set, set to Rococo value
+        return '42'
+    else:
+        return network_ss58_format
 
 
 def network_healthy_min_peer_count():
