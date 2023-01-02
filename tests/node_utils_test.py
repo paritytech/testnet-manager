@@ -33,7 +33,7 @@ class NodeUtilsTest(unittest.TestCase):
 
     def test_get_node_health(self):
         health = get_node_health(self.polkadot_rpc_http_url)
-        self.assertEquals(health.status_code, 200, "Successfully retrieved node health")
+        self.assertEqual(health.status_code, 200, "Successfully retrieved node health")
 
     def test_is_node_ready(self):
         node_ready = is_node_ready(self.polkadot_rpc_http_url)
@@ -45,7 +45,7 @@ class NodeUtilsTest(unittest.TestCase):
 
     def test_get_node_peer_id(self):
         node_peer_id = substrate_rpc_request(self.polkadot_node_client, "system_localPeerId")
-        self.assertEquals(node_peer_id, '12D3KooWMddYZctYE6RePcxvEWvU1Xyq5X4x7WW6FK4GjVF8QvFt', "Successfully retrieved peer ID")
+        self.assertEqual(node_peer_id, '12D3KooWMddYZctYE6RePcxvEWvU1Xyq5X4x7WW6FK4GjVF8QvFt', "Successfully retrieved peer ID")
 
     def test_get_node_version(self):
         node_binary_version = self.polkadot.exec("polkadot --version").output.decode("utf-8")
