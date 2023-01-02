@@ -24,3 +24,11 @@ node:
   # kube-setup/chainspec.yml
   customChainspecUrl: http://chainspec.rococo/rococo-local.json
   forceDownloadChainspec: true
+
+extraInitContainers:
+  - name: dump-session-keys
+    image: docker.io/paritytech/substrate-session-keys-grabber:d17032f1-20221202
+    args: ["/keystore"]
+    volumeMounts:
+      - mountPath: /keystore
+        name: chain-keystore

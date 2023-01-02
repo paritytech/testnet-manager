@@ -22,14 +22,12 @@ releases:
   - name: localwococo-bootnode
     namespace: wococo
     chart: parity/node
-    version: 4.0.2
     values:
       - ./values-localwococo-bootnode.yaml
 
   - name: localwococo-validator-a
     namespace: wococo
     chart: parity/node
-    version: 4.0.2
     values:
       - ./values-localwococo-bootnode.yaml
       - node:
