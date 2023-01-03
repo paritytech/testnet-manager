@@ -676,7 +676,5 @@ async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
 
 async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
     for node_name in nodes:
-        collator_set_keys(node_name, para_id)
-    #if statefulset:
-        #get statefulset node list
-        #collator_set_keys()
+        ss58_format = get_substrate_node(node_name).get("ss58_format")
+        collator_set_keys(node_name, para_id, ss58_format)

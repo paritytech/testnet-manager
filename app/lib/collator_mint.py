@@ -97,10 +97,9 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
         return None
 
 
-def collator_set_keys(node_name, para_id):
+def collator_set_keys(node_name, para_id, ss58_format):
     try:
         # 1. Get collator account keypair
-        ss58_format = get_substrate_node(node_name).get("ss58_format")
         collator_keypair = get_derived_collator_keypair(node_name, ss58_format)
         collator_account_address = collator_keypair.ss58_address
         # 2. Check funds
