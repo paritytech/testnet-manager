@@ -78,7 +78,7 @@ class ParachainManagerTest(unittest.TestCase):
         para_id = 102
         initialize_parachain(self.relay_substrate, self.alice_key, para_id, '0x11', '0x11', 1)
         leases_count = get_parachain_leases_count(self.relay_substrate, para_id)
-        self.assertEquals(leases_count, 1, 'Slot lease set')
+        self.assertEqual(leases_count, 1, 'Slot lease set')
 
 
 if __name__ == '__main__':

@@ -3,7 +3,10 @@ import logging
 
 from fastapi import APIRouter, Path, Query, HTTPException
 from starlette.responses import JSONResponse, PlainTextResponse
+from substrateinterface import Keypair
 
+from app.config.network_configuration import network_sudo_seed
+from app.lib.balance_utils import teleport_funds
 from app.lib.kubernetes_client import list_validator_stateful_sets
 from app.lib.log_utils import get_node_pod_logs
 from app.lib.network_utils import list_substrate_nodes, list_validators, list_parachains, list_parachain_collators, \
@@ -11,7 +14,9 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     rotate_nodes_session_keys, register_statefulset_collators, onboard_parachain_by_id, \
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
-    deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators
+    deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators, \
+    set_collator_nodes_keys_on_chain
+from app.lib.substrate import get_relay_chain_client
 
 log = logging.getLogger('router_apis')
 
@@ -180,4 +185,27 @@ async def remove_invulnerables(
 ):
     if node or address:
         asyncio.create_task(remove_invulnerable_collators(para_id, node, address))
+    return PlainTextResponse('OK')
+
+
+@router.post("/collators/set_on_chain_keys")
+async def set_on_chain_keys(
+    para_id: str = Query(description="Parachain ID"),
+    node: list[str] = Query(default=[], description="Collator node(s) for which to set keys on chain"),
+    statefulset: str = Query(default=None, description="Name of the StatefulSet for which to set keys on chain"),
+):
+    if node:
+        asyncio.create_task(set_collator_nodes_keys_on_chain(para_id, node,statefulset))
+    return PlainTextResponse('OK')
+
+
+@router.post("/xcm/teleport_funds")
+def teleport_funds_from_sudo(
+    para_id: int = Query(description="Parachain ID"),
+    account: list[str] = Query(description="Account(s) to fund on the Parachain (in relay-chain SS58 format)"),
+    amount: int = Query(default=1000000000000, description="Amount to transfer to each accounts")
+):
+    relay_chain_client = get_relay_chain_client()
+    from_account_keypair = Keypair.create_from_seed(network_sudo_seed())
+    teleport_funds(relay_chain_client, from_account_keypair, para_id, account, amount)
     return PlainTextResponse('OK')

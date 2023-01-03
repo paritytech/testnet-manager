@@ -1,7 +1,7 @@
 import logging
 
 from substrateinterface import Keypair
-from app.lib.balance_utils import transfer_funds
+from app.lib.balance_utils import transfer_funds, teleport_funds
 from app.lib.substrate import substrate_query_url, get_substrate_client
 
 

@@ -1,19 +1,21 @@
-# List validators to setup (not in set
-#
 import asyncio
 import logging
 from datetime import datetime, timedelta
 
-from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_validators_root_seed, \
-    node_http_endpoint, get_network, network_consensus
+from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_root_seed, \
+    node_http_endpoint, get_network, network_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
-from app.lib.collator_manager import get_derived_collator_account, get_collator_status, \
-    collator_register, collator_deregister, get_derived_moon_collator_account, get_moon_collator_status, \
+from app.lib.collator_account import get_derived_moon_collator_account, get_derived_collator_account, \
+    get_derived_collator_session_keys
+from app.lib.collator_manager import get_collator_status, \
+    collator_register, collator_deregister, get_moon_collator_status, \
     set_collator_selection_invulnerables, get_collator_selection_invulnerables
+from app.lib.collator_mint import collator_set_keys
 from app.lib.kubernetes_client import list_validator_pods, get_external_validators_from_configmap, \
     list_collator_pods, get_pod, list_substrate_node_pods
 from app.lib.node_utils import is_node_ready, \
-    get_last_runtime_upgrade, has_pod_node_role_label
+    get_last_runtime_upgrade, has_pod_node_role_label, \
+    check_has_session_keys
 from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecycles, \
     initialize_parachain, cleanup_parachain, get_parachain_wasm, get_parachain_head, get_parathreads_ids, \
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
@@ -21,8 +23,10 @@ from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecy
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
-from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, get_validators_pending_deletion, \
-    deregister_validators, register_validators, setup_pos_validator, staking_chill
+from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, \
+    get_validators_pending_deletion, \
+    deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys, \
+    get_derived_validator_session_keys
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +39,7 @@ def get_validator_account_from_pod(pod):
     if validator_account:
         return validator_account
     else:
-        return get_derived_node_stash_account_address(network_validators_root_seed(), node_name)
+        return get_derived_node_stash_account_address(network_root_seed(), node_name)
 
 
 def get_collator_account_from_pod(pod):
@@ -123,7 +127,10 @@ def get_node_info_from_pod(pod):
     node_role = node_labels.get('role')
     node_para_id = node_labels.get('paraId')
     node_status = pod.status.phase
-    node_uptime = str(timedelta(seconds=int(datetime.now().timestamp() - pod.status.start_time.timestamp())))
+    if pod.status.start_time:
+        node_uptime = str(timedelta(seconds=int(datetime.now().timestamp() - pod.status.start_time.timestamp())))
+    else:
+        node_update = '?'
     node_image = pod.spec.containers[0].image
     node_args = pod.spec.containers[0].args
 
@@ -202,10 +209,27 @@ def get_substrate_node(node_name):
         node_info['validator_account'] = get_validator_account_from_pod(pod)
         node_info['validator_status'] = get_validator_status(node_info['validator_account'], validator_set, validators_to_add,
                                                             validators_to_retire)
+        node_info['on_chain_session_keys'] = get_account_session_keys(ws_endpoint, node_info['validator_account'])
+        if node_info['on_chain_session_keys']:
+            node_info['session_keys'] = node_info['on_chain_session_keys']
+        else:
+            node_info['session_keys'] = get_derived_validator_session_keys(node_name)
+        node_client = get_node_client(node_name)
+        node_info['has_session_keys'] = check_has_session_keys(node_client, node_info['session_keys'])
+
     if node_info.get("role") == "collator":
         node_info['collator_account'] = get_collator_account_from_pod(pod)
         chain = pod.metadata.labels['chain']
+        ws_endpoint = node_ws_endpoint(node_name)
         node_client = get_node_client(node_name)
+        node_info['on_chain_session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
+        # If not present in on-chain state, get derived session keys
+        if node_info['on_chain_session_keys']:
+            node_info['session_keys'] = node_info['on_chain_session_keys']
+        else:
+            node_info['session_keys'] = get_derived_collator_session_keys(node_name)
+            log.info(node_info['session_keys'])
+        node_info['has_session_keys'] = check_has_session_keys(node_client, node_info['session_keys'])
         if chain.startswith("moon"):
             selected_candidates = node_client.query('ParachainStaking', 'SelectedCandidates', params=[]).value
             candidate_pool = node_client.query('ParachainStaking', 'CandidatePool', params=[]).value
@@ -226,7 +250,7 @@ def get_substrate_node(node_name):
 async def setup_validators_session_keys(node_name):
     log.info("Setting up validator session key for {}".format(node_name))
     ws_endpoint = network_ws_endpoint()
-    validators_root_seed = network_validators_root_seed()
+    validators_root_seed = network_root_seed()
 
     # Rotate session keys
     node_endpoint = node_http_endpoint(node_name)
@@ -280,7 +304,7 @@ async def register_validator_pods(pods):
     node_stash_accounts = []
     nodes_to_register = []
     consensus = network_consensus()
-    validators_root_seed = network_validators_root_seed()
+    validators_root_seed = network_root_seed()
 
     for pod in pods:
         node = pod.metadata.name
@@ -317,7 +341,6 @@ async def register_validator_pods(pods):
                 log.info(f'Successfully set up PoS Validator: {node}')
             else:
                 log.error(f'Fail to set up PoS Validator: {node}')
-
 
 
 async def register_statefulset_validators(stateful_set_name):
@@ -371,7 +394,7 @@ async def deregister_validator_pods(pods):
     if pods_to_deregister and consensus == "pos":
         log.info(f'The following validators will be deregister: {pods_to_deregister}')
         for pod_name in pods_to_deregister:
-            validator_stash_mnemonic = get_node_stash_account_mnemonic(network_validators_root_seed(), pod_name)
+            validator_stash_mnemonic = get_node_stash_account_mnemonic(network_root_seed(), pod_name)
             staking_chill(ws_endpoint, validator_stash_mnemonic)
 
 
@@ -463,7 +486,6 @@ async def onboard_parachain_by_id(para_id):
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     parachain_pods = list_collator_pods(para_id)
-    #
     para_node_client = get_node_client(parachain_pods[0].metadata.name)
     node_para_id = get_parachain_id(parachain_pods[0])
     if node_para_id == para_id:
@@ -650,3 +672,11 @@ async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
         invulnerables_to_remove.append(account_address)
     invulnerables = list(set(current_invulnerables).intersection(set(invulnerables_to_remove)))
     await set_collator_selection_invulnerables(para_id, invulnerables)
+
+
+async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
+    for node_name in nodes:
+        collator_set_keys(node_name, para_id)
+    #if statefulset:
+        #get statefulset node list
+        #collator_set_keys()

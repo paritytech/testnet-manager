@@ -93,19 +93,21 @@
         <td>Sync State</td>
         <td>{{ node.syncState }}</td>
     </tr>
+    {% if node.health.isSyncing %}
     <tr>
         <td>Is Syncing</td>
         <td>{{ node.health.isSyncing }}</td>
     </tr>
+    {% endif %}
     <tr>
         <td>Properties</td>
         <td>{{ node.properties }}</td>
     </tr>
     <tr>
-        <td>Args</td>
+        <td>Flags</td>
         <td>
             <details>
-                <summary style="list-style:none">⚙️</summary>
+                <summary style="list-style:none">⚙️ View</summary>
                 <p>
                 <ul>
                     {% for arg in node['args'] %}
@@ -122,7 +124,7 @@
         <td>Labels</td>
         <td>
             <details>
-                <summary style="list-style:none">🏷</summary>
+                <summary style="list-style:none">🏷 View</summary>
                 <p>
                 <ul>
                     {% for key,value in node.labels.items() %}
@@ -133,16 +135,18 @@
             </details>
         </td>
     </tr>
+    {% if node.health.peers %}
     <tr>
         <td>Peers Count</td>
         <td>{{ node.health.peers }}</td>
     </tr>
-    {% if node.peers %}
+    {% endif %}
+    {% if node.peers != '?' %}
     <tr>
         <td>Peers</td>
         <td>
             <details>
-                <summary style="list-style:none">👋</summary>
+                <summary style="list-style:none">View 👋</summary>
                 <p>
                 <table>
                     <tr>
@@ -165,11 +169,12 @@
         </td>
     </tr>
     {% endif %}
+    {% if node.localListenAddresses and node.localListenAddresses != '?' %}
     <tr>
         <td>Local Listen Addresses</td>
         <td>
             <details>
-                <summary style="list-style:none">📃</summary>
+                <summary style="list-style:none">📃 View</summary>
                 <p>
                 <ul>
                     {% for address in node.localListenAddresses %}
@@ -180,6 +185,35 @@
             </details>
         </td>
     </tr>
+    {% endif %}
+    {% if node.session_keys %}
+    <tr>
+        <td>Session Keys</td>
+        <td>
+            <details>
+            <p>
+                <summary style="list-style:none">🔑 View</summary>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Public Key</th>
+                            <th>In Keystore</th>
+                            <th>On Chain</th>
+                        </tr>
+                        {% for keyType,keyValue in node.session_keys.items() %}
+                        <tr>
+                            <td style="font-weight: bold">{{ keyType }}</td>
+                            <td>{{ keyValue }}</td>
+                            <td>{{ '✅' if node.has_session_keys and node.has_session_keys[keyType] else '❌' }}</td>
+                            <td>{{ '✅' if node.session_keys[keyType] == node.on_chain_session_keys[keyType] else '❌' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    {% endif %}
     </tbody>
 </table>
 

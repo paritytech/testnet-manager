@@ -1,6 +1,7 @@
 import requests
 import logging
 
+from app.config.constants import KEY_TYPE_SHORT_NAMES
 from app.config.network_configuration import network_healthy_min_peer_count
 from substrateinterface import Keypair
 
@@ -64,6 +65,7 @@ def is_node_ready_ws(node_client):
         log.error("Failed to call System.Number on {}; Error: {}".format(getattr(node_client, 'url', 'NO_URL'), err))
         return False
 
+
 def get_node_version(node_client):
     try:
         return node_client.rpc_request(method='system_version', params=[])['result']
@@ -88,6 +90,23 @@ def get_last_runtime_upgrade(node_client):
     except Exception as err:
         log.error("Failed to call System.LastRuntimeUpgrade on {}; Error: {}".format(getattr(node_client, 'url', 'NO_URL'), err))
         return None
+
+
+def node_keystore_has_key(node_client, public_key_type, public_key_value):
+    short_key_type = KEY_TYPE_SHORT_NAMES[public_key_type]
+    try:
+        log.debug(f'Check that node has [keyType={short_key_type},publicKey={public_key_value}]')
+        return node_client.rpc_request(method='author_hasKey', params=[public_key_value, short_key_type])['result']
+    except Exception as err:
+        log.warning(f'Failed to call author_hasKey[keyType={short_key_type},publicKey={public_key_value}] on {getattr(node_client, "url", "NO_URL")}; Error: {err}')
+        return None
+
+
+def check_has_session_keys(node_client, session_keys=None):
+    has_session_keys = {}
+    for key_type, key_value in session_keys.items():
+        has_session_keys[key_type] = node_keystore_has_key(node_client, key_type, key_value)
+    return has_session_keys
 
 
 def inject_key(node_client, key_uri, key_type='aura'):

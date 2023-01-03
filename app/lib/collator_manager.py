@@ -1,8 +1,10 @@
 import logging
 
 from substrateinterface import Keypair
-from app.lib.collator_moonbeam import get_moon_node_collator_uri, get_moon_keypair_from_uri, register_moon_collator
-from app.config.network_configuration import network_validators_root_seed
+
+from app.lib.collator_account import get_moon_keypair_from_uri
+from app.lib.collator_moonbeam import get_moon_node_collator_uri, register_moon_collator
+from app.config.network_configuration import network_root_seed
 from app.lib.collator_tick import register_tick_collator
 from app.lib.collator_mint import register_mint_collator, deregister_mint_collator
 from app.lib.kubernetes_client import list_collator_pods
@@ -12,13 +14,13 @@ log = logging.getLogger('collator_manager')
 
 
 def get_derived_collator_account(node_name, ss58_format):
-    key_seed = network_validators_root_seed()
+    key_seed = network_root_seed()
     keypair = Keypair.create_from_uri(key_seed + "//collator//" + node_name, ss58_format=int(ss58_format))
     return keypair.ss58_address
 
 
 def get_derived_moon_collator_account(node_name):
-    key_seed = network_validators_root_seed()
+    key_seed = network_root_seed()
     keypair = get_moon_keypair_from_uri(get_moon_node_collator_uri(key_seed, node_name))
     return keypair.ss58_address
 

@@ -19,7 +19,7 @@ releases:
   - name: localrococo-bootnode
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
+    version: 4.2.6
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
@@ -31,7 +31,6 @@ releases:
   - name: localrococo-bootnode-bob
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
@@ -43,17 +42,25 @@ releases:
   - name: localrococo-validator-a
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
           replicas: 1
+      - node:
+          keys:
+            - type: gran
+              scheme: "ed25519"
+              seed: "test test test test test test test test test test test junk"
+              extraDerivation: "//validator//${HOSTNAME}"
+            - type: babe
+              scheme: "sr25519"
+              seed: "test test test test test test test test test test test junk"
+              extraDerivation: "//validator//${HOSTNAME}"
 
 ## Para chain Shell ##
   - name: localrococo-shell-collator
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-shell-collator.yaml
 
@@ -61,7 +68,6 @@ releases:
   - name: localrococo-statemint-alice
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-statemint-collator.yaml
       - node:
@@ -74,7 +80,6 @@ releases:
   - name: localrococo-statemint-bob
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-statemint-collator.yaml
       - node:
@@ -87,15 +92,18 @@ releases:
   - name: localrococo-statemint-a
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-statemint-collator.yaml
-
+      - node:
+          keys:
+            - type: aura
+              scheme: "sr25519"
+              seed: "test test test test test test test test test test test junk"
+              extraDerivation: "//collator//${HOSTNAME}"
 ## Para chain Moonbase ##
   - name: localrococo-moonbase-alice
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-moonbase-collator.yml
       - node:
@@ -109,7 +117,6 @@ releases:
   - name: localrococo-moonbase-collator
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-moonbase-collator.yml
 
@@ -117,7 +124,6 @@ releases:
   - name: localrococo-tick-collator
     namespace: rococo
     chart: parity/node
-    version: 4.0.2
     values:
       - values-tick-collator.yml
 

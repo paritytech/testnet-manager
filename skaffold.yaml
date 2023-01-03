@@ -16,10 +16,7 @@ deploy:
       namespace: rococo
       repo: https://paritytech.github.io/helm-charts/
       remoteChart: testnet-manager
-      artifactOverrides:
-        image: local/testnet-manager
-      imageStrategy:
-        helm: {}
+      upgradeOnChange: true
       valuesFiles:
         - local-kubernetes/charts/values-testnet-manager.yml
 portForward:

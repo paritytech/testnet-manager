@@ -1,7 +1,6 @@
 import logging
-import time
 
-from substrateinterface import Keypair
+from substrateinterface import Keypair, KeypairType
 from app.lib.substrate import substrate_batchall_call, substrate_call
 
 log = logging.getLogger('balance_utils')
@@ -47,6 +46,38 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
         return True
     else:
         log.error("Account {} did not receive fund, Extrinsic failed. Error: {}".format(
+            target_account_address_list, getattr(receipt, 'error_message', None)))
+        return None
+
+
+def teleport_funds(substrate_client, from_account_keypair, para_id, target_account_address_list, transfer_amount):
+    log.info(f'Teleporting funds: {transfer_amount} UNIT from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}')
+    batch_call = []
+    for address in target_account_address_list:
+        target_account_public_key = Keypair(ss58_address=address, crypto_type=KeypairType.SR25519).public_key
+        batch_call.append(substrate_client.compose_call(
+        call_module='XcmPallet',
+        call_function='limited_teleport_assets',
+        call_params={
+            'dest': {'V1': {'parents': 0, 'interior': {'X1': {'Parachain': para_id}}}},
+            "beneficiary": {"V1": {"parents": 0, "interior": {
+                "X1": {"AccountId32": ("Any", target_account_public_key)}}}},
+            'assets': {'V1': [[{'fun': {'Fungible': transfer_amount}, 'id': {
+                'Concrete': {'parents': 0, 'interior': 'Here'}}}]]},
+            'fee_asset_item': 0,
+            'weight_limit': 'Unlimited',
+            }
+        ))
+
+    if len(batch_call) == 1:
+        receipt = substrate_call(substrate_client, from_account_keypair, batch_call[0])
+    else:
+        receipt = substrate_batchall_call(substrate_client, from_account_keypair, batch_call)
+
+    if receipt and receipt.is_success:
+        return True
+    else:
+        log.error("Teleport to Accounts={} failed. Error: {}".format(
             target_account_address_list, getattr(receipt, 'error_message', None)))
         return None
 

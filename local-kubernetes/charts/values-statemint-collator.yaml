@@ -1,7 +1,7 @@
 image:
   # also update version in kube-setup/chainspec.yml
-  repository: paritypr/polkadot-parachain-debug
-  tag: v0.9.230-ec1786ca
+  repository: parity/polkadot-parachain
+  tag: latest
   pullPolicy: IfNotPresent
 
 initContainer:

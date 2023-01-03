@@ -4,7 +4,7 @@ import unittest
 from testcontainers.core.container import DockerContainer
 from substrateinterface import SubstrateInterface, Keypair
 
-from app.lib.balance_utils import get_funds, transfer_funds, fund_accounts
+from app.lib.balance_utils import get_funds, transfer_funds, fund_accounts, teleport_funds
 from tests.test_utils import wait_for_http_ready
 
 
@@ -53,6 +53,14 @@ class BalanceUtilsTest(unittest.TestCase):
         funds = get_funds(self.substrate_client, self.test_key_0_address)
         print("funds", funds)
         self.assertEqual(funds, 1000000000000, 'Alice account have {} token'.format(funds))
+
+    def test_teleport_funds(self):
+        alice_keypair = Keypair.create_from_seed(self.alice_key)
+        alice_funds_before_teleport = get_funds(self.substrate_client, alice_keypair.ss58_address)
+        teleport_amount = 10000000000000000
+        teleport_funds(self.substrate_client, alice_keypair, 1000, [self.test_key_0_address], 10000000000000000)
+        alice_funds_after_teleport = get_funds(self.substrate_client, alice_keypair.ss58_address)
+        self.assertLess(alice_funds_after_teleport, alice_funds_before_teleport - teleport_amount, 'Alice account have {} been teleported')
 
     def test_fund_accounts(self):
         print(datetime.datetime.now())
