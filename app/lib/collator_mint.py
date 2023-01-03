@@ -7,8 +7,7 @@ from app.config.network_configuration import network_root_seed, get_network_ss58
     network_sudo_seed
 from app.lib.balance_utils import transfer_funds, teleport_funds
 from app.lib.collator_account import get_derived_collator_keypair, get_derived_collator_seed
-from app.lib.network_utils import get_substrate_node
-from app.lib.node_utils import inject_key, node_keystore_has_key
+from app.lib.node_utils import inject_key, node_keystore_has_key, check_has_session_keys
 from app.lib.session_keys import set_node_session_key
 from app.lib.stash_accounts import get_account_funds
 from app.lib.substrate import get_node_client, substrate_sudo_relay_xcm_call, get_relay_chain_client
@@ -97,10 +96,9 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
         return None
 
 
-def collator_set_keys(node_name, para_id):
+def collator_set_keys(node_name, para_id, ss58_format):
     try:
         # 1. Get collator account keypair
-        ss58_format = get_substrate_node(node_name).get("ss58_format")
         collator_keypair = get_derived_collator_keypair(node_name, ss58_format)
         collator_account_address = collator_keypair.ss58_address
         # 2. Check funds
@@ -124,11 +122,12 @@ def collator_set_keys(node_name, para_id):
         if not node_keystore_has_key(node_client, 'aura', aura_public_key):
             log.error(f'Node ({node_name}) doesn\'t have the required aura key in its keystore')
             return None
-        # 5. Setting aura key on chain via "set session key"
-        set_session_key_result = set_node_session_key(node_client.url, collator_keypair.seed_hex, aura_public_key)
-        if not set_session_key_result:
-            log.error("Unable to rotate session key for node: {}".format(getattr(node_client, 'url', 'NO_URL')))
-            return None
+        # 5. Setting aura key on chain via "set session key" if not already set
+        if check_has_session_keys(node_client.url, {'aura': aura_public_key}):
+            set_session_key_result = set_node_session_key(node_client.url, collator_keypair.seed_hex, aura_public_key)
+            if not set_session_key_result:
+                log.error(f"Unable to set session key for node: {node_client.url}, session_key={aura_public_key}")
+                return None
     except Exception as e:
         log.error("Unable to collator_set_keys. Error: {}, stacktrace:\n".format(e, traceback.print_exc()))
         return None
