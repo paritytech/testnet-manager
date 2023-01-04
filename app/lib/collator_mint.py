@@ -127,7 +127,8 @@ def collator_set_keys(node_name, para_id, ss58_format):
             return None
         # 5. Setting aura key on chain via "set session key" if not already set
         if check_has_session_keys(node_client, {'aura': aura_public_key}):
-            set_session_key_result = set_node_session_key(node_client.url, collator_keypair.seed_hex, aura_public_key)
+            collator_seed_phrase = get_derived_collator_seed(node_name)
+            set_session_key_result = set_node_session_key(node_client.url, collator_seed_phrase, aura_public_key)
             if not set_session_key_result:
                 log.error(f"Unable to set session key for node: {node_client.url}, session_key={aura_public_key}")
                 return None
