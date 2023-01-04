@@ -1,4 +1,5 @@
 import logging
+import time
 import traceback
 
 from substrateinterface import Keypair
@@ -107,23 +108,25 @@ def collator_set_keys(node_name, para_id, ss58_format):
         collator_account_funds = get_account_funds(node_client.url, collator_account_address)
         # 3. If insufficient, add funds with teleport
         if collator_account_funds < 0.5 * 10 ** 9:
-            log.info(f"Funding {collator_account_address} (funds={collator_account_funds}) via Teleport from relay-chain")
             relay_chain_client = get_relay_chain_client()
             sudo_keypair = Keypair.create_from_seed(network_sudo_seed())
+            log.info(f"Funding {collator_account_address}[ss58format={ss58_format}](funds={collator_account_funds}) via Teleport from relay-chain")
             # Get corresponding collator account address on the relay-chain (with the relay-chain ss58 format)
             relay_chain_collator_account = get_derived_collator_keypair(node_name, get_network_ss58_format())
-            teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [collator_account_address], 1 * 10 ** 12)
+            teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1 * 10 ** 12)
             if not teleport_result:
                 log.error("Unable fund account: {}, node: {}".format(
                     collator_account_address, getattr(relay_chain_client, 'url', 'NO_URL')))
                 return None
+            log.info("Waiting 1 minute for teleport to complete")
+            time.sleep(60)
         # 4. Check node has aura key
         aura_public_key = "0x" + collator_keypair.public_key.hex()
         if not node_keystore_has_key(node_client, 'aura', aura_public_key):
             log.error(f'Node ({node_name}) doesn\'t have the required aura key in its keystore')
             return None
         # 5. Setting aura key on chain via "set session key" if not already set
-        if check_has_session_keys(node_client.url, {'aura': aura_public_key}):
+        if check_has_session_keys(node_client, {'aura': aura_public_key}):
             set_session_key_result = set_node_session_key(node_client.url, collator_keypair.seed_hex, aura_public_key)
             if not set_session_key_result:
                 log.error(f"Unable to set session key for node: {node_client.url}, session_key={aura_public_key}")

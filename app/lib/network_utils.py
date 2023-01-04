@@ -21,7 +21,8 @@ from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecy
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
     get_permanent_slot_lease_period_length, get_all_parachain_heads
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
-from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic
+from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic, \
+    get_account_funds
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
 from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, \
     get_validators_pending_deletion, \
@@ -207,6 +208,7 @@ def get_substrate_node(node_name):
         validators_to_add = get_validators_pending_addition(ws_endpoint)
         validators_to_retire = get_validators_pending_deletion(ws_endpoint)
         node_info['validator_account'] = get_validator_account_from_pod(pod)
+        node_info['validator_account_funds'] = get_account_funds(ws_endpoint, node_info['validator_account'])
         node_info['validator_status'] = get_validator_status(node_info['validator_account'], validator_set, validators_to_add,
                                                             validators_to_retire)
         node_info['on_chain_session_keys'] = get_account_session_keys(ws_endpoint, node_info['validator_account'])
@@ -222,6 +224,7 @@ def get_substrate_node(node_name):
         chain = pod.metadata.labels['chain']
         ws_endpoint = node_ws_endpoint(node_name)
         node_client = get_node_client(node_name)
+        node_info['collator_account_funds'] = get_account_funds(ws_endpoint, node_info['collator_account'])
         node_info['on_chain_session_keys'] = get_account_session_keys(ws_endpoint, node_info['collator_account'])
         # If not present in on-chain state, get derived session keys
         if node_info['on_chain_session_keys']:
