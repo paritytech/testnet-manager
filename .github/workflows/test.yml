@@ -13,7 +13,7 @@ jobs:
       TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:

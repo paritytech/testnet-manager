@@ -107,12 +107,12 @@ def collator_set_keys(node_name, para_id, ss58_format):
         node_client = get_node_client(node_name)
         collator_account_funds = get_account_funds(node_client.url, collator_account_address)
         # 3. If insufficient, add funds with teleport
-        if collator_account_funds < 0.5 * 10 ** 9:
+        if collator_account_funds < 0.5 * 10 ** 12:
             relay_chain_client = get_relay_chain_client()
             sudo_keypair = Keypair.create_from_seed(network_sudo_seed())
             log.info(f"Funding {collator_account_address}[ss58format={ss58_format}](funds={collator_account_funds}) via Teleport from relay-chain")
             # Get corresponding collator account address on the relay-chain (with the relay-chain ss58 format)
-            relay_chain_collator_account = get_derived_collator_keypair(node_name, get_network_ss58_format())
+            relay_chain_collator_account = get_derived_collator_keypair(node_name, get_network_ss58_format()).ss58_address
             teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1 * 10 ** 12)
             if not teleport_result:
                 log.error("Unable fund account: {}, node: {}".format(
@@ -127,7 +127,8 @@ def collator_set_keys(node_name, para_id, ss58_format):
             return None
         # 5. Setting aura key on chain via "set session key" if not already set
         if check_has_session_keys(node_client, {'aura': aura_public_key}):
-            set_session_key_result = set_node_session_key(node_client.url, collator_keypair.seed_hex, aura_public_key)
+            collator_seed_phrase = get_derived_collator_seed(node_name)
+            set_session_key_result = set_node_session_key(node_client.url, collator_seed_phrase, aura_public_key)
             if not set_session_key_result:
                 log.error(f"Unable to set session key for node: {node_client.url}, session_key={aura_public_key}")
                 return None
