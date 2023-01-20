@@ -231,7 +231,6 @@ def get_substrate_node(node_name):
             node_info['session_keys'] = node_info['on_chain_session_keys']
         else:
             node_info['session_keys'] = get_derived_collator_session_keys(node_name)
-            log.info(node_info['session_keys'])
         node_info['has_session_keys'] = check_has_session_keys(node_client, node_info['session_keys'])
         if chain.startswith("moon"):
             selected_candidates = node_client.query('ParachainStaking', 'SelectedCandidates', params=[]).value
@@ -673,7 +672,7 @@ async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
             invulnerables_to_remove.append(node_collator_account)
     for account_address in addresses:
         invulnerables_to_remove.append(account_address)
-    invulnerables = list(set(current_invulnerables).intersection(set(invulnerables_to_remove)))
+    invulnerables = list(set(current_invulnerables).difference(set(invulnerables_to_remove)))
     await set_collator_selection_invulnerables(para_id, invulnerables)
 
 
