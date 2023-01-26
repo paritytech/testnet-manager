@@ -97,7 +97,7 @@ reload: build
 	@make web
 
 log:
-	@kubectl --context ${KUBERNETES_CONTEXT}  logs --tail 50 -f -l app.kubernetes.io/name=testnet-manager
+	@kubectl --context ${KUBERNETES_CONTEXT}  logs --tail 50 -f -l app.kubernetes.io/name=testnet-manager -n ${CHAIN_NAMESPACE}
 
 # ============================================================================================
 

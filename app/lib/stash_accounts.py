@@ -23,7 +23,12 @@ def get_derived_node_stash_account_address(root_seed, node_name):
 
 
 def get_account_funds(ws_endpoint, account_address):
-    return substrate_query_url(ws_endpoint, 'System', 'Account', [account_address])['data']['free']
+    funds_data = substrate_query_url(ws_endpoint, 'System', 'Account', [account_address])['data']
+    # if account is not created the data is empty.
+    if 'free' in funds_data:
+        return funds_data['free']
+    else:
+        return None
 
 
 def fund_account(ws_endpoint, funding_account_seed, target_account_address):

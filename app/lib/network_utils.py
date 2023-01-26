@@ -535,7 +535,7 @@ def list_parachain_collators(para_id, stateful_set_name=''):
     collator_selection_invulnerables = []
     collator_selection_candidates = []
     collator_selection_desired_candidates = None
-    runtime = "?"
+    runtime = get_last_runtime_upgrade(parachain_node_client)
     try:
         # Get parachain staking pallet state for "moon*" chains
         if chain_name.startswith("moon"):
@@ -550,7 +550,6 @@ def list_parachain_collators(para_id, stateful_set_name=''):
         collator_selection_candidates = parachain_node_client.query('CollatorSelection', 'Candidates', params=[]).value
         collator_selection_desired_candidates = parachain_node_client.query('CollatorSelection', 'DesiredCandidates',
                                                                             params=[]).value
-        runtime = get_last_runtime_upgrade(parachain_node_client)
     except Exception as err:
         log.info(f'Unable to get collator set: {err}')
 
