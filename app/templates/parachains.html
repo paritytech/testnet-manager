@@ -21,8 +21,7 @@
         <th>Lifecycle</th>
         <th>Location</th>
         <th>Leases</th>
-        <th>Head</th>
-        <th>CurrentCodeHash</th>
+        <th>Runtime</th>
     </tr>
     </thead>
     <tbody>
@@ -36,26 +35,7 @@
             <td>{{ parachains[para_id]['lifecycle'] | default('')}}</td>
             <td>{{ parachains[para_id]['location'] | default('')}}</td>
             <td>{{ parachains[para_id]['leases_count'] | default('') }}</td>
-            <td style="width: 5%">
-                {% if parachains[para_id]['head'] %}
-                <details>
-                    <summary style="list-style:none">*️⃣</summary>
-                    <p style="inline-size: 10em;overflow-wrap: break-word;">
-                        {{ parachains[para_id]['head'] | default('') }}
-                    </p>
-                </details>
-                {% endif %}
-            </td>
-            <td style="width: 5%">
-                {% if parachains[para_id]['current_code_hash'] %}
-                <details>
-                    <summary style="list-style:none">#️⃣</summary>
-                    <p style="inline-size: 10em;overflow-wrap: break-word;">
-                        {{ parachains[para_id]['current_code_hash'] | default('') }}
-                    </p>
-                </details>
-                {% endif %}
-            </td>
+            <td><a target="_blank" href="/parachains/{{ para_id }}/runtime">Runtime info</a></td>
         </tr>
     {% endfor %}
     </tbody>
