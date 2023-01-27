@@ -17,7 +17,7 @@ from app.lib.node_utils import is_node_ready, \
     get_last_runtime_upgrade, has_pod_node_role_label, \
     check_has_session_keys
 from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecycles, \
-    initialize_parachain, cleanup_parachain, get_parachain_wasm, get_parachain_head, get_parathreads_ids, \
+    initialize_parachain, cleanup_parachain, get_chain_wasm, get_parachain_head, get_parathreads_ids, \
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
     get_permanent_slot_lease_period_length, get_all_parachain_heads
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
@@ -493,7 +493,7 @@ async def onboard_parachain_by_id(para_id):
     node_para_id = get_parachain_id(parachain_pods[0])
     if node_para_id == para_id:
         state = get_parachain_head(para_node_client)
-        wasm = get_parachain_wasm(para_node_client)
+        wasm = get_chain_wasm(para_node_client)
 
         if state and wasm:
             permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
@@ -687,7 +687,7 @@ async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
 
 def get_substrate_runtime(node_client):
     last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").value
-    wasm = get_parachain_wasm(node_client)
+    wasm = get_chain_wasm(node_client)
     code_hash = "0x" + blake2_256(bytearray.fromhex(wasm.replace('0x', '')))
     head = get_parachain_head(node_client)
 

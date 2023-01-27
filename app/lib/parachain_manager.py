@@ -91,7 +91,7 @@ def get_parachain_id(pod):
         return None
 
 
-def get_parachain_wasm(node_client):
+def get_chain_wasm(node_client):
     # query for Substrate.Code see: https://github.com/polkascan/py-substrate-interface/issues/190
     block_hash = node_client.get_chain_head()
     parachain_wasm = node_client.get_storage_by_key(block_hash, "0x3a636f6465")
