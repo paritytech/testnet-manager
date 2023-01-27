@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id}}{% endif %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id}}{% endif %}</h3>
+
+<table id="table" class="display compact" style="width: 100%; white-space: nowrap; table-layout: fixed;">
+    <colgroup>
+        <col width="10%" />
+        <col width="30%" />
+    </colgroup>
+    <thead>
+    <tr>
+        <th>Keys</th>
+        <th>Values</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Name</td>
+        <td>{{ runtime.spec_name }}</td>
+    </tr>
+    <tr>
+        <td>Version</td>
+        <td>{{ runtime.spec_version }}</td>
+    </tr>
+    <tr>
+        <td>Current code hash</td>
+        <td>{{ runtime.code_hash }}</td>
+    </tr>
+    <tr>
+        <td>Current Head</td>
+        <td style="overflow: hidden; text-overflow: ellipsis">
+            {{ runtime.head }}
+        </td>
+    </tr>
+    {% if runtime.isParachain %}
+    <tr>
+        <td>On RelayChain</td>
+        <td>
+            <table class="display compact" style="width: 60%; white-space: nowrap; table-layout: fixed;">
+                <colgroup>
+                    <col width="85em" />
+                    <col width="100%" />
+                    <col width="80em" />
+                </colgroup>
+                <tr>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>On Chain</th>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold">Code Hash</td>
+                    <td style="overflow: hidden; text-overflow: ellipsis">
+                        {{ runtime.parachain_code_hash_in_relay  }}
+                    </td>
+                    <td>{{ '✅' if runtime.code_hash and runtime.parachain_code_hash_in_relay else '❌' }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold">Head</td>
+                    <td style="overflow: hidden; text-overflow: ellipsis">
+                        {{ runtime.parachain_head_in_relay  }}
+                    </td>
+                    <td>{{ '✅' if runtime.head == runtime.parachain_head_in_relay else '❌' }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    {% endif %}
+    </tbody>
+</table>
+
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[-1], ["All"]],
+            "paging": false,
+            "ordering": false,
+            "searching": false,
+            "info": false
+        });
+    });
+</script>
+</body>
+</html>

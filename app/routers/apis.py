@@ -15,7 +15,7 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
     deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators, \
-    set_collator_nodes_keys_on_chain
+    set_collator_nodes_keys_on_chain, get_relay_runtime, get_parachain_runtime
 from app.lib.substrate import get_relay_chain_client
 
 log = logging.getLogger('router_apis')
@@ -63,6 +63,18 @@ async def get_collators(
     statefulset: str = Query(default="", description="To restrict the displayed nodes to a single StatefulSet")
 ):
     return JSONResponse(list_parachain_collators(para_id, statefulset))
+
+
+@router.get("/runtime")
+async def get_runtime():
+    return JSONResponse(get_relay_runtime())
+
+
+@router.get("/parachains/{para_id}/runtime")
+async def get_runtime_parachain(
+    para_id: str = Path(description="ID of the parachain for which to get runtime info")
+):
+    return JSONResponse(get_parachain_runtime(para_id))
 
 
 @router.post("/validators/register")

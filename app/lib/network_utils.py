@@ -28,6 +28,7 @@ from app.lib.validator_manager import get_validator_set, get_validators_pending_
     get_validators_pending_deletion, \
     deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys, \
     get_derived_validator_session_keys
+from substrateinterface.utils.hasher import blake2_256
 
 log = logging.getLogger(__name__)
 
@@ -682,3 +683,33 @@ async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
     for node_name in nodes:
         ss58_format = get_substrate_node(node_name).get("ss58_format")
         collator_set_keys(node_name, para_id, ss58_format)
+
+
+def get_substrate_runtime(node_client):
+    last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").value
+    wasm = get_parachain_wasm(node_client)
+    code_hash = "0x" + blake2_256(bytearray.fromhex(wasm.replace('0x', '')))
+    head = get_parachain_head(node_client)
+
+    return {
+        'spec_version': last_runtime_upgrade['spec_version'],
+        'spec_name': last_runtime_upgrade['spec_name'],
+        'code_hash': code_hash,
+        'head': head
+    }
+
+
+def get_relay_runtime():
+    node_client = get_relay_chain_client()
+    return get_substrate_runtime(node_client)
+
+
+def get_parachain_runtime(para_id):
+    parachain_pods = list_collator_pods(para_id)
+    para_client = get_node_client(parachain_pods[0].metadata.name)
+    relay_client = get_relay_chain_client()
+    runtime_info = get_substrate_runtime(para_client)
+    runtime_info['isParachain'] = True
+    runtime_info['parachain_head_in_relay'] = relay_client.query('Paras', 'Heads', params=[para_id]).value
+    runtime_info['parachain_code_hash_in_relay'] = relay_client.query('Paras', 'CurrentCodeHash', params=[para_id]).value
+    return runtime_info

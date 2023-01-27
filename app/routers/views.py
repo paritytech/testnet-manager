@@ -5,7 +5,7 @@ from starlette.templating import Jinja2Templates
 from app.config.network_configuration import get_node_logs_link, get_network
 from app.lib.kubernetes_client import list_validator_stateful_sets, list_parachain_collator_stateful_sets
 from app.lib.network_utils import list_substrate_nodes, list_validators, get_session_queued_keys, list_parachains, \
-    list_parachain_collators, get_substrate_node
+    list_parachain_collators, get_substrate_node, get_relay_runtime, get_parachain_runtime
 from app.lib.parachain_manager import get_all_parachain_lifecycles
 from app.lib.substrate import get_relay_chain_client
 
@@ -133,3 +133,18 @@ async def collators(
                                                          'deleted_collator_count': deleted_collator_count,
                                                          'collator_stateful_sets': cluster_collator_stateful_set
                                                          })
+
+
+@router.get("/runtime", response_class=HTMLResponse, include_in_schema=False)
+async def get_runtime(
+    request: Request
+):
+    return templates.TemplateResponse('runtime_info.html', dict(request=request, network=network, runtime=get_relay_runtime()))
+
+
+@router.get("/parachains/{para_id}/runtime", response_class=HTMLResponse, include_in_schema=False)
+async def get_runtime_parachain(
+    request: Request,
+    para_id: str = Path(description="ID of the parachain for which to get runtime info")
+):
+    return templates.TemplateResponse('runtime_info.html', dict(request=request, network=network, para_id=para_id, runtime=get_parachain_runtime(para_id)))
