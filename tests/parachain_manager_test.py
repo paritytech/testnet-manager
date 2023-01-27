@@ -5,7 +5,7 @@ import unittest
 from substrateinterface import SubstrateInterface
 from testcontainers.compose import DockerCompose
 from tests.test_utils import wait_for_http_ready
-from app.lib.parachain_manager import get_parachain_head, get_parachain_wasm, initialize_parachain, cleanup_parachain, \
+from app.lib.parachain_manager import get_parachain_head, get_chain_wasm, initialize_parachain, cleanup_parachain, \
     get_parachains_ids, \
     get_parathreads_ids, get_parachain_lifecycles, get_parachain_leases_count
 
@@ -47,8 +47,8 @@ class ParachainManagerTest(unittest.TestCase):
         print(result)
         self.assertTrue(result is None, 'Parachain is not registered')
 
-    def test_get_parachain_wasm(self):
-        result = get_parachain_wasm(self.parachain_substrate)
+    def test_get_chain_wasm(self):
+        result = get_chain_wasm(self.parachain_substrate)
         print(result)
         self.assertTrue(result.startswith('0x'), 'Get parachain wasm')
 
