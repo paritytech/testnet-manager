@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id}}{% endif %}</title>
+    <title>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id }}{% endif %}</title>
     <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
 </head>
 
 <body>
-<h3>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id}}{% endif %}</h3>
+<h3>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id }}{% endif %}</h3>
 
 <table id="table" class="display compact" style="width: 100%; white-space: nowrap; table-layout: fixed;">
     <colgroup>
@@ -73,6 +73,18 @@
     {% endif %}
     </tbody>
 </table>
+
+{% if request.query_params['isAdmin'] %}
+<form method="post" action="/api/{% if runtime.isParachain %}parachains/{{ para_id }}/{% endif %}runtime/upgrade"  enctype="multipart/form-data">
+  <div>
+    <label for="file">Choose new runtime </label>
+    <input type="file" id="file" name="runtime" accept=".wasm" />
+  </div>
+  <div>
+    <button>Upgrade!</button>
+  </div>
+</form>
+{% endif %}
 
 <script
         src="/static/libs/jquery-3.6.0.slim.min.js"

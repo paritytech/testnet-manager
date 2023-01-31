@@ -1,11 +1,19 @@
 import logging
 from math import floor
 
-from app.lib.substrate import substrate_sudo_call, substrate_batchall_call, get_node_client
+from app.lib.substrate import substrate_sudo_call, substrate_batchall_call, get_node_client, \
+    substrate_sudo_relay_xcm_call, substrate_call
 from substrateinterface import Keypair
+from app.lib.kubernetes_client import list_collator_pods
+from substrateinterface.utils.hasher import blake2_256
+import time
 
 log = logging.getLogger('collator_manager')
 
+
+def get_parachain_node_client(para_id):
+    parachain_pods = list_collator_pods(para_id)
+    return get_node_client(parachain_pods[0].metadata.name)
 
 # returns current parachains list
 def get_parachains_ids(substrate_client):
@@ -172,3 +180,65 @@ def cleanup_parachain(substrate_client, sudo_seed, para_id):
         }
     )
     return substrate_sudo_call(substrate_client, keypair, payload)
+
+
+def parachain_runtime_upgrade(para_id, runtime):
+    # Doc: https://github.com/paritytech/cumulus/issues/764
+    para_client = get_parachain_node_client(para_id)
+    code = '0x'+runtime.hex()
+    code_hash = "0x" + blake2_256(runtime)
+    log.info('Code hash: {}'.format(code_hash))
+    # Construct parachainSystem.authorizeUpgrade(hash) call on the parachain and grab the encoded call
+    call = para_client.compose_call(
+        call_module='ParachainSystem',
+        call_function='authorize_upgrade',
+        call_params={
+            'code_hash': code_hash
+        }
+    )
+    receipt = substrate_sudo_relay_xcm_call(para_id,  call.encode())
+    if receipt and receipt.is_success:
+        log.info('Successfully sent parachainSystem.authorizeUpgrade(hash) on Relaychain')
+        log.info('https://polkadot.js.org/apps/#/explorer/query/{}'.format(receipt.block_hash))
+    else:
+        err = "Unable to send parachainSystem.authorizeUpgrade(hash) on Relaychain. Error: {}".format(
+            getattr(receipt, 'error_message', None))
+        log.error(err)
+        return False, err
+
+    # After XCM dispatch (as pointed out by Document Runtime Upgrade Process #764
+    # we need to wait for both the Relay Chain block as well as the Parachain block that will process the XCM),
+    # submit the compact.compressed.wasm file using the unsigned transaction parachainSystem.enactAuthorizedUpgrade.
+    # Anyone can submit this extrinsic. Trouble Shooting: 1010: Invalid Transaction: Transaction call is not
+    # expected. means the XCM was not yet processed on the parachain side so it does not recognize the blob. A
+    # collator restart will reset the transaction banning as a workaround.
+    log.info('Waiting 30s for parachain to receive AuthorizedUpgrade XCM')
+    for i in range(30):
+        time.sleep(2)
+        if para_client.query('ParachainSystem', 'AuthorizedUpgrade').value:
+            break
+        if i == 29:
+            err = "Timeout, parachain did not received AuthorizedUpgrade message"
+            log.error(err)
+            return False, err
+
+    # After dispatch, submit the compact.compressed.wasm file using the unsigned transaction
+    # parachainSystem.enactAuthorizedUpgrade. Anyone can submit this extrinsic.
+    call2 = para_client.compose_call(
+        call_module='ParachainSystem',
+        call_function='enact_authorized_upgrade',
+        call_params={
+            'code': code
+        }
+    )
+    receipt = substrate_call(para_client, None, call2)
+    if receipt and receipt.is_success:
+        err = "Successfully sent parachainSystem.enactAuthorizedUpgrade on Parachain, " \
+              "Check results here: https://polkadot.js.org/apps/#/explorer/query/{}".format(receipt.block_hash)
+        log.info(err)
+        return True, err
+    else:
+        err = "Unable to sent parachainSystem.enactAuthorizedUpgrade on Parachain. Error: {}".format(
+            getattr(receipt, 'error_message', None))
+        log.error(err)
+        return False, err
