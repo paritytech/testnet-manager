@@ -52,10 +52,15 @@ def substrate_rpc_request(substrate_client, method, params=[]):
 
 
 def substrate_call(substrate_client, keypair, call, wait=True):
-    extrinsic = substrate_client.create_signed_extrinsic(
-        call=call,
-        keypair=keypair,
-    )
+    if keypair:
+        extrinsic = substrate_client.create_signed_extrinsic(
+            call=call,
+            keypair=keypair,
+        )
+    else:
+        extrinsic = substrate_client.create_unsigned_extrinsic(
+            call=call
+        )
 
     try:
         receipt = substrate_client.submit_extrinsic(extrinsic, wait_for_inclusion=wait)
@@ -72,6 +77,21 @@ def substrate_sudo_call(substrate_client, keypair, payload, wait=True):
         call_function='sudo',
         call_params={
             'call': payload.value,
+        }
+    )
+    return substrate_call(substrate_client, keypair, call, wait)
+
+
+def substrate_sudo_unchecked_weight_call(substrate_client, keypair, payload, wait=True):
+    call = substrate_client.compose_call(
+        call_module='Sudo',
+        call_function='sudo_unchecked_weight',
+        call_params={
+            'call': payload.value,
+            'weight': {
+                'ref_time': 0,
+                'proof_size': 0
+            }
         }
     )
     return substrate_call(substrate_client, keypair, call, wait)

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from fastapi import APIRouter, Path, Query, HTTPException
+from fastapi import APIRouter, Path, Query, HTTPException, File
 from starlette.responses import JSONResponse, PlainTextResponse
 from substrateinterface import Keypair
 
@@ -15,8 +15,9 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
     deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators, \
-    set_collator_nodes_keys_on_chain, get_relay_runtime, get_parachain_runtime
+    set_collator_nodes_keys_on_chain, get_relay_runtime, get_parachain_runtime, runtime_upgrade
 from app.lib.substrate import get_relay_chain_client
+from app.lib.parachain_manager import parachain_runtime_upgrade
 
 log = logging.getLogger('router_apis')
 
@@ -221,3 +222,25 @@ def teleport_funds_from_sudo(
     from_account_keypair = Keypair.create_from_seed(network_sudo_seed())
     teleport_funds(relay_chain_client, from_account_keypair, para_id, account, amount)
     return PlainTextResponse('OK')
+
+@router.post("/parachains/{para_id}/runtime/upgrade")
+async def parachain_upload_runtime_and_upgrade(
+        runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm"),
+        para_id: str = Path(description="Parachain ID on which to upgrade runtime"),
+):
+    status, txt = parachain_runtime_upgrade(para_id, runtime)
+    if not status:
+        raise HTTPException(status_code=500, detail=txt)
+    else:
+        return PlainTextResponse(txt)
+
+
+@router.post("/runtime/upgrade")
+async def upload_runtime_and_upgrade(
+        runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm")
+):
+    status, txt = runtime_upgrade(runtime)
+    if not status:
+        raise HTTPException(status_code=500, detail=txt)
+    else:
+        return PlainTextResponse(txt)

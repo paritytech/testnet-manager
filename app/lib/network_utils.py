@@ -19,16 +19,18 @@ from app.lib.node_utils import is_node_ready, \
 from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecycles, \
     initialize_parachain, cleanup_parachain, get_chain_wasm, get_parachain_head, get_parathreads_ids, \
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
-    get_permanent_slot_lease_period_length, get_all_parachain_heads
+    get_permanent_slot_lease_period_length, get_all_parachain_heads, get_parachain_node_client
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic, \
     get_account_funds
-from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
+from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request, \
+    substrate_sudo_unchecked_weight_call
 from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, \
     get_validators_pending_deletion, \
     deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys, \
     get_derived_validator_session_keys
 from substrateinterface.utils.hasher import blake2_256
+from substrateinterface import Keypair
 
 log = logging.getLogger(__name__)
 
@@ -528,8 +530,7 @@ def list_parachain_collators(para_id, stateful_set_name=''):
     else:
         return []
 
-    # TODO replace with parachain client url
-    parachain_node_client = get_node_client(collator_pods[0].metadata.name)
+    parachain_node_client = get_parachain_node_client(para_id)
 
     parachain_staking_selected_candidates = []
     parachain_staking_candidate_pool = []
@@ -705,11 +706,34 @@ def get_relay_runtime():
 
 
 def get_parachain_runtime(para_id):
-    parachain_pods = list_collator_pods(para_id)
-    para_client = get_node_client(parachain_pods[0].metadata.name)
+    para_client = get_parachain_node_client(para_id)
     relay_client = get_relay_chain_client()
     runtime_info = get_substrate_runtime(para_client)
     runtime_info['isParachain'] = True
     runtime_info['parachain_head_in_relay'] = relay_client.query('Paras', 'Heads', params=[para_id]).value
     runtime_info['parachain_code_hash_in_relay'] = relay_client.query('Paras', 'CurrentCodeHash', params=[para_id]).value
     return runtime_info
+
+
+def runtime_upgrade(runtime):
+    relay_client = get_relay_chain_client()
+    code = '0x' + runtime.hex()
+    keypair = Keypair.create_from_seed(network_sudo_seed())
+    call = relay_client.compose_call(
+        call_module='System',
+        call_function='set_code',
+        call_params={
+            'code': code
+        }
+    )
+    receipt = substrate_sudo_unchecked_weight_call(relay_client, keypair, call)
+    if receipt and receipt.is_success:
+        txt = "Successfully sent System.set_code on Relaychain, " \
+              "Check results here: https://polkadot.js.org/apps/#/explorer/query/{}".format(receipt.block_hash)
+        log.info(txt)
+        return True, txt
+    else:
+        err = "Unable to sent System.set_code. Error: {}".format(
+            getattr(receipt, 'error_message', None))
+        log.error(err)
+        return False, err
