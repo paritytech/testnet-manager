@@ -14,6 +14,7 @@ When provided with the relay-chain Sudo account, the **testnet-manager** can per
 - Rotate validator session keys
 - Onboard/Offboard a parachain
 - Register/Deregister parachain collators
+- Execute runtime upgrades on relay-chains and common good parachains
 
 ## Running tests
 
