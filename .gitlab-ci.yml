@@ -2,6 +2,7 @@ stages:
   - test
   - build
   - publish
+  - deploy
 
 default:
   interruptible:                   true
@@ -77,3 +78,13 @@ build-push-image:
     - buildah push --format=v2s2 "$IMAGE_NAME:$VERSION"
   after_script:
     - buildah logout --all
+
+deploy:
+  <<:          *test-refs
+  stage: deploy
+  environment: parity-lab
+  image: argoproj/argocd:v2.5.5
+  variables:
+    ARGOCD_OPTS: --grpc-web
+  script:
+    - argocd app list
