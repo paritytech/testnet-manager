@@ -111,6 +111,8 @@ deploy-to-versi:
 
 deploy-to-testnet-rococo:
   <<:              *release-refs
+  needs:
+    - job: deploy-to-versi
   extends: .deploy-with-argocd
   environment: parity-testnet-rococo
   variables:
@@ -119,6 +121,8 @@ deploy-to-testnet-rococo:
 
 deploy-to-testnet-wococo:
   <<:              *release-refs
+  needs:
+    - job: deploy-to-versi
   extends: .deploy-with-argocd
   environment: parity-testnet-wococo
   variables:
