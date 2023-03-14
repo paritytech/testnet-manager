@@ -59,10 +59,10 @@ def teleport_funds(substrate_client, from_account_keypair, para_id, target_accou
         call_module='XcmPallet',
         call_function='limited_teleport_assets',
         call_params={
-            'dest': {'V1': {'parents': 0, 'interior': {'X1': {'Parachain': para_id}}}},
-            "beneficiary": {"V1": {"parents": 0, "interior": {
+            'dest': {'V2': {'parents': 0, 'interior': {'X1': {'Parachain': para_id}}}},
+            "beneficiary": {"V2": {"parents": 0, "interior": {
                 "X1": {"AccountId32": ("Any", target_account_public_key)}}}},
-            'assets': {'V1': [[{'fun': {'Fungible': transfer_amount}, 'id': {
+            'assets': {'V2': [[{'fun': {'Fungible': transfer_amount}, 'id': {
                 'Concrete': {'parents': 0, 'interior': 'Here'}}}]]},
             'fee_asset_item': 0,
             'weight_limit': 'Unlimited',
