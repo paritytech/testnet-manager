@@ -8,17 +8,12 @@
 <body>
 <h3>{{ network.capitalize() }}{% if runtime.isParachain %}: {{ para_id }}{% endif %}</h3>
 
-<table id="table" class="display compact" style="width: 100%; white-space: nowrap; table-layout: fixed;">
+<h4>Runtime Info</h4>
+<table id="runtime-info" class="display compact" style="width: 100%; white-space: nowrap; table-layout: fixed;">
     <colgroup>
         <col width="10%" />
         <col width="30%" />
     </colgroup>
-    <thead>
-    <tr>
-        <th>Keys</th>
-        <th>Values</th>
-    </tr>
-    </thead>
     <tbody>
     <tr>
         <td>Name</td>
@@ -86,6 +81,23 @@
 </form>
 {% endif %}
 
+
+<details>
+    <summary style="list-style:none"><h4>Runtime Config ▼</h4></summary>
+    <div>
+        <table id="runtime-config" class="display compact" style="width: 100%; table-layout: fixed;">
+            <tbody>
+            {% for key, value in configuration.items() %}
+            <tr>
+              <td>{{key}}</td>
+              <td>{{value}}</td>
+            </tr>
+           {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</details>
+
 <script
         src="/static/libs/jquery-3.6.0.slim.min.js"
         integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
@@ -93,9 +105,16 @@
 <script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
 <script>
     $(document).ready( function () {
-        $('#table').DataTable({
-            // https://datatables.net/reference/option/
+        // https://datatables.net/reference/option/
+        $('#runtime-info').DataTable({
             "lengthMenu": [[-1], ["All"]],
+            "paging": false,
+            "ordering": false,
+            "searching": false,
+            "info": false
+        });
+        $('#runtime-config').DataTable({
+            //"lengthMenu": [[-1], ["All"]],
             "paging": false,
             "ordering": false,
             "searching": false,

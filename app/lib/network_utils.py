@@ -2,6 +2,8 @@ import asyncio
 import logging
 from datetime import datetime, timedelta
 
+from scalecodec.exceptions import RemainingScaleBytesNotEmptyException
+
 from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_root_seed, \
     node_http_endpoint, get_network, network_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
@@ -689,7 +691,7 @@ async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
 def get_substrate_runtime(node_client):
     last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").value
     wasm = get_chain_wasm(node_client)
-    code_hash = "0x" + blake2_256(bytearray.fromhex(wasm.replace('0x', '')))
+    code_hash = f'0x{blake2_256(bytearray.fromhex(wasm[2:])).hex()}'
     head = get_parachain_head(node_client)
 
     return {
@@ -703,6 +705,17 @@ def get_substrate_runtime(node_client):
 def get_relay_runtime():
     node_client = get_relay_chain_client()
     return get_substrate_runtime(node_client)
+
+
+def get_relay_active_configuration():
+    relay_client = get_relay_chain_client()
+    try:
+        active_config = relay_client.query('Configuration', 'ActiveConfig')
+        return active_config.value
+    # Catch scale encoding exception happening on Versi
+    except RemainingScaleBytesNotEmptyException as err:
+        log.error(f'Scale decoding exception: {err}')
+        return {}
 
 
 def get_parachain_runtime(para_id):
