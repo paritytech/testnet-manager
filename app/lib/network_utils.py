@@ -26,7 +26,7 @@ from app.lib.session_keys import rotate_node_session_keys, set_node_session_key,
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic, \
     get_account_funds
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request, \
-    substrate_sudo_unchecked_weight_call
+    substrate_sudo_unchecked_weight_call, substrate_sudo_call
 from app.lib.validator_manager import get_validator_set, get_validators_pending_addition, \
     get_validators_pending_deletion, \
     deregister_validators, register_validators, setup_pos_validator, staking_chill, get_account_session_keys, \
@@ -716,6 +716,23 @@ def get_relay_active_configuration():
     except RemainingScaleBytesNotEmptyException as err:
         log.error(f'Scale decoding exception: {err}')
         return {}
+
+
+def update_relay_configuration(new_configuration_key, new_configuration_value):
+    relay_client = get_relay_chain_client()
+    keypair = Keypair.create_from_seed(network_sudo_seed())
+    # See https://polkascan.github.io/py-substrate-metadata-docs/polkadot/configuration/#set_X
+    call = relay_client.compose_call('Configuration', f'set_{new_configuration_key}', {'new': new_configuration_value})
+    receipt = substrate_sudo_call(relay_client, keypair, call)
+    if receipt and receipt.is_success:
+        txt = f'Successfully sent Configuration.set_{new_configuration_key}={new_configuration_value} on Relaychain'
+        log.info(txt)
+        return True, txt
+    else:
+        err = f"Unable to apply Configuration.set_{new_configuration_key}={new_configuration_value} on Relaychain. " \
+              f"Error: {getattr(receipt, 'error_message', None)}"
+        log.error(err)
+        return False, err
 
 
 def get_parachain_runtime(para_id):
