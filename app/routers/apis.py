@@ -16,8 +16,9 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
     deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators, \
-    set_collator_nodes_keys_on_chain, get_relay_runtime, get_parachain_runtime, runtime_upgrade, \
-    get_relay_active_configuration, update_relay_configuration
+    set_collator_nodes_keys_on_chain
+from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configuration, update_relay_configuration, \
+    get_parachain_runtime, runtime_upgrade
 from app.lib.substrate import get_relay_chain_client
 from app.lib.parachain_manager import parachain_runtime_upgrade
 
