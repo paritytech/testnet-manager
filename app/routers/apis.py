@@ -4,6 +4,7 @@ import logging
 from fastapi import APIRouter, Path, Query, HTTPException, File
 from starlette.responses import JSONResponse, PlainTextResponse
 from substrateinterface import Keypair
+from typing import Any, Dict
 
 from app.config.network_configuration import network_sudo_seed
 from app.lib.balance_utils import teleport_funds
@@ -15,7 +16,8 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
     deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators, \
-    set_collator_nodes_keys_on_chain, get_relay_runtime, get_parachain_runtime, runtime_upgrade
+    set_collator_nodes_keys_on_chain, get_relay_runtime, get_parachain_runtime, runtime_upgrade, \
+    get_relay_active_configuration, update_relay_configuration
 from app.lib.substrate import get_relay_chain_client
 from app.lib.parachain_manager import parachain_runtime_upgrade
 
@@ -70,6 +72,19 @@ async def get_collators(
 async def get_runtime():
     return JSONResponse(get_relay_runtime())
 
+@router.get("/runtime/configuration")
+async def get_runtime_configuration():
+    return JSONResponse(get_relay_active_configuration())
+
+
+@router.post("/runtime/configuration")
+async def update_runtime_configuration(new_configuration_keys: Dict[Any, Any]):
+
+    for key, value in new_configuration_keys.items():
+        status, message = update_relay_configuration(key, value)
+        if not status:
+            raise HTTPException(status_code=500, detail=message)
+    return PlainTextResponse("OK")
 
 @router.get("/parachains/{para_id}/runtime")
 async def get_runtime_parachain(
