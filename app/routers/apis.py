@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, Path, Query, HTTPException, File
+from fastapi import APIRouter, Path, Query, HTTPException, File, UploadFile
 from starlette.responses import JSONResponse, PlainTextResponse
 from substrateinterface import Keypair
 
@@ -254,10 +254,12 @@ async def parachain_upload_runtime_and_upgrade(
 
 @router.post("/runtime/upgrade")
 async def upload_runtime_and_upgrade(
-    runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm"),
-    schedule_blocks_wait: int | None = Query(description="Setup scheduler to delay execution of the runtime by a number of blocks")
+    runtime: UploadFile = File(description="File with runtime: *.compact.compressed.wasm"),
+    schedule_blocks_wait: int = Query(description="Setup scheduler to delay execution of the runtime by a number of blocks", default=None)
 ):
-    status, txt = runtime_upgrade(runtime)
+    runtime_name = runtime.filename.split('.')[0]
+    runtime_bytes = await runtime.read()
+    status, txt = runtime_upgrade(runtime_name, runtime_bytes, schedule_blocks_wait)
     if not status:
         raise HTTPException(status_code=500, detail=txt)
     else:

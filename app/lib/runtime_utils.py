@@ -5,7 +5,8 @@ from substrateinterface.utils.hasher import blake2_256
 from app.config.network_configuration import network_sudo_seed
 from app.lib.network_utils import log
 from app.lib.parachain_manager import get_chain_wasm, get_parachain_head, get_parachain_node_client
-from app.lib.substrate import get_relay_chain_client, substrate_sudo_call, substrate_wrap_with_weight
+from app.lib.substrate import get_relay_chain_client, substrate_sudo_call, substrate_wrap_with_weight, \
+    substrate_wrap_with_scheduler
 
 
 def get_substrate_runtime(node_client):
@@ -65,9 +66,10 @@ def get_parachain_runtime(para_id):
     return runtime_info
 
 
-def runtime_upgrade(runtime, schedule_blocks_wait=None):
+def runtime_upgrade(runtime_name, runtime_wasm, schedule_blocks_wait=None):
+    log.info(f'Upgrading relay-chain runtime to runtime to {runtime_name}')
     relay_client = get_relay_chain_client()
-    code = '0x' + runtime.hex()
+    code = '0x' + runtime_wasm.hex()
     keypair = Keypair.create_from_seed(network_sudo_seed())
     inner_call = relay_client.compose_call(
         call_module='System',
@@ -80,10 +82,19 @@ def runtime_upgrade(runtime, schedule_blocks_wait=None):
     # ref_time: 1*10^12 (1s)
     # proof_size: 3145828 (=3*1024*1024)
     wrapped_call = substrate_wrap_with_weight(relay_client, inner_call, weight_ref_time=1000000000000, weight_proof_size=3145828)
+    if schedule_blocks_wait:
+        # The block number at which to execute the call will be current_block + blocks_to_wait + 1
+        current_block = relay_client.get_block_number(relay_client.get_chain_head())
+        schedule_block_number = current_block + schedule_blocks_wait + 1
+        schedule_priority = 63
+        wrapped_call = substrate_wrap_with_scheduler(relay_client, wrapped_call,
+                                                     schedule_name=runtime_name,
+                                                     schedule_when=schedule_block_number,
+                                                     schedule_priority=schedule_priority)
     receipt = substrate_sudo_call(relay_client, keypair, wrapped_call)
     if receipt and receipt.is_success:
-        txt = "Successfully sent System.set_code on Relaychain, " \
-              "Check results here: https://polkadot.js.org/apps/#/explorer/query/{}".format(receipt.block_hash)
+        txt = f'Successfully sent Runtime Upgrade request (System.set_code) on Relaychain for {runtime_name}' \
+              f'Check results here: https://polkadot.js.org/apps/#/explorer/query/{receipt.block_hash}'
         log.info(txt)
         return True, txt
     else:
