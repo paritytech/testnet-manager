@@ -1,3 +1,4 @@
+import hashlib
 import logging
 from substrateinterface import SubstrateInterface, Keypair
 from app.config.network_configuration import network_ws_endpoint, node_ws_endpoint, network_sudo_seed
@@ -128,6 +129,20 @@ def substrate_wrap_with_weight(substrate_client, payload, weight_ref_time, weigh
     )
 
 
+def substrate_wrap_with_scheduler(substrate_client, payload, schedule_name, schedule_when, schedule_priority):
+    schedule_id = f'0x{hashlib.blake2s(schedule_name.encode()).hexdigest()}'
+    log.info(f'Wrapping call with named scheduler; id=blake2s("{schedule_name}")={schedule_id}')
+    return substrate_client.compose_call(
+        call_module='Scheduler',
+        call_function='schedule_named',
+        call_params={
+            'id': schedule_id,
+            'when': schedule_when,
+            'maybe_periodic': None,
+            'priority': schedule_priority,
+            'call': payload.value
+        }
+    )
 
 
 def substrate_query(substrate_client, module, function, params=[]):
