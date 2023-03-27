@@ -1,10 +1,10 @@
 import asyncio
 import logging
+from typing import Any, Dict
 
 from fastapi import APIRouter, Path, Query, HTTPException, File
 from starlette.responses import JSONResponse, PlainTextResponse
 from substrateinterface import Keypair
-from typing import Any, Dict
 
 from app.config.network_configuration import network_sudo_seed
 from app.lib.balance_utils import teleport_funds
@@ -73,19 +73,20 @@ async def get_collators(
 async def get_runtime():
     return JSONResponse(get_relay_runtime())
 
+
 @router.get("/runtime/configuration")
 async def get_runtime_configuration():
     return JSONResponse(get_relay_active_configuration())
 
 
 @router.post("/runtime/configuration")
-async def update_runtime_configuration(new_configuration_keys: Dict[Any, Any]):
-
+async def update_runtime_configuration(new_configuration_keys: Dict[str, Any]):
     for key, value in new_configuration_keys.items():
         status, message = update_relay_configuration(key, value)
         if not status:
             raise HTTPException(status_code=500, detail=message)
     return PlainTextResponse("OK")
+
 
 @router.get("/parachains/{para_id}/runtime")
 async def get_runtime_parachain(

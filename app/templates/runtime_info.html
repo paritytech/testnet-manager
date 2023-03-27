@@ -74,16 +74,14 @@
   <div>
     <label for="file">Choose new runtime </label>
     <input type="file" id="file" name="runtime" accept=".wasm" />
-  </div>
-  <div>
-    <button>Upgrade!</button>
+    <button>🚀 Upgrade Runtime</button>
   </div>
 </form>
 {% endif %}
 
 
 <details>
-    <summary style="list-style:none"><h4>Runtime Config ▼</h4></summary>
+    <summary style="list-style:none"><h4>View Runtime Config 📄 ▼</h4></summary>
     <div>
         <table id="runtime-config" class="display compact" style="width: 100%;">
             <tbody>
@@ -97,6 +95,22 @@
         </table>
     </div>
 </details>
+
+{% if request.query_params['isAdmin'] %}
+<details>
+    <summary style="list-style:none"><h4>Update Runtime Config 📝 ▼</h4></summary>
+    <div>
+        <select id="newRuntimeConfigurationKey">
+            <option selected></option>
+            {% for key, value in configuration.items() %}
+            <option value="{{key}}">{{key}}</option>
+           {% endfor %}
+        </select>
+        <input id="newRuntimeConfigurationValue"/>
+        <button id="updateRuntimeConfig">🚀 Update Runtime Config</button>
+    </div>
+</details>
+{% endif %}
 
 <script
         src="/static/libs/jquery-3.6.0.slim.min.js"
@@ -120,6 +134,27 @@
             "searching": false,
             "info": false
         });
+    });
+
+    const updateConfigButton = document.querySelector("#updateRuntimeConfig");
+    document.querySelector("#updateRuntimeConfig").addEventListener("click", () => {
+        updateConfigButton.disabled = true;
+        const newRuntimeConfigurationKey = document.querySelector("#newRuntimeConfigurationKey").value
+        const newRuntimeConfigurationValue = JSON.parse(document.querySelector("#newRuntimeConfigurationValue").value)
+        const newRuntimeConfiguration = { [newRuntimeConfigurationKey]: newRuntimeConfigurationValue };
+        fetch("/api/runtime/configuration", {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newRuntimeConfiguration)
+        })
+            .then(() => {
+                updateConfigButton.textContent = "Update in progress"
+                updateConfigButton.style.backgroundColor = 'lightgreen'
+            })
+            .catch(error => {
+                updateConfigButton.textContent = "Update Failed: " + error
+                updateConfigButton.style.backgroundColor = 'red'
+            });
     });
 </script>
 </body>
