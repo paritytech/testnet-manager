@@ -5,7 +5,7 @@ from substrateinterface.utils.hasher import blake2_256
 from app.config.network_configuration import network_sudo_seed
 from app.lib.network_utils import log
 from app.lib.parachain_manager import get_chain_wasm, get_parachain_head, get_parachain_node_client
-from app.lib.substrate import get_relay_chain_client, substrate_sudo_call, substrate_sudo_unchecked_weight_call
+from app.lib.substrate import get_relay_chain_client, substrate_sudo_call, substrate_wrap_with_weight
 
 
 def get_substrate_runtime(node_client):
@@ -65,18 +65,22 @@ def get_parachain_runtime(para_id):
     return runtime_info
 
 
-def runtime_upgrade(runtime):
+def runtime_upgrade(runtime, schedule_blocks_wait=None):
     relay_client = get_relay_chain_client()
     code = '0x' + runtime.hex()
     keypair = Keypair.create_from_seed(network_sudo_seed())
-    call = relay_client.compose_call(
+    inner_call = relay_client.compose_call(
         call_module='System',
         call_function='set_code',
         call_params={
             'code': code
         }
     )
-    receipt = substrate_sudo_unchecked_weight_call(relay_client, keypair, call)
+    # Wrap with weight set to:
+    # ref_time: 1*10^12 (1s)
+    # proof_size: 3145828 (=3*1024*1024)
+    wrapped_call = substrate_wrap_with_weight(relay_client, inner_call, weight_ref_time=1000000000000, weight_proof_size=3145828)
+    receipt = substrate_sudo_call(relay_client, keypair, wrapped_call)
     if receipt and receipt.is_success:
         txt = "Successfully sent System.set_code on Relaychain, " \
               "Check results here: https://polkadot.js.org/apps/#/explorer/query/{}".format(receipt.block_hash)
