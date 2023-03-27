@@ -242,8 +242,8 @@ def teleport_funds_from_sudo(
 
 @router.post("/parachains/{para_id}/runtime/upgrade")
 async def parachain_upload_runtime_and_upgrade(
-        runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm"),
-        para_id: str = Path(description="Parachain ID on which to upgrade runtime"),
+    runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm"),
+    para_id: str = Path(description="Parachain ID on which to upgrade runtime"),
 ):
     status, txt = parachain_runtime_upgrade(para_id, runtime)
     if not status:
@@ -254,7 +254,8 @@ async def parachain_upload_runtime_and_upgrade(
 
 @router.post("/runtime/upgrade")
 async def upload_runtime_and_upgrade(
-        runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm")
+    runtime: bytes = File(description="File with runtime: *.compact.compressed.wasm"),
+    schedule_blocks_wait: int | None = Query(description="Setup scheduler to delay execution of the runtime by a number of blocks")
 ):
     status, txt = runtime_upgrade(runtime)
     if not status:

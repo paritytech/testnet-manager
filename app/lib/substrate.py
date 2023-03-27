@@ -111,6 +111,25 @@ def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True, su
         return substrate_call(substrate_client, keypair, call, wait)
 
 
+# Default weight values
+# weight_ref_time: 1*10^12 (1s)
+# weight_proof_size: 3145828 (=3*1024*1024)
+def substrate_wrap_with_weight(substrate_client, payload, weight_ref_time, weight_proof_size):
+    return substrate_client.compose_call(
+        call_module='Utility',
+        call_function='with_weight',
+        call_params={
+            'call': payload.value,
+            'weight': {
+                'ref_time': weight_ref_time,
+                'proof_size': weight_proof_size
+            }
+        }
+    )
+
+
+
+
 def substrate_query(substrate_client, module, function, params=[]):
     try:
         return substrate_client.query(module, function, params=params).value
