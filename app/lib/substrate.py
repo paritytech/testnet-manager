@@ -1,6 +1,8 @@
 import hashlib
 import logging
 from substrateinterface import SubstrateInterface, Keypair
+from substrateinterface.utils.hasher import blake2_256
+
 from app.config.network_configuration import network_ws_endpoint, node_ws_endpoint, network_sudo_seed
 from app.config import ws_pool
 
@@ -130,8 +132,8 @@ def substrate_wrap_with_weight(substrate_client, payload, weight_ref_time, weigh
 
 
 def substrate_wrap_with_scheduler(substrate_client, payload, schedule_name, schedule_when, schedule_priority):
-    schedule_id = f'0x{hashlib.blake2s(schedule_name.encode()).hexdigest()}'
-    log.info(f'Wrapping call with named scheduler; id=blake2s("{schedule_name}")={schedule_id}')
+    schedule_id = f'0x{blake2_256(schedule_name.encode()).hexdigest()}'
+    log.info(f'Wrapping call with named scheduler; id=blake2_256("{schedule_name}")={schedule_id}')
     return substrate_client.compose_call(
         call_module='Scheduler',
         call_function='schedule_named',

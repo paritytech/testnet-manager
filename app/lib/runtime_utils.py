@@ -67,7 +67,8 @@ def get_parachain_runtime(para_id):
 
 
 def runtime_upgrade(runtime_name, runtime_wasm, schedule_blocks_wait=None):
-    log.info(f'Upgrading relay-chain runtime to runtime to {runtime_name}')
+    log.info(f'Upgrading relay-chain runtime to {runtime_name} \
+            {" with " + schedule_blocks_wait + " blocks " if schedule_blocks_wait else ""}')
     relay_client = get_relay_chain_client()
     code = '0x' + runtime_wasm.hex()
     keypair = Keypair.create_from_seed(network_sudo_seed())
@@ -93,10 +94,10 @@ def runtime_upgrade(runtime_name, runtime_wasm, schedule_blocks_wait=None):
                                                      schedule_priority=schedule_priority)
     receipt = substrate_sudo_call(relay_client, keypair, wrapped_call)
     if receipt and receipt.is_success:
-        txt = f'Successfully sent Runtime Upgrade request (System.set_code) on Relaychain for {runtime_name}' \
+        msg = f'Successfully sent Runtime Upgrade request (System.set_code) on Relaychain for {runtime_name} \n' \
               f'Check results here: https://polkadot.js.org/apps/#/explorer/query/{receipt.block_hash}'
-        log.info(txt)
-        return True, txt
+        log.info(msg)
+        return True, msg
     else:
         err = "Unable to sent System.set_code. Error: {}".format(
             getattr(receipt, 'error_message', None))
