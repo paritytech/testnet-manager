@@ -240,6 +240,7 @@ def teleport_funds_from_sudo(
     teleport_funds(relay_chain_client, from_account_keypair, para_id, account, amount)
     return PlainTextResponse('OK')
 
+
 @router.post("/parachains/{para_id}/runtime/upgrade")
 async def parachain_upload_runtime_and_upgrade(
     runtime: UploadFile = File(description="File with runtime: *.compact.compressed.wasm"),

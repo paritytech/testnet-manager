@@ -152,4 +152,9 @@ async def get_runtime_parachain(
     request: Request,
     para_id: str = Path(description="ID of the parachain for which to get runtime info")
 ):
-    return templates.TemplateResponse('runtime_info.html', dict(request=request, network=network, para_id=para_id, runtime=get_parachain_runtime(para_id)))
+    return templates.TemplateResponse('runtime_info.html',
+                                      dict(request=request,
+                                           network=network,
+                                           para_id=para_id,
+                                           runtime=get_parachain_runtime(para_id)
+                                           ))
