@@ -182,11 +182,12 @@ def cleanup_parachain(substrate_client, sudo_seed, para_id):
     return substrate_sudo_call(substrate_client, keypair, payload)
 
 
-def parachain_runtime_upgrade(para_id, runtime):
+def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
+    log.info(f'Upgrading para-chain #{para_id} runtime to {runtime_name}')
     # Doc: https://github.com/paritytech/cumulus/issues/764
     para_client = get_parachain_node_client(para_id)
-    code = '0x'+runtime.hex()
-    code_hash = "0x" + blake2_256(runtime)
+    code = '0x' + runtime_wasm.hex()
+    code_hash = "0x" + blake2_256(runtime_wasm)
     log.info('Code hash: {}'.format(code_hash))
     # Construct parachainSystem.authorizeUpgrade(hash) call on the parachain and grab the encoded call
     call = para_client.compose_call(
@@ -233,12 +234,12 @@ def parachain_runtime_upgrade(para_id, runtime):
     )
     receipt = substrate_call(para_client, None, call2)
     if receipt and receipt.is_success:
-        err = "Successfully sent parachainSystem.enactAuthorizedUpgrade on Parachain, " \
-              "Check results here: https://polkadot.js.org/apps/#/explorer/query/{}".format(receipt.block_hash)
-        log.info(err)
-        return True, err
+        msg = f'Successfully sent parachainSystem.enactAuthorizedUpgrade on Parachain #{para_id} for {runtime_name} \n' \
+              f'Check results here: https://polkadot.js.org/apps/#/explorer/query/{receipt.block_hash}'
+        log.info(msg)
+        return True, msg
     else:
-        err = "Unable to sent parachainSystem.enactAuthorizedUpgrade on Parachain. Error: {}".format(
-            getattr(receipt, 'error_message', None))
+        err = f'Unable to sent parachainSystem.enactAuthorizedUpgrade on Parachain #{para_id} for {runtime_name} \n' \
+              f'Error: {getattr(receipt, "error_message", None)}'
         log.error(err)
         return False, err
