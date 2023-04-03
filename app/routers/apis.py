@@ -135,7 +135,7 @@ async def register_inactive_validators():
         log.info("Executing register_inactive_validators task")
         asyncio.create_task(exec_cron_task(executable_task))
     else:
-        log.error('register_inactive_validators task not found')
+        raise HTTPException(status_code=404, detail='register_inactive_validators task not found')
     return PlainTextResponse('OK')
 
 @router.post("/rotate_session_keys")
