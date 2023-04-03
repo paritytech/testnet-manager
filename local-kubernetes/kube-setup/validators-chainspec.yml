@@ -52,7 +52,7 @@ spec:
         - name: dir
           mountPath: /dir
       - name: create-chainspec-shell
-        image: paritypr/polkadot-parachain-debug:master-4bb9b610
+        image: parity/polkadot-parachain:latest
         command: [ "/bin/sh" ]
         args:
           - -c
@@ -61,7 +61,7 @@ spec:
         - name: dir
           mountPath: /dir
       - name: create-chainspec-statemint
-        image: paritypr/polkadot-parachain-debug:v0.9.230-ec1786ca
+        image: parity/polkadot-parachain:latest
         command: [ "/bin/sh" ]
         args:
           - -c
@@ -95,7 +95,7 @@ spec:
           - name: dir
             mountPath: /dir
       - name: create-chainspec-tick
-        image: paritypr/polkadot-parachain-debug:master-4bb9b610
+        image: parity/polkadot-parachain:latest
         command: [ "/bin/sh" ]
         args:
           - -c
