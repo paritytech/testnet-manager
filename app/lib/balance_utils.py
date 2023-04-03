@@ -30,12 +30,13 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
             call_params={
                 'dest': address,
                 'value': transfer_amount
-                }
-            )
+            }
+        )
         )
 
     log.info(
-        "Sending {} from {} to {}".format(transfer_amount, from_account_keypair.ss58_address, target_account_address_list))
+        "Sending {} from {} to {}".format(transfer_amount, from_account_keypair.ss58_address,
+                                          target_account_address_list))
     if len(batch_call) == 1:
         receipt = substrate_call(substrate_client, from_account_keypair, batch_call[0])
     else:
@@ -51,7 +52,8 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
 
 
 def teleport_funds(substrate_client, from_account_keypair, para_id, target_account_address_list, transfer_amount):
-    log.info(f'Teleporting funds: {transfer_amount} UNIT from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}')
+    log.info(
+        f'Teleporting funds: {transfer_amount} UNIT from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}')
     batch_call = []
     for address in target_account_address_list:
         target_account_public_key = Keypair(ss58_address=address, crypto_type=KeypairType.SR25519).public_key
@@ -59,11 +61,44 @@ def teleport_funds(substrate_client, from_account_keypair, para_id, target_accou
         call_module='XcmPallet',
         call_function='limited_teleport_assets',
         call_params={
-            'dest': {'V2': {'parents': 0, 'interior': {'X1': {'Parachain': para_id}}}},
-            "beneficiary": {"V2": {"parents": 0, "interior": {
-                "X1": {"AccountId32": ("Any", target_account_public_key)}}}},
-            'assets': {'V2': [[{'fun': {'Fungible': transfer_amount}, 'id': {
-                'Concrete': {'parents': 0, 'interior': 'Here'}}}]]},
+            'dest': {
+                'V3': {
+                    "parents": 0,
+                    'interior': {
+                        'X1': {
+                            'Parachain': para_id
+                        }
+                    }
+                }
+            },
+            'beneficiary': {
+                'V3': {
+                    'parents': 0,
+                    'interior': {
+                        'X1': {
+                            'AccountId32': {
+                                'network': None,
+                                'id': target_account_public_key
+                            }
+                        }
+                    }
+                }
+            },
+            'assets': {
+                'V3': [[
+                    {
+                        'id': {
+                            'Concrete': {
+                                'parents': 0,
+                                'interior': 'Here'
+                            }
+                        },
+                        'fun': {
+                            'Fungible': transfer_amount
+                        }
+                    }
+                ]]
+            },
             'fee_asset_item': 0,
             'weight_limit': 'Unlimited',
             }
@@ -93,4 +128,4 @@ def fund_accounts(substrate_client, addresses, funding_account_seed):
                 'address={} is not properly funded (funds={}), schedule transferring funds from sudo account'.format(
                     address, address_funds))
             target_account_address_list.append(address)
-    transfer_funds(substrate_client, funding_account_keypair, target_account_address_list, 1 * 10**12)
+    transfer_funds(substrate_client, funding_account_keypair, target_account_address_list, 1 * 10 ** 12)
