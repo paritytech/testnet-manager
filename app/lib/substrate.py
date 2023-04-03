@@ -185,6 +185,12 @@ def substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded
             'message': {
                 'V3': [[
                     {
+                        'UnpaidExecution': {
+                            'weight_limit': 'Unlimited',
+                            'check_origin': None
+                        }
+                    },
+                    {
                         'Transact': {
                             'origin_kind': 'Superuser',
                             'require_weight_at_most': {
