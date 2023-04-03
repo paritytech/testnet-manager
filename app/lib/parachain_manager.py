@@ -187,7 +187,8 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
     # Doc: https://github.com/paritytech/cumulus/issues/764
     para_client = get_parachain_node_client(para_id)
     code = '0x' + runtime_wasm.hex()
-    code_hash = "0x" + blake2_256(runtime_wasm)
+    code_hash = f'0x{blake2_256(runtime_wasm).hex()}'
+
     log.info('Code hash: {}'.format(code_hash))
     # Construct parachainSystem.authorizeUpgrade(hash) call on the parachain and grab the encoded call
     call = para_client.compose_call(

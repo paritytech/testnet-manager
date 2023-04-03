@@ -164,16 +164,39 @@ def substrate_query_url(url, module, function,params=[]):
 def substrate_sudo_relay_xcm_call(para_id, encoded_message):
     substrate_client = get_relay_chain_client()
     keypair = Keypair.create_from_seed(network_sudo_seed())
-    return substrate_xcm_call(substrate_client, keypair, para_id, encoded_message)
+    return substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded_message)
 
 
-def substrate_xcm_call(substrate_client, keypair, para_id, encoded_message):
+def substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded_message):
     payload = substrate_client.compose_call(
         call_module='XcmPallet',
         call_function='send',
         call_params={
-            'dest': {'V0': {'X1': {'Parachain': para_id}}},
-            'message': {'V0': {'Transact': ('Superuser', 1000000000, {'encoded': str(encoded_message)})}}
-        }
-    )
+            'dest': {
+                'V3': {
+                    "parents": 0,
+                    'interior': {
+                        'X1': {
+                            'Parachain': para_id
+                        }
+                    }
+                }
+            },
+            'message': {
+                'V3': [[
+                    {
+                        'Transact': {
+                            'origin_kind': 'Superuser',
+                            'require_weight_at_most': {
+                                'ref_time': 10**9,
+                                'proof_size': 1024
+                            },
+                            'call': {
+                                'encoded': str(encoded_message)
+                            }
+                        }
+                    }
+                ]]
+            }
+        })
     return substrate_sudo_call(substrate_client, keypair, payload)
