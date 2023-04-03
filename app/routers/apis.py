@@ -230,7 +230,7 @@ async def set_on_chain_keys(
 
 
 @router.post("/xcm/teleport_funds")
-def teleport_funds_from_sudo(
+async def teleport_funds_from_sudo(
     para_id: int = Query(description="Parachain ID"),
     account: list[str] = Query(description="Account(s) to fund on the Parachain (in relay-chain SS58 format)"),
     amount: int = Query(default=1000000000000, description="Amount to transfer to each accounts")
