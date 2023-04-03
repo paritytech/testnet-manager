@@ -21,6 +21,7 @@ from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configurat
     get_parachain_runtime, runtime_upgrade
 from app.lib.substrate import get_relay_chain_client
 from app.lib.parachain_manager import parachain_runtime_upgrade
+from app.lib.cron_tasks import list_cron_tasks, exec_cron_task
 
 log = logging.getLogger('router_apis')
 
@@ -124,6 +125,18 @@ async def deregister_validators(
         asyncio.create_task(deregister_validator_nodes(node))
     return PlainTextResponse('OK')
 
+@router.get("/validators/register_inactive")
+async def register_inactive_validators():
+    tasks: list[dict[str, str]] = list_cron_tasks()
+    for task in tasks:
+        if task['name'] == 'register_inactive_validators':
+            executable_task = task['id']
+    if executable_task:
+        log.info("Executing register_inactive_validators task")
+        asyncio.create_task(exec_cron_task(executable_task))
+    else:
+        log.error('register_inactive_validators task not found')
+    return PlainTextResponse('OK')
 
 @router.post("/rotate_session_keys")
 async def rotate_session_keys(
