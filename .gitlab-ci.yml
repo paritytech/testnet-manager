@@ -65,7 +65,7 @@ variables:
     - argocd app list
     - argocd app set  $APP --helm-set testnet-manager.image.tag=$VERSION
     - argocd app sync $APP
-    - argocd app wait $APP --timeout 120
+    - argocd app wait $APP --timeout 300
 
 build-docker-bot:
   stage:                           build
