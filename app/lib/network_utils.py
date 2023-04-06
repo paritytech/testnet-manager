@@ -112,7 +112,7 @@ def list_validators(stateful_set_name=''):
                 is_validator = get_validator_status(validator_address, validator_set, validators_to_add,
                                                             validators_to_retire)
                 validators.append(
-                    {'name': 'unknown-validator-' + str(i), 'location': 'deleted_from_cluster',
+                    {'name': 'unknown-validator-' + str(i), 'location': 'unknown',
                      'address': validator_address,
                      # 'funds': node_stash_account_funds,
                      'is_validator': is_validator, 'status': 'Missing', 'version': '?'})
