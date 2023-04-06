@@ -1,6 +1,6 @@
 from kubernetes import client as kubernetes_client
 
-from app.config.network_configuration import get_namespace
+from app.config.network_configuration import get_namespace, network_external_validators_configmap
 
 namespace = get_namespace()
 
@@ -61,8 +61,11 @@ def list_collator_pods(para_id=None, stateful_set_name=None):
 
 def get_external_validators_from_configmap():
     try:
-        external_validator_configmap = kubernetes_client.CoreV1Api().read_namespaced_config_map(name='external-validators', namespace=get_namespace())
-        return external_validator_configmap.data if external_validator_configmap.data is not None else {}
+        external_validators = kubernetes_client.CoreV1Api().read_namespaced_config_map(
+            name=network_external_validators_configmap(),
+            namespace=get_namespace()
+        )
+        return external_validators.data if external_validators.data is not None else {}
     except Exception:
         return {}
 
