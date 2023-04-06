@@ -56,10 +56,8 @@ async def validators(
         list(filter(lambda val: val['is_validator'] and val['location'] == 'in_cluster', validators)))
     inactive_validator_count = len(
         list(filter(lambda val: not val['is_validator'] and val['location'] == 'in_cluster', validators)))
-    deleted_validator_count = len(
+    unknown_validator_count = len(
         list(filter(lambda val: val['is_validator'] and val['location'] == 'deleted_from_cluster', validators)))
-    deleted_validators = list(filter(lambda val: val['is_validator'] and val['location'] == 'deleted_from_cluster', validators))
-    deleted_validator_addresses = list(map(lambda val: val['address'], deleted_validators))
 
     session_keys = get_session_queued_keys()
     for index in range(len(validators)):
@@ -72,10 +70,9 @@ async def validators(
                                                           'external_validator_count': external_validator_count,
                                                           'active_validator_count': active_validator_count,
                                                           'inactive_validator_count': inactive_validator_count,
-                                                          'deleted_validator_count': deleted_validator_count,
+                                                          'unknown_validator_count': unknown_validator_count,
                                                           'selected_stateful_set': statefulset,
                                                           'validator_stateful_sets': validator_stateful_sets,
-                                                          'deleted_validator_addresses': deleted_validator_addresses
                                                           })
 
 

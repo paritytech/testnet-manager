@@ -9,7 +9,7 @@
 {% if name_filter or address_filter or version_filter or location_filter or is_validator_filter %}
 <h3>Filter params: name={{ name_filter }}, address={{ address_filter }}, version={{ version_filter }}, location={{ location_filter }},is_validator={{ is_validator_filter }}</h3>
 {% else %}
-<h3>{{ network_name.capitalize() }} Validators : {{ external_validator_count }} Active in VM / {{ active_validator_count }} Active in K8S {% if inactive_validator_count %}/ {{ inactive_validator_count }} Inactive in K8S {% endif %}{% if deleted_validator_count %}/ {{ deleted_validator_count }} Deleted in K8S {% endif %}</h3>
+<h3>{{ network_name.capitalize() }} Validators : {{ external_validator_count }} External to K8S / {{ active_validator_count }} Active in K8S {% if inactive_validator_count %}/ {{ inactive_validator_count }} Inactive in K8S {% endif %}{% if unknown_validator_count %}/ {{ unknown_validator_count }} Unknown (external or deleted from K8S) {% endif %}</h3>
 {% endif %}
 <select id="statefulset_selection">
     <option value="/validators" {% if selected_stateful_set == '' %}selected{% endif %}>all</option>
@@ -21,9 +21,6 @@
 <button id="registerValidators" {% if selected_stateful_set == '' %}style="display: none"{% endif %}>Register</button>
 <button id="deregisterValidators" {% if selected_stateful_set == '' %}style="display: none"{% endif %}>Deregister</button>
 <button id="rotateSessionKeys">Rotate session keys</button>
-{% if deleted_validator_addresses %}
-<button id="deregisterDeletedValidators">Deregister Deleted validators</button>
-{% endif %}
 
 <table id="table" class="display compact" style="width:100%">
     <thead>
@@ -134,24 +131,6 @@
                     });
             }
         });
-
-        {% if deleted_validator_addresses %}
-        const deregisterDeletedValidatorsButton = document.querySelector("#deregisterDeletedValidators");
-        document.querySelector("#deregisterDeletedValidators").addEventListener("click", () => {
-            if (window.confirm(`Are you sure you want to deregister the following validators:\n{{ deleted_validator_addresses | join('\n') }}`)) {
-                deregisterDeletedValidatorsButton.disabled = true
-                fetch("/api/validators/deregister?address={{ deleted_validator_addresses | join('&address=') }}", {method: "POST"})
-                    .then(() => {
-                        deregisterDeletedValidatorsButton.textContent = "Deregistration in progress"
-                        deregisterDeletedValidatorsButton.style.backgroundColor = 'lightgreen'
-                    })
-                    .catch(error => {
-                        deregisterDeletedValidatorsButton.textContent = "Deregistration Failed: " + error
-                        deregisterDeletedValidatorsButton.style.backgroundColor = 'red'
-                    });
-            }
-        });
-        {% endif %}
     });
 </script>
 </body>
