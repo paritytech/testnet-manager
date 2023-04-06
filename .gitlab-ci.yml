@@ -57,7 +57,7 @@ variables:
 
 .deploy-with-argocd:                           &deploy-with-argocd
   stage: deploy
-  image: argoproj/argocd:v2.5.5
+  image: argoproj/argocd:v2.6.7
   variables:
     ARGOCD_OPTS: --grpc-web --grpc-web-root-path /$DOMAIN
   script:
@@ -109,16 +109,6 @@ deploy-to-versi:
     DOMAIN: parity-versi
     APP: testnet-manager
 
-deploy-to-testnet-rococo:
-  <<:              *release-refs
-  needs:
-    - job: deploy-to-versi
-  extends: .deploy-with-argocd
-  environment: parity-testnet-rococo
-  variables:
-    DOMAIN: parity-testnet
-    APP: testnet-manager-rococo
-
 deploy-to-testnet-wococo:
   <<:              *release-refs
   needs:
@@ -128,3 +118,23 @@ deploy-to-testnet-wococo:
   variables:
     DOMAIN: parity-testnet
     APP: testnet-manager-wococo
+
+deploy-to-testnet-rococo:
+  <<:              *release-refs
+  needs:
+    - job: deploy-to-wococo
+  extends: .deploy-with-versi
+  environment: parity-testnet-rococo
+  variables:
+    DOMAIN: parity-testnet
+    APP: testnet-manager-rococo
+
+deploy-to-testnet-westend:
+  <<:              *release-refs
+  needs:
+    - job: deploy-to-wococo
+  extends: .deploy-with-argocd
+  environment: parity-testnet-westend
+  variables:
+    DOMAIN: parity-testnet
+    APP: testnet-manager-westend
