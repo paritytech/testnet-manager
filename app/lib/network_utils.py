@@ -86,7 +86,7 @@ def list_validators(stateful_set_name=''):
             if is_validator:
                 validators.append({'name': node_name, 'location': 'external', 'address': node_address,
                                    # 'funds': node_stash_account_funds,
-                                   'is_validator': is_validator, 'status': 'Running', 'version': '?'})
+                                   'is_validator': is_validator, 'status': '?', 'version': '?'})
 
     for pod in validator_pods:
         node_stash_account_address = get_validator_account_from_pod(pod)
