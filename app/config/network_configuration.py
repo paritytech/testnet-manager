@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 def get_var_from_env(var):
     value = environ.get(var)
     if value is None:
-        log.error("Cannot retrieve value from " + var)
+        log.warning("Cannot retrieve value from " + var)
     return value
 
 
@@ -73,3 +73,10 @@ def network_consensus():
     if value is None:
         value = "poa"
     return value.lower()
+
+
+def network_external_validators_configmap():
+    external_validators_configmap = get_var_from_env('EXTERNAL_VALIDATORS_CONFIGMAP')
+    if external_validators_configmap is None:
+        return "external-validators"
+    return external_validators_configmap
