@@ -44,12 +44,13 @@
         <tr>
             {% if validator.location == 'in_cluster' %}
             <td><a href="/nodes/{{ validator.name }}">{{ validator.name }}</a></td>
+            <td><a target="_blank" href="{{ node_logs_link | replace('{node}',validator.name) }}">🔎</a></td>
             {% else %}
+            <td>{{ validator.name }}/td>
             <td></td>
             {% endif %}
-            <td><a target="_blank" href="{{ node_logs_link | replace('{node}',validator.name) }}">🔎</a></td>
             <td>{{ validator.address }}</td>
-            <td><a target="_blank" href="https:/.subscan.io/account/{{ validator.address }}">🔗</a></td>
+            <td><a target="_blank" href="https://{{ network_name }}.subscan.io/account/{{ validator.address }}">🔗</a></td>
             <td>{{ validator.version }}</td>
             <td>{{ validator.status }}</td>
             <td>{{ validator.location }}</td>
