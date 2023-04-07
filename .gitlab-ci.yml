@@ -109,7 +109,7 @@ deploy-to-versi:
     DOMAIN: parity-versi
     APP: testnet-manager
 
-deploy-to-testnet-wococo:
+deploy-to-wococo:
   <<:              *release-refs
   needs:
     - job: deploy-to-versi
@@ -119,17 +119,17 @@ deploy-to-testnet-wococo:
     DOMAIN: parity-testnet
     APP: testnet-manager-wococo
 
-deploy-to-testnet-rococo:
+deploy-to-rococo:
   <<:              *release-refs
   needs:
     - job: deploy-to-wococo
-  extends: .deploy-with-versi
+  extends: .deploy-with-argocd
   environment: parity-testnet-rococo
   variables:
     DOMAIN: parity-testnet
     APP: testnet-manager-rococo
 
-deploy-to-testnet-westend:
+deploy-to-westend:
   <<:              *release-refs
   needs:
     - job: deploy-to-wococo
