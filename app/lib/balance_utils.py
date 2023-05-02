@@ -1,7 +1,7 @@
 import logging
 
 from substrateinterface import Keypair, KeypairType
-from app.lib.substrate import substrate_batchall_call, substrate_call
+from app.lib.substrate import substrate_batchall_call, substrate_call, substrate_rpc_request, get_chain_properties
 
 log = logging.getLogger('balance_utils')
 
@@ -51,9 +51,34 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
         return None
 
 
-def teleport_funds(substrate_client, from_account_keypair, para_id, target_account_address_list, transfer_amount):
+def transfer_funds(substrate_client, from_account_keypair, target_account_address_list, transfer_amount):
+    chain_properties = get_chain_properties()
     log.info(
-        f'Teleporting funds: {transfer_amount} UNIT from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}')
+        f"Transferring funds: {transfer_amount} {chain_properties['tokenSymbol']} from {from_account_keypair} to Account={target_account_address_list}")
+    token_decimals = chain_properties['tokenDecimals']
+    batch_call = []
+    for target_account_address in target_account_address_list:
+        batch_call.append(substrate_client.compose_call(
+        call_module='Balances',
+        call_function='transfer_keep_alive',
+        call_params={
+            'dest': target_account_address,
+            'value': transfer_amount * 10 ** token_decimals
+        }))
+    receipt = substrate_batchall_call(substrate_client, from_account_keypair, batch_call)
+    if receipt and receipt.is_success:
+        return True
+    else:
+        log.error("Balance Transfer to Accounts={} failed. Error: {}".format(
+            target_account_address_list, getattr(receipt, 'error_message', None)))
+        return None
+
+
+def teleport_funds(substrate_client, from_account_keypair, para_id, target_account_address_list, transfer_amount):
+    chain_properties = get_chain_properties()
+    log.info(
+        f"Teleporting funds: {transfer_amount} {chain_properties['tokenSymbol']} from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}")
+    token_decimals = chain_properties['tokenDecimals']
     batch_call = []
     for address in target_account_address_list:
         target_account_public_key = Keypair(ss58_address=address, crypto_type=KeypairType.SR25519).public_key
@@ -94,7 +119,7 @@ def teleport_funds(substrate_client, from_account_keypair, para_id, target_accou
                             }
                         },
                         'fun': {
-                            'Fungible': transfer_amount
+                            'Fungible': transfer_amount * 10 ** token_decimals
                         }
                     }
                 ]]
@@ -103,12 +128,7 @@ def teleport_funds(substrate_client, from_account_keypair, para_id, target_accou
             'weight_limit': 'Unlimited',
             }
         ))
-
-    if len(batch_call) == 1:
-        receipt = substrate_call(substrate_client, from_account_keypair, batch_call[0])
-    else:
-        receipt = substrate_batchall_call(substrate_client, from_account_keypair, batch_call)
-
+    receipt = substrate_batchall_call(substrate_client, from_account_keypair, batch_call)
     if receipt and receipt.is_success:
         return True
     else:

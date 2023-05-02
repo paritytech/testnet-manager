@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse, PlainTextResponse
 from substrateinterface import Keypair
 
 from app.config.network_configuration import network_sudo_seed
-from app.lib.balance_utils import teleport_funds
+from app.lib.balance_utils import teleport_funds, transfer_funds
 from app.lib.kubernetes_client import list_validator_stateful_sets
 from app.lib.log_utils import get_node_pod_logs
 from app.lib.network_utils import list_substrate_nodes, list_validators, list_parachains, list_parachain_collators, \
@@ -242,16 +242,31 @@ async def set_on_chain_keys(
     return PlainTextResponse('OK')
 
 
+@router.post("/balances/transfer_funds")
+async def transfer_funds_from_sudo(
+    account: list[str] = Query(description="Account(s) to fund on the Relay-Chain"),
+    amount: int = Query(default=1, description="Amount to transfer to each accounts")
+):
+    relay_chain_client = get_relay_chain_client()
+    from_account_keypair = Keypair.create_from_seed(network_sudo_seed())
+    if transfer_funds(relay_chain_client, from_account_keypair, account, amount):
+        return PlainTextResponse('OK')
+    else:
+        raise HTTPException(status_code=500, detail="Failed to transfer funds")
+
+
 @router.post("/xcm/teleport_funds")
 async def teleport_funds_from_sudo(
     para_id: int = Query(description="Parachain ID"),
     account: list[str] = Query(description="Account(s) to fund on the Parachain (in relay-chain SS58 format)"),
-    amount: int = Query(default=1000000000000, description="Amount to transfer to each accounts")
+    amount: int = Query(default=1, description="Amount to transfer to each accounts")
 ):
     relay_chain_client = get_relay_chain_client()
     from_account_keypair = Keypair.create_from_seed(network_sudo_seed())
-    teleport_funds(relay_chain_client, from_account_keypair, para_id, account, amount)
-    return PlainTextResponse('OK')
+    if teleport_funds(relay_chain_client, from_account_keypair, para_id, account, amount):
+        return PlainTextResponse('OK')
+    else:
+        raise HTTPException(status_code=500, detail="Failed to teleport funds")
 
 
 @router.post("/parachains/{para_id}/runtime/upgrade")
