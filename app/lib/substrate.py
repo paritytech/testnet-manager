@@ -43,8 +43,8 @@ def get_relay_chain_client():
 
 
 # Returns {'ss58Format': int, 'tokenDecimals': int, 'tokenSymbol': str}
-def get_chain_properties():
-    return substrate_rpc_request(get_relay_chain_client(), 'system_properties')
+def get_chain_properties(substrate_client):
+    return substrate_rpc_request(substrate_client, 'system_properties')
 
 
 def get_node_client(node_name):
