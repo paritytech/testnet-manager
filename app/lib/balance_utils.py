@@ -54,7 +54,7 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
 def transfer_funds(substrate_client, from_account_keypair, target_account_address_list, transfer_amount):
     chain_properties = get_chain_properties(substrate_client)
     log.info(
-        f"Transferring funds: {transfer_amount} {chain_properties['tokenSymbol']} from {from_account_keypair} to Account={target_account_address_list}")
+        f"Transferring funds: {transfer_amount} {chain_properties.get('tokenSymbol','UNIT')} from {from_account_keypair} to Account={target_account_address_list}")
     token_decimals = chain_properties['tokenDecimals']
     batch_call = []
     for target_account_address in target_account_address_list:
@@ -77,7 +77,7 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
 def teleport_funds(substrate_client, from_account_keypair, para_id, target_account_address_list, transfer_amount):
     chain_properties = get_chain_properties(substrate_client)
     log.info(
-        f"Teleporting funds: {transfer_amount} {chain_properties['tokenSymbol']} from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}")
+        f"Teleporting funds: {transfer_amount} {chain_properties.get('tokenSymbol','UNIT')} from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}")
     token_decimals = chain_properties['tokenDecimals']
     batch_call = []
     for address in target_account_address_list:
