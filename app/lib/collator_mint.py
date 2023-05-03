@@ -11,7 +11,8 @@ from app.lib.collator_account import get_derived_collator_keypair, get_derived_c
 from app.lib.node_utils import inject_key, node_keystore_has_key, check_has_session_keys
 from app.lib.session_keys import set_node_session_key
 from app.lib.stash_accounts import get_account_funds
-from app.lib.substrate import get_node_client, substrate_sudo_relay_xcm_call, get_relay_chain_client
+from app.lib.substrate import get_node_client, substrate_sudo_relay_xcm_call, get_relay_chain_client, \
+    get_chain_properties
 from app.lib.substrate import substrate_call
 
 log = logging.getLogger('collator_mint')
@@ -107,13 +108,14 @@ def collator_set_keys(node_name, para_id, ss58_format):
         node_client = get_node_client(node_name)
         collator_account_funds = get_account_funds(node_client.url, collator_account_address)
         # 3. If insufficient, add funds with teleport
-        if collator_account_funds < 0.5 * 10 ** 12:
+        token_decimals = get_chain_properties(node_client)['tokenDecimals']
+        if collator_account_funds < 0.5 * 10 ** token_decimals:
             relay_chain_client = get_relay_chain_client()
             sudo_keypair = Keypair.create_from_seed(network_sudo_seed())
             log.info(f"Funding {collator_account_address}[ss58format={ss58_format}](funds={collator_account_funds}) via Teleport from relay-chain")
             # Get corresponding collator account address on the relay-chain (with the relay-chain ss58 format)
             relay_chain_collator_account = get_derived_collator_keypair(node_name, get_network_ss58_format()).ss58_address
-            teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1 * 10 ** 12)
+            teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1 * 10 ** token_decimals)
             if not teleport_result:
                 log.error("Unable fund account: {}, node: {}".format(
                     collator_account_address, getattr(relay_chain_client, 'url', 'NO_URL')))

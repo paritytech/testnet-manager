@@ -58,7 +58,7 @@ class BalanceUtilsTest(unittest.TestCase):
         alice_keypair = Keypair.create_from_seed(self.alice_key)
         alice_funds_before_teleport = get_funds(self.substrate_client, alice_keypair.ss58_address)
         teleport_amount = 1
-        teleport_funds(self.substrate_client, alice_keypair, 1000, [self.test_key_0_address], 1)
+        teleport_funds(self.substrate_client, alice_keypair, 1000, [self.test_key_0_address], teleport_amount)
         alice_funds_after_teleport = get_funds(self.substrate_client, alice_keypair.ss58_address)
         self.assertLess(alice_funds_after_teleport, alice_funds_before_teleport - teleport_amount, 'Alice account have {} been teleported')
 
