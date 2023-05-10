@@ -115,7 +115,7 @@ def collator_set_keys(node_name, para_id, ss58_format):
             log.info(f"Funding {collator_account_address}[ss58format={ss58_format}](funds={collator_account_funds}) via Teleport from relay-chain")
             # Get corresponding collator account address on the relay-chain (with the relay-chain ss58 format)
             relay_chain_collator_account = get_derived_collator_keypair(node_name, get_network_ss58_format()).ss58_address
-            teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1 * 10 ** token_decimals)
+            teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1)
             if not teleport_result:
                 log.error("Unable fund account: {}, node: {}".format(
                     collator_account_address, getattr(relay_chain_client, 'url', 'NO_URL')))
