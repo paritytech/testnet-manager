@@ -108,7 +108,7 @@ def collator_set_keys(node_name, para_id, ss58_format):
         node_client = get_node_client(node_name)
         collator_account_funds = get_account_funds(node_client.url, collator_account_address)
         # 3. If insufficient, add funds with teleport
-        token_decimals = get_chain_properties(node_client)['tokenDecimals']
+        token_decimals = get_chain_properties(node_client).get('tokenDecimals', 12)
         if collator_account_funds < 0.5 * 10 ** token_decimals:
             relay_chain_client = get_relay_chain_client()
             sudo_keypair = Keypair.create_from_seed(network_sudo_seed())

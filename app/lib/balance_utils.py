@@ -25,7 +25,7 @@ def transfer_funds(substrate_client, from_account_keypair, target_account_addres
     chain_properties = get_chain_properties(substrate_client)
     log.info(
         f"Transferring funds: {transfer_amount} {chain_properties.get('tokenSymbol','UNIT')} from {from_account_keypair} to Account={target_account_address_list}")
-    token_decimals = chain_properties['tokenDecimals']
+    token_decimals = chain_properties.get('tokenDecimals', 12)
     batch_call = []
     for target_account_address in target_account_address_list:
         batch_call.append(substrate_client.compose_call(
@@ -48,7 +48,7 @@ def teleport_funds(substrate_client, from_account_keypair, para_id, target_accou
     chain_properties = get_chain_properties(substrate_client)
     log.info(
         f"Teleporting funds: {transfer_amount} {chain_properties.get('tokenSymbol','UNIT')} from {from_account_keypair} to Para #{para_id} Account={target_account_address_list}")
-    token_decimals = chain_properties['tokenDecimals']
+    token_decimals = chain_properties.get('tokenDecimals', 12)
     batch_call = []
     for address in target_account_address_list:
         target_account_public_key = Keypair(ss58_address=address, crypto_type=KeypairType.SR25519).public_key
@@ -110,7 +110,7 @@ def teleport_funds(substrate_client, from_account_keypair, para_id, target_accou
 def fund_accounts(substrate_client, addresses, funding_account_seed):
     funding_account_keypair = Keypair.create_from_seed(funding_account_seed)
     target_account_address_list = []
-    token_decimals = get_chain_properties(substrate_client)['tokenDecimals']
+    token_decimals = get_chain_properties(substrate_client).get('tokenDecimals', 12)
     for address in addresses:
         address_funds = get_funds(substrate_client, address)
         log.info('address={} (funds={})'.format(address, address_funds))
