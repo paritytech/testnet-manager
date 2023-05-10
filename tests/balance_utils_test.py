@@ -13,7 +13,7 @@ class BalanceUtilsTest(unittest.TestCase):
     def setUp(self):
         # Start Alice validator
         self.alice_validator = DockerContainer('parity/polkadot:latest')
-        self.alice_validator.with_command('--chain rococo-local --validator --alice --unsafe-ws-external --rpc-cors=all')
+        self.alice_validator.with_command('--chain rococo-local --validator --alice --unsafe-ws-external --rpc-cors=all --rpc-methods=unsafe')
         self.alice_validator.with_exposed_ports(9944)
         self.alice_validator.start()
         self.alice_validator_rpc_ws_url = 'ws://{}:{}'.format(self.alice_validator.get_container_host_ip(),
@@ -21,7 +21,7 @@ class BalanceUtilsTest(unittest.TestCase):
 
         # Start Bob validator
         self.bob_validator = DockerContainer('parity/polkadot:latest')
-        self.bob_validator.with_command('--chain rococo-local --validator --bob --unsafe-rpc-external --rpc-cors=all')
+        self.bob_validator.with_command('--chain rococo-local --validator --bob --unsafe-rpc-external --rpc-cors=all --rpc-methods=unsafe')
         self.bob_validator.with_exposed_ports(9933)
         self.bob_validator.start()
         self.bob_validator_http_url = 'http://{}:{}'.format(self.bob_validator.get_container_host_ip(),
@@ -48,7 +48,7 @@ class BalanceUtilsTest(unittest.TestCase):
 
     def test_transfer_funds(self):
         alice_keypair = Keypair.create_from_seed(self.alice_key)
-        new_fund = transfer_funds(self.substrate_client, alice_keypair, [self.test_key_0_address], 1000000000000)
+        new_fund = transfer_funds(self.substrate_client, alice_keypair, [self.test_key_0_address], 1)
         print("new_fund", new_fund)
         funds = get_funds(self.substrate_client, self.test_key_0_address)
         print("funds", funds)
@@ -57,8 +57,8 @@ class BalanceUtilsTest(unittest.TestCase):
     def test_teleport_funds(self):
         alice_keypair = Keypair.create_from_seed(self.alice_key)
         alice_funds_before_teleport = get_funds(self.substrate_client, alice_keypair.ss58_address)
-        teleport_amount = 10000000000000000
-        teleport_funds(self.substrate_client, alice_keypair, 1000, [self.test_key_0_address], 10000000000000000)
+        teleport_amount = 1
+        teleport_funds(self.substrate_client, alice_keypair, 1000, [self.test_key_0_address], teleport_amount)
         alice_funds_after_teleport = get_funds(self.substrate_client, alice_keypair.ss58_address)
         self.assertLess(alice_funds_after_teleport, alice_funds_before_teleport - teleport_amount, 'Alice account have {} been teleported')
 

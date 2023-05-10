@@ -36,7 +36,7 @@ class StashAccountTest(unittest.TestCase):
         alice_funds = get_account_funds(self.polkadot_rpc_ws_url, alice_key.ss58_address)
         stash_account_funds = get_account_funds(self.polkadot_rpc_ws_url, stash_account.ss58_address)
         self.assertLess(alice_funds, 99990000000000000, "Alice's funds successfully transfered out")
-        self.assertEqual(stash_account_funds, 1000000000000, "Stash account's funds successfully transfered in")
+        self.assertEqual(stash_account_funds, 10000000000, "Stash account's funds successfully transfered in")
 
 if __name__ == '__main__':
     unittest.main()

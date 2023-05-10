@@ -15,6 +15,7 @@ def get_parachain_node_client(para_id):
     parachain_pods = list_collator_pods(para_id)
     return get_node_client(parachain_pods[0].metadata.name)
 
+
 # returns current parachains list
 def get_parachains_ids(substrate_client):
     parachains = substrate_client.query('Paras', 'Parachains', params=[])

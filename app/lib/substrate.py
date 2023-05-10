@@ -42,6 +42,11 @@ def get_relay_chain_client():
     return get_substrate_client(url)
 
 
+# Returns {'ss58Format': int, 'tokenDecimals': int, 'tokenSymbol': str}
+def get_chain_properties(substrate_client):
+    return substrate_rpc_request(substrate_client, 'system_properties')
+
+
 def get_node_client(node_name):
     return get_substrate_client(node_ws_endpoint(node_name))
 
@@ -101,13 +106,18 @@ def substrate_sudo_unchecked_weight_call(substrate_client, keypair, payload, wai
 
 
 def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True, sudo=False):
-    call = substrate_client.compose_call(
-        call_module='Utility',
-        call_function='batch',
-        call_params={
-            'calls': batch_call
-        }
-    )
+    # If the batch contains only 1 element, don't use batch
+    if len(batch_call) == 1:
+        call = batch_call[0]
+    else:
+        call = substrate_client.compose_call(
+            call_module='Utility',
+            call_function='batch',
+            call_params={
+                'calls': batch_call
+            }
+        )
+
     if sudo:
         return substrate_sudo_call(substrate_client, keypair, call, wait)
     else:
@@ -194,8 +204,8 @@ def substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded
                         'Transact': {
                             'origin_kind': 'Superuser',
                             'require_weight_at_most': {
-                                'ref_time': 10**9,
-                                'proof_size': 1024
+                                'ref_time': 10**12,
+                                'proof_size': 20000
                             },
                             'call': {
                                 'encoded': str(encoded_message)
