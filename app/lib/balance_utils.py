@@ -119,4 +119,4 @@ def fund_accounts(substrate_client, addresses, funding_account_seed):
                 'address={} is not properly funded (funds={}), schedule transferring funds from sudo account'.format(
                     address, address_funds))
             target_account_address_list.append(address)
-    transfer_funds(substrate_client, funding_account_keypair, target_account_address_list, 1 * 10 ** token_decimals)
+    transfer_funds(substrate_client, funding_account_keypair, target_account_address_list, 1)
