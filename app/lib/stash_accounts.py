@@ -1,8 +1,8 @@
 import logging
 
 from substrateinterface import Keypair
-from app.lib.balance_utils import transfer_funds, teleport_funds
-from app.lib.substrate import substrate_query_url, get_substrate_client, get_chain_properties
+
+from app.lib.substrate import substrate_query_url
 
 log = logging.getLogger('stash_accounts')
 
@@ -28,9 +28,3 @@ def get_account_funds(ws_endpoint, account_address):
         return funds_data['free']
     else:
         return None
-
-
-def fund_account(ws_endpoint, funding_account_seed, target_account_address):
-    substrate_client = get_substrate_client(ws_endpoint)
-    keypair = Keypair.create_from_seed(funding_account_seed)
-    transfer_funds(substrate_client, keypair, [target_account_address], 1)
