@@ -80,10 +80,7 @@ def runtime_upgrade(runtime_name, runtime_wasm, schedule_blocks_wait=None):
             'code': code
         }
     )
-    # Wrap with weight set to:
-    # ref_time: 1*10^12 (1s)
-    # proof_size: 3145828 (=3*1024*1024)
-    wrapped_call = substrate_wrap_with_weight(relay_client, inner_call, weight_ref_time=1000000000000, weight_proof_size=3145828)
+    wrapped_call = substrate_wrap_with_weight(relay_client, inner_call)
     if schedule_blocks_wait:
         # The block number at which to execute the call will be current_block + blocks_to_wait + 1
         current_block = relay_client.get_block_number(relay_client.get_chain_head())

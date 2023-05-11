@@ -51,6 +51,24 @@ def get_node_client(node_name):
     return get_substrate_client(node_ws_endpoint(node_name))
 
 
+def get_query_weight(substrate_client, call):
+    return get_query_info(substrate_client, call)['weight']
+
+
+# Returns: {'weight': {'ref_time': 178260000, 'proof_size': 3593}, 'class': 'Normal', 'partialFee': 469298416}
+def get_query_info(substrate_client, call):
+    keypair = Keypair.create_from_mnemonic(Keypair.generate_mnemonic())
+    extrinsic = substrate_client.create_signed_extrinsic(call=call, keypair=keypair)
+    extrinsic_len = substrate_client.create_scale_object('u32')
+    extrinsic_len.encode(len(extrinsic.data))
+    try:
+        return substrate_client.runtime_call("TransactionPaymentApi", "query_fee_details", [extrinsic, extrinsic_len])
+    except Exception as err:
+        log.error(f'Failed to get query_info on {getattr(substrate_client, "url", "NO_URL")}; Error: {err}')
+        # TransactionPaymentApi may not be in all parachains, return value which will work in most cases.
+        return {'weight': {'ref_time': 1000000000, 'proof_size': 4096}, 'class': 'Normal', 'partialFee': 1000000000}
+
+
 def substrate_rpc_request(substrate_client, method, params=[]):
     try:
         return substrate_client.rpc_request(method=method, params=params)['result']
@@ -124,19 +142,14 @@ def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True, su
         return substrate_call(substrate_client, keypair, call, wait)
 
 
-# Default weight values
-# weight_ref_time: 1*10^12 (1s)
-# weight_proof_size: 3145828 (=3*1024*1024)
-def substrate_wrap_with_weight(substrate_client, payload, weight_ref_time, weight_proof_size):
+def substrate_wrap_with_weight(substrate_client, payload):
+    weight = get_query_weight(substrate_client, payload)
     return substrate_client.compose_call(
         call_module='Utility',
         call_function='with_weight',
         call_params={
             'call': payload.value,
-            'weight': {
-                'ref_time': weight_ref_time,
-                'proof_size': weight_proof_size
-            }
+            'weight': weight
         }
     )
 
@@ -171,13 +184,13 @@ def substrate_query_url(url, module, function,params=[]):
     return substrate_query(substrate_client, module, function, params)
 
 
-def substrate_sudo_relay_xcm_call(para_id, encoded_message):
+def substrate_sudo_relay_xcm_call(para_id, encoded_message, weight):
     substrate_client = get_relay_chain_client()
     keypair = Keypair.create_from_seed(network_sudo_seed())
-    return substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded_message)
+    return substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded_message, weight)
 
 
-def substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded_message):
+def substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded_message, weight):
     payload = substrate_client.compose_call(
         call_module='XcmPallet',
         call_function='send',
@@ -203,10 +216,7 @@ def substrate_xcm_sudo_transact_call(substrate_client, keypair, para_id, encoded
                     {
                         'Transact': {
                             'origin_kind': 'Superuser',
-                            'require_weight_at_most': {
-                                'ref_time': 10**12,
-                                'proof_size': 20000
-                            },
+                            'require_weight_at_most': weight,
                             'call': {
                                 'encoded': str(encoded_message)
                             }

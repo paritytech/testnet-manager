@@ -13,7 +13,7 @@ from app.lib.session_keys import set_node_session_key
 from app.lib.stash_accounts import get_account_funds
 from app.lib.substrate import get_node_client, substrate_sudo_relay_xcm_call, get_relay_chain_client, \
     get_chain_properties
-from app.lib.substrate import substrate_call
+from app.lib.substrate import substrate_call, get_query_weight
 
 log = logging.getLogger('collator_mint')
 
@@ -68,8 +68,9 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
             )
 
             encoded_call = call.encode()
+            weight = get_query_weight(node_client, call)
             para_id = node_client.query('ParachainInfo', 'ParachainId', params=[]).value
-            receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call)
+            receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call, weight)
             if receipt and receipt.is_success:
                 log.info("✅ Success: desired candidate increased to {}".format(new_desired_candidates))
             else:
@@ -159,8 +160,9 @@ def deregister_mint_collator(node_name, ss58_format):
                 }
             )
             encoded_call = call.encode()
+            weight = get_query_weight(node_client, call)
             para_id = node_client.query('ParachainInfo', 'ParachainId', params=[]).value
-            receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call)
+            receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call, weight)
             if receipt and receipt.is_success:
                 log.info("✅ Success: desired candidate Decreased to {}".format(new_desired_candidates))
             else:
