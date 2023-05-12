@@ -62,7 +62,7 @@ def get_query_info(substrate_client, call):
     extrinsic_len = substrate_client.create_scale_object('u32')
     extrinsic_len.encode(len(extrinsic.data))
     try:
-        return substrate_client.runtime_call("TransactionPaymentApi", "query_fee_details", [extrinsic, extrinsic_len])
+        return substrate_client.runtime_call("TransactionPaymentApi", "query_info", [extrinsic, extrinsic_len]).value
     except Exception as err:
         log.error(f'Failed to get query_info on {getattr(substrate_client, "url", "NO_URL")}; Error: {err}')
         # TransactionPaymentApi may not be in all parachains, return value which will work in most cases.
