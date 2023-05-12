@@ -21,11 +21,14 @@ def get_funds(substrate_client, address):
         return 0
 
 
-def transfer_funds(substrate_client, from_account_keypair, target_account_address_list, transfer_amount):
+def transfer_funds(substrate_client, from_account_keypair, target_account_address_list, transfer_amount, add_token_decimals=True):
     chain_properties = get_chain_properties(substrate_client)
     log.info(
         f"Transferring funds: {transfer_amount} {chain_properties.get('tokenSymbol','UNIT')} from {from_account_keypair} to Account={target_account_address_list}")
-    token_decimals = chain_properties.get('tokenDecimals', 12)
+    if add_token_decimals:
+        token_decimals = chain_properties.get('tokenDecimals', 12)
+    else:
+        token_decimals = 1
     batch_call = []
     for target_account_address in target_account_address_list:
         batch_call.append(substrate_client.compose_call(

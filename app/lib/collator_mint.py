@@ -23,7 +23,7 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
         # 1. Generating stash account keypair
         node_client = get_node_client(node_name)
         keypair_rich = Keypair.create_from_uri(network_root_seed(), ss58_format=int(ss58_format))
-        collator_seed = get_derived_collator_seed(node_client)
+        collator_seed = get_derived_collator_seed(node_name)
         keypair = get_derived_collator_keypair(node_name, ss58_format)
         candidates = node_client.query('CollatorSelection', 'Candidates').value
 
@@ -31,12 +31,14 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
             # 2. Check enough funds
             candidacy_bond = node_client.query('CollatorSelection', 'CandidacyBond', params=[]).value
             account_info = node_client.query('System', 'Account', params=[keypair.ss58_address]).value
+            chain_properties = get_chain_properties(node_client)
+            token_decimals = chain_properties.get('tokenDecimals', 9)
             log.info("Check that {}({}) have more than {}".format(
                 keypair.ss58_address, account_info['data']['free'], candidacy_bond))
-            if account_info['data']['free'] < candidacy_bond + 0.1:
+            if account_info['data']['free'] < candidacy_bond + 0.1*10**token_decimals:
                 print("Funding {}".format(keypair.ss58_address))
                 # candidacyBond + 1 tx fee
-                result = transfer_funds(node_client, keypair_rich, [keypair.ss58_address], candidacy_bond + 1)
+                result = transfer_funds(node_client, keypair_rich, [keypair.ss58_address], candidacy_bond + 1*10**token_decimals, False)
                 if result == None:
                     # exit, failed to fund account
                     log.error("Unable fund account: {}, node: {}".format(
