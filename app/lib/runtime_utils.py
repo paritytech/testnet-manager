@@ -10,8 +10,7 @@ from app.lib.substrate import get_relay_chain_client, substrate_sudo_call, subst
 
 
 def get_substrate_runtime(node_client):
-    last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").get('value', {'spec_version': None,
-                                                                                           'spec_name': None})
+    last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").value
     wasm = get_chain_wasm(node_client)
     code_hash = f'0x{blake2_256(bytearray.fromhex(wasm[2:])).hex()}'
     head = get_parachain_head(node_client)
