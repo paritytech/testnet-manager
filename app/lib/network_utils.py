@@ -483,7 +483,7 @@ def list_parachains():
     return parachains
 
 
-async def onboard_parachain_by_id(para_id, force_queue_action=True):
+async def onboard_parachain_by_id(para_id, force_queue_action):
     log.info(f'starting to onboard parachain #{para_id}')
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
@@ -507,7 +507,7 @@ async def onboard_parachain_by_id(para_id, force_queue_action=True):
         log.error('Node para_id: {} doesn\'t match the requested offboard para_id {}'.format(node_para_id, para_id))
 
 
-async def offboard_parachain_by_id(para_id, force_queue_action=True):
+async def offboard_parachain_by_id(para_id, force_queue_action):
     log.info(f'starting to offboard parachain #{para_id}')
     substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
