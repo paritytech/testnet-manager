@@ -192,12 +192,19 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
 
     log.info('Code hash: {}'.format(code_hash))
     # Construct parachainSystem.authorizeUpgrade(hash) call on the parachain and grab the encoded call
+    call_function_metadata = para_client.get_metadata_call_function("ParachainSystem", "authorize_upgrade")
+    if len(call_function_metadata['fields']) == 2:
+        call_params = {
+            'code_hash': code_hash,
+            # Since the authorization only has a hash, it cannot actually perform the verification.
+            'check_version': False
+        }
+    else:
+        call_params = {'code_hash': code_hash}
     call = para_client.compose_call(
         call_module='ParachainSystem',
         call_function='authorize_upgrade',
-        call_params={
-            'code_hash': code_hash
-        }
+        call_params=call_params
     )
     weight = get_query_weight(para_client, call)
     receipt = substrate_sudo_relay_xcm_call(para_id, call.encode(), weight)

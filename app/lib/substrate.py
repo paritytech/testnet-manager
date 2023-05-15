@@ -57,11 +57,11 @@ def get_query_weight(substrate_client, call):
 
 # Returns: {'weight': {'ref_time': 178260000, 'proof_size': 3593}, 'class': 'Normal', 'partialFee': 469298416}
 def get_query_info(substrate_client, call):
-    keypair = Keypair.create_from_mnemonic(Keypair.generate_mnemonic())
-    extrinsic = substrate_client.create_signed_extrinsic(call=call, keypair=keypair)
-    extrinsic_len = substrate_client.create_scale_object('u32')
-    extrinsic_len.encode(len(extrinsic.data))
     try:
+        keypair = Keypair.create_from_mnemonic(Keypair.generate_mnemonic())
+        extrinsic = substrate_client.create_signed_extrinsic(call=call, keypair=keypair)
+        extrinsic_len = substrate_client.create_scale_object('u32')
+        extrinsic_len.encode(len(extrinsic.data))
         return substrate_client.runtime_call("TransactionPaymentApi", "query_info", [extrinsic, extrinsic_len]).value
     except Exception as err:
         log.error(f'Failed to get query_info on {getattr(substrate_client, "url", "NO_URL")}; Error: {err}')
