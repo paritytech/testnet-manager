@@ -483,7 +483,7 @@ def list_parachains():
     return parachains
 
 
-async def onboard_parachain_by_id(para_id):
+async def onboard_parachain_by_id(para_id, force_queue_action=True):
     log.info(f'starting to onboard parachain #{para_id}')
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
@@ -498,7 +498,7 @@ async def onboard_parachain_by_id(para_id):
             permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
             log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
                 para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
-            initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length)
+            initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action)
         else:
             log.error(
                 'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(
@@ -507,7 +507,7 @@ async def onboard_parachain_by_id(para_id):
         log.error('Node para_id: {} doesn\'t match the requested offboard para_id {}'.format(node_para_id, para_id))
 
 
-async def offboard_parachain_by_id(para_id):
+async def offboard_parachain_by_id(para_id, force_queue_action=True):
     log.info(f'starting to offboard parachain #{para_id}')
     substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
@@ -515,7 +515,7 @@ async def offboard_parachain_by_id(para_id):
     para_id = get_parachain_id(parachain_pods[0])
 
     log.info('Scheduling cleanup of parachain: {}'.format(para_id))
-    cleanup_parachain(substrate_client, sudo_seed, para_id)
+    cleanup_parachain(substrate_client, sudo_seed, para_id, force_queue_action)
 
 
 # Collators

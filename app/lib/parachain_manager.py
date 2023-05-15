@@ -137,7 +137,7 @@ def get_permanent_slot_lease_period_length(substrate_client):
     return substrate_client.get_constant("AssignedSlots", "PermanentSlotLeasePeriodLength").value
 
 
-def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, lease_period_count=0):
+def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, lease_period_count=0, force_queue_action=True):
     batch_call = []
     keypair = Keypair.create_from_seed(sudo_seed)
     batch_call.append(substrate_client.compose_call(
@@ -168,19 +168,36 @@ def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, leas
                 'period_count': lease_period_count
             }
         ))
+    if force_queue_action:
+        batch_call.append(substrate_client.compose_call(
+            call_module='Paras',
+            call_function='force_queue_action',
+            call_params={
+                'para': para_id
+            }
+        ))
     return substrate_batchall_call(substrate_client, keypair, batch_call, True, True)
 
 
-def cleanup_parachain(substrate_client, sudo_seed, para_id):
+def cleanup_parachain(substrate_client, sudo_seed, para_id, force_queue_action=True):
     keypair = Keypair.create_from_seed(sudo_seed)
-    payload = substrate_client.compose_call(
+    batch_call = []
+    batch_call.append(substrate_client.compose_call(
         call_module='ParasSudoWrapper',
         call_function='sudo_schedule_para_cleanup',
         call_params={
             'id': para_id
         }
-    )
-    return substrate_sudo_call(substrate_client, keypair, payload)
+    ))
+    if force_queue_action:
+        batch_call.append(substrate_client.compose_call(
+            call_module='Paras',
+            call_function='force_queue_action',
+            call_params={
+                'para': para_id
+            }
+        ))
+    return substrate_batchall_call(substrate_client, keypair, batch_call, True, True)
 
 
 def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):

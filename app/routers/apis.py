@@ -157,25 +157,31 @@ async def rotate_session_keys(
 
 @router.post("/parachains/onboard")
 async def onboard_parachains(
-    para_id: list[str] = Query(description="Parachain ID(s) to onboard")
+    para_id: list[str] = Query(description="Parachain ID(s) to onboard"),
+    force: bool = Query(default=True, description="Put a parachain directly into the next session's action queue."),
 ):
     parachains = list_parachains()
     for id in para_id:
         # Onboard parachain if not currently active
-        if id not in parachains:
-            asyncio.create_task(onboard_parachain_by_id(id))
+        if not parachains.get(int(id), {}).get('lifecycle') in ['Parachain', 'Onboarding']:
+            asyncio.create_task(onboard_parachain_by_id(id, force))
+        else:
+            log.info(F'Parachain #{id} already onboarded')
     return PlainTextResponse('OK')
 
 
 @router.post("/parachains/offboard")
 async def offboard_parachains(
-    para_id: list[str] = Query(description="Parachain ID(s) to offboard")
+    para_id: list[str] = Query(description="Parachain ID(s) to offboard"),
+    force: bool = Query(default=True, description="Put a parachain directly into the next session's action queue."),
 ):
     parachains = list_parachains()
     for id in para_id:
         # Offboard parachain if currently active
-        if id in parachains:
-            asyncio.create_task(offboard_parachain_by_id(id))
+        if parachains.get(int(id), {}).get('lifecycle') in ['Parachain', 'Onboarding']:
+            asyncio.create_task(offboard_parachain_by_id(id,force))
+        else:
+            log.info(F'Parachain #{id} already offboarded')
     return PlainTextResponse('OK')
 
 

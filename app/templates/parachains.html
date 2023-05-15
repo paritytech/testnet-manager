@@ -13,6 +13,8 @@
 {% if request.query_params['isAdmin'] %}
 <button onClick="offboardSelectedParachains(this)">Offboard Selected Parachains</button>
 {% endif %}
+<input type="checkbox" id="forceQueueAction" checked>
+<label for="forceQueueAction">Force (Put a parachain directly into the next session's action queue.)</label>
 <table id="table" class="display compact" style="width:100%">
     <thead>
     <tr>
@@ -65,8 +67,8 @@
             paraInputCheckboxes = document.querySelectorAll('input[name="para_id"]');
             selectedParaIds =  Array.from(paraInputCheckboxes).filter(input => input.checked).map(input => input.value);
             element.disabled = true
-            console.log(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}`)
-            fetch(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}`, {method: "POST"})
+            console.log(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`)
+            fetch(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`, {method: "POST"})
                 .then(() => {
                     element.textContent = "Onboarding in progress"
                     element.backgroundColor = 'lightgreen'
@@ -81,8 +83,8 @@
             paraInputCheckboxes = document.querySelectorAll('input[name="para_id"]');
             selectedParaIds =  Array.from(paraInputCheckboxes).filter(input => input.checked).map(input => input.value);
             element.disabled = true
-            console.log(`/api/parachains/offboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}`)
-            fetch(`/api/parachains/offboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}`, {method: "POST"})
+            console.log(`/api/parachains/offboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`)
+            fetch(`/api/parachains/offboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`, {method: "POST"})
                 .then(() => {
                     element.textContent = "Offboarding in progress"
                     element.backgroundColor = 'lightgreen'
