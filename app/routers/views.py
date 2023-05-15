@@ -14,7 +14,9 @@ router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
 network = get_network()
 
+
 @router.get("/",  response_class=HTMLResponse, include_in_schema=False)
+@router.get("/index.html",  response_class=HTMLResponse, include_in_schema=False)
 async def homepage(request: Request):
     return templates.TemplateResponse('index.html', {'request': request, 'network': network})
 
@@ -80,7 +82,7 @@ async def validators(
 async def parachains(
     request: Request
 ):
-    parachains = list_parachains()
+    parachains = list_parachains().test
     paras_count = len(parachains)
     parachain_count = len(list(filter(lambda para: para[1].get('lifecycle') == 'Parachain', parachains.items())))
     parathread_count = len(list(filter(lambda para: 'Parathread' in para[1].get('lifecycle', ''), parachains.items())))

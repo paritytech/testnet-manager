@@ -1,0 +1,42 @@
+name: Run smoke test
+
+on: [push]
+
+
+jobs:
+  smoke_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name:  Install minikube helmfile and plugins
+        run : |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          install minikube-linux-amd64 /usr/local/bin/minikube
+          minikube version
+          HELMFILE_VERSION=0.153.1
+          curl -LO  https://github.com/helmfile/helmfile/releases/download/v${HELMFILE_VERSION}/helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz
+          tar -xzf helmfile_${HELMFILE_VERSION}_linux_amd64.tar.gz  -C /usr/local/bin/
+          helm plugin install https://github.com/databus23/helm-diff
+
+      - name: setup
+        run : |
+          cd local-kubernetes
+          make kube
+          make install
+          kubectl get pod -n rococo
+          kubectl wait --for=condition=Ready pods --all -n rococo --timeout=900s
+          kubectl get pod -n rococo
+
+      - name: Tests
+        run : |
+          pwd
+          (cd local-kubernetes && make web-ci)
+          pwd
+          ./tests/smoke_test.sh
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: web
+          path: output
+

@@ -2,7 +2,7 @@
 # Validator-manager Quick Deploy Makefile for Development and Testing
 # ============================================================================================
 
-KUBERNETES_CONTEXT = rancher-desktop #  minikube or rancher-desktop
+KUBERNETES_CONTEXT = minikube #  minikube or rancher-desktop
 # rococo or wococo (don't put space at the end of the variable it will be used as is)
 CHAIN_NAMESPACE = rococo
 
@@ -18,7 +18,7 @@ kube: kube_${KUBERNETES_CONTEXT}
 kube_minikube:
 	@minikube start \
 		--addons ingress --addons metrics-server --addons registry --driver docker \
-		--kubernetes-version=1.23.3 --memory=8g --cpus=4
+		--kubernetes-version=1.23.3 --memory=6g --cpus=2
 
 kube_minikube-podman:
 	@minikube start \
@@ -80,20 +80,23 @@ web-tasks:
 	@xdg-open 'http://localhost:8081/tasks'
 	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/testnet-manager-task-scheduler 8081:80 -n ${CHAIN_NAMESPACE}
 
+web-ci:
+	kubectl --context ${KUBERNETES_CONTEXT} port-forward service/testnet-manager 8080:80 -n ${CHAIN_NAMESPACE} &
+	timeout 30 sh -c 'until nc -z 127.0.0.1  8080; do sleep 1; echo -n .; done'
+
 # ============================================================================================
 
 apply: check
 	@helmfile --file ./charts/helmfile-${CHAIN_NAMESPACE}.yaml apply
-	@kubectl --context ${KUBERNETES_CONTEXT} delete pod  -l app.kubernetes.io/name=testnet-manager -n ${CHAIN_NAMESPACE}
-	@kubectl --context ${KUBERNETES_CONTEXT} delete pod  -l app.kubernetes.io/name=testnet-manager-task-scheduler -n ${CHAIN_NAMESPACE} # force recreate testnet-manager pod
 
-install: build setup apply
+install: setup build apply
 
 # ============================================================================================
 
 reload: build
 	@kubectl --context ${KUBERNETES_CONTEXT} delete pod  -l app.kubernetes.io/name=testnet-manager -n ${CHAIN_NAMESPACE}
-	@kubectl --context ${KUBERNETES_CONTEXT} delete pod  -l app.kubernetes.io/name=testnet-manager-task-scheduler -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} delete pod  -l app.kubernetes.io/name=testnet-manager-task-scheduler -n ${CHAIN_NAMESPACE} # force recreate testnet-manager pod
+	@make log &
 	@make web
 
 log:
