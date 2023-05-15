@@ -8,7 +8,7 @@ from app.config.network_configuration import network_root_seed
 from app.lib.collator_tick import register_tick_collator
 from app.lib.collator_mint import register_mint_collator, deregister_mint_collator
 from app.lib.kubernetes_client import list_collator_pods
-from app.lib.substrate import substrate_sudo_relay_xcm_call, get_node_client
+from app.lib.substrate import substrate_sudo_relay_xcm_call, get_node_client, get_query_weight
 
 log = logging.getLogger('collator_manager')
 
@@ -107,8 +107,9 @@ async def set_collator_selection_invulnerables(para_id, invulnerables):
         }
     )
     encoded_call = call.encode()
-    log.info(call)
-    receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call)
+    weight = get_query_weight(node_client, call)
+    log.info("call: {}, weight: {}".format(call, weight))
+    receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call, weight)
     if receipt and receipt.is_success:
         log.info(f'✅ Success: new invulnerable list send via XCM to para #{para_id}')
     else:

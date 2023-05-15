@@ -19,7 +19,7 @@ releases:
   - name: localrococo-bootnode
     namespace: rococo
     chart: parity/node
-    version: 4.2.6
+    version: &node_version 4.5.0
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
@@ -31,6 +31,7 @@ releases:
   - name: localrococo-bootnode-bob
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
@@ -42,6 +43,7 @@ releases:
   - name: localrococo-validator-a
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
@@ -61,6 +63,7 @@ releases:
   - name: localrococo-shell-collator
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-shell-collator.yaml
 
@@ -68,6 +71,7 @@ releases:
   - name: localrococo-statemint-alice
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-statemint-collator.yaml
       - node:
@@ -80,6 +84,7 @@ releases:
   - name: localrococo-statemint-bob
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-statemint-collator.yaml
       - node:
@@ -92,6 +97,7 @@ releases:
   - name: localrococo-statemint-a
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-statemint-collator.yaml
       - node:
@@ -104,6 +110,7 @@ releases:
   - name: localrococo-moonbase-alice
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-moonbase-collator.yml
       - node:
@@ -117,6 +124,7 @@ releases:
   - name: localrococo-moonbase-collator
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-moonbase-collator.yml
 
@@ -124,6 +132,7 @@ releases:
   - name: localrococo-tick-collator
     namespace: rococo
     chart: parity/node
+    version: *node_version
     values:
       - values-tick-collator.yml
 
