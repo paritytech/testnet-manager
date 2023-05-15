@@ -82,7 +82,7 @@ async def validators(
 async def parachains(
     request: Request
 ):
-    parachains = list_parachains().test
+    parachains = list_parachains()
     paras_count = len(parachains)
     parachain_count = len(list(filter(lambda para: para[1].get('lifecycle') == 'Parachain', parachains.items())))
     parathread_count = len(list(filter(lambda para: 'Parathread' in para[1].get('lifecycle', ''), parachains.items())))

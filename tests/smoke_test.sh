@@ -22,7 +22,7 @@ runtime
 for path in $ROUTE;
 do
   echo "/$path"
-  curl -f http://localhost:8080/$path --create-dirs -O --output-dir ./output
+  curl --fail --silent --show-error http://localhost:8080/$path --create-dirs --remote-name --output-dir ./output
 done
 
 find ./output -type f -not -name "*.html" -exec mv {} {}.html \;
