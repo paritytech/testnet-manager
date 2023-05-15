@@ -10,8 +10,7 @@ from app.lib.substrate import get_relay_chain_client, substrate_sudo_call, subst
 
 
 def get_substrate_runtime(node_client):
-    last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").get('value', {'spec_version': None,
-                                                                                           'spec_name': None})
+    last_runtime_upgrade = node_client.query("System", "LastRuntimeUpgrade").value
     wasm = get_chain_wasm(node_client)
     code_hash = f'0x{blake2_256(bytearray.fromhex(wasm[2:])).hex()}'
     head = get_parachain_head(node_client)
@@ -80,10 +79,7 @@ def runtime_upgrade(runtime_name, runtime_wasm, schedule_blocks_wait=None):
             'code': code
         }
     )
-    # Wrap with weight set to:
-    # ref_time: 1*10^12 (1s)
-    # proof_size: 3145828 (=3*1024*1024)
-    wrapped_call = substrate_wrap_with_weight(relay_client, inner_call, weight_ref_time=1000000000000, weight_proof_size=3145828)
+    wrapped_call = substrate_wrap_with_weight(relay_client, inner_call)
     if schedule_blocks_wait:
         # The block number at which to execute the call will be current_block + blocks_to_wait + 1
         current_block = relay_client.get_block_number(relay_client.get_chain_head())

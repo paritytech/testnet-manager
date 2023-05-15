@@ -2,7 +2,7 @@ import logging
 from math import floor
 
 from app.lib.substrate import substrate_sudo_call, substrate_batchall_call, get_node_client, \
-    substrate_sudo_relay_xcm_call, substrate_call
+    substrate_sudo_relay_xcm_call, substrate_call, get_query_weight
 from substrateinterface import Keypair
 from app.lib.kubernetes_client import list_collator_pods
 from substrateinterface.utils.hasher import blake2_256
@@ -216,7 +216,8 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
             'code_hash': code_hash
         }
     )
-    receipt = substrate_sudo_relay_xcm_call(para_id,  call.encode())
+    weight = get_query_weight(para_client, call)
+    receipt = substrate_sudo_relay_xcm_call(para_id, call.encode(), weight)
     if receipt and receipt.is_success:
         log.info('Successfully sent parachainSystem.authorizeUpgrade(hash) on Relaychain')
         log.info('https://polkadot.js.org/apps/#/explorer/query/{}'.format(receipt.block_hash))
