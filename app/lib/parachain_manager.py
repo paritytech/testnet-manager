@@ -58,8 +58,10 @@ def get_all_parachain_lifecycles(substrate_client):
     paras_lifecycles = substrate_client.query_map('Paras', 'ParaLifecycles')
     result = {}
     for para_lifecycle in paras_lifecycles:
-        para_id = para_lifecycle[0].value
-        result[para_id] = para_lifecycle[1].value
+        # If all parachins are off-boarded, ParaLifecycles will return list of None objets without 'value' attribute.
+        if getattr(para_lifecycle[0], "value", None):
+            para_id = para_lifecycle[0].value
+            result[para_id] = para_lifecycle[1].value
     return result
 
 

@@ -178,7 +178,7 @@ async def offboard_parachains(
     parachains = list_parachains()
     for id in para_id:
         # Offboard parachain if currently active
-        if parachains.get(int(id), {}).get('lifecycle') in ['Parachain', 'Onboarding']:
+        if parachains.get(int(id), {}).get('lifecycle') in ['Parachain', 'Onboarding', 'Parathread']:
             asyncio.create_task(offboard_parachain_by_id(id,force))
         else:
             log.info(F'Parachain #{id} already offboarded')
