@@ -1,8 +1,13 @@
+import logging
+import traceback
+
 from substrateinterface import Keypair, KeypairType
 from hashlib import blake2b
 
 from app.config.network_configuration import network_root_seed
+from app.lib.substrate import get_node_client
 
+log = logging.getLogger(__name__)
 
 def get_derived_collator_seed(node_name):
     root_seed = network_root_seed()
@@ -18,9 +23,16 @@ def get_derived_collator_account(node_name, ss58_format=42):
 
 
 def get_derived_collator_session_keys(node_name):
-    return {
-        'aura': '0x' + get_derived_collator_keypair(node_name).public_key.hex()
-    }
+    try:
+        node_client = get_node_client(node_name)
+        seed = get_derived_collator_seed(node_name)
+        hex = node_client.runtime_call("SessionKeys", "generate_session_keys", [seed]).value
+        return {
+            'aura': hex
+        }
+    except Exception as e:
+        log.error("Unable to get_derived_collator_session_keys. Error: {}, stacktrace:\n".format(e, traceback.print_exc()))
+        return None
 
 
 def get_moon_node_collator_uri(root_seed, node_name):
