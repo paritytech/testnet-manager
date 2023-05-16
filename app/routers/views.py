@@ -85,7 +85,7 @@ async def parachains(
     parachains = list_parachains()
     paras_count = len(parachains)
     parachain_count = len(list(filter(lambda para: para[1].get('lifecycle') == 'Parachain', parachains.items())))
-    parathread_count = len(list(filter(lambda para: 'Parathread' in para[1].get('lifecycle', ''), parachains.items())))
+    parathread_count = len(list(filter(lambda para: para[1].get('lifecycle') == 'Parathread', parachains.items())))
 
     return templates.TemplateResponse('parachains.html', dict(request=request, network_name=network, parachains=parachains,
                                                          paras_count=paras_count, parachain_count=parachain_count,
