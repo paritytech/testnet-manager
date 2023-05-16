@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import PlainTextResponse
 
+from app import __version__
 from app.lib.cron_tasks import load_cron_tasks
 from app.tasks import views, apis
 from app.config import log_config
@@ -18,7 +19,7 @@ class EndpointFilter(logging.Filter):
         return record.args and len(record.args) >= 3 and record.args[2] != "/health"
 
 
-app = FastAPI(title=settings.SCHEDULER_APP_NAME, on_startup=[load_cron_tasks])
+app = FastAPI(title=settings.SCHEDULER_APP_NAME, on_startup=[load_cron_tasks], version=__version__)
 app.include_router(apis.router)
 app.include_router(views.router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

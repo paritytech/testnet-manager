@@ -84,6 +84,7 @@ build-push-image:
     - !reference [.image_version, script]
     - test "$DOCKER_USER" -a "$DOCKER_PASS" ||
         ( echo "no docker credentials provided"; exit 1 )
+    - echo "__version__ = '$(git describe --tags)'" > app/__init__.py
     - $BUILDAH_COMMAND build
         --format=docker
         --build-arg VCS_REF="${CI_COMMIT_SHA}"
