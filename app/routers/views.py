@@ -14,7 +14,9 @@ router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
 network = get_network()
 
+
 @router.get("/",  response_class=HTMLResponse, include_in_schema=False)
+@router.get("/index.html",  response_class=HTMLResponse, include_in_schema=False)
 async def homepage(request: Request):
     return templates.TemplateResponse('index.html', {'request': request, 'network': network})
 
