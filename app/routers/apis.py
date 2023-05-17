@@ -243,9 +243,13 @@ async def set_on_chain_keys(
     node: list[str] = Query(default=[], description="Collator node(s) for which to set keys on chain"),
     statefulset: str = Query(default=None, description="Name of the StatefulSet for which to set keys on chain"),
 ):
-    if node:
+    if node or statefulset:
         asyncio.create_task(set_collator_nodes_keys_on_chain(para_id, node,statefulset))
-    return PlainTextResponse('OK')
+        return PlainTextResponse('OK')
+    else:
+        msg = F'Failed to execute set_on_chain_keys api call for Parachain #{para_id}: "node" or "statefulset" parameter should be set'
+        log.error(msg)
+        return PlainTextResponse(msg, status_code=400)
 
 
 @router.post("/balances/transfer_funds")

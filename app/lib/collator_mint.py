@@ -7,7 +7,7 @@ from substrateinterface import Keypair
 from app.config.network_configuration import network_root_seed, get_network_ss58_format, \
     network_sudo_seed
 from app.lib.balance_utils import transfer_funds, teleport_funds
-from app.lib.collator_account import get_derived_collator_keypair, get_derived_collator_seed
+from app.lib.collator_account import get_derived_collator_keypair, get_derived_collator_seed, get_derived_collator_session_keys
 from app.lib.node_utils import inject_key, node_keystore_has_key, check_has_session_keys
 from app.lib.session_keys import set_node_session_key
 from app.lib.stash_accounts import get_account_funds
@@ -106,6 +106,7 @@ def collator_set_keys(node_name, para_id, ss58_format):
         # 1. Get collator account keypair
         collator_keypair = get_derived_collator_keypair(node_name, ss58_format)
         collator_account_address = collator_keypair.ss58_address
+        aura_public_key = get_derived_collator_session_keys(node_name)['aura']
         # 2. Check funds
         log.info("Check that {} has enough funds".format(collator_account_address))
         node_client = get_node_client(node_name)
@@ -126,7 +127,6 @@ def collator_set_keys(node_name, para_id, ss58_format):
             log.info("Waiting 1 minute for teleport to complete")
             time.sleep(60)
         # 4. Check node has aura key
-        aura_public_key = "0x" + collator_keypair.public_key.hex()
         if not node_keystore_has_key(node_client, 'aura', aura_public_key):
             log.error(f'Node ({node_name}) doesn\'t have the required aura key in its keystore')
             return None
@@ -137,6 +137,7 @@ def collator_set_keys(node_name, para_id, ss58_format):
             if not set_session_key_result:
                 log.error(f"Unable to set session key for node: {node_client.url}, session_key={aura_public_key}")
                 return None
+        log.info(f"✅ Success: Set session key for node: {node_name}, session_key={aura_public_key}")
     except Exception as e:
         log.error("Unable to collator_set_keys. Error: {}, stacktrace:\n".format(e, traceback.print_exc()))
         return None
