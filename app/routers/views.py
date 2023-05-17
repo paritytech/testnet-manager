@@ -2,6 +2,7 @@ from fastapi import APIRouter, Path, Query, Request
 from starlette.responses import HTMLResponse
 from starlette.templating import Jinja2Templates
 
+from app import __version__
 from app.config.network_configuration import get_node_logs_link, get_network
 from app.lib.kubernetes_client import list_validator_stateful_sets, list_parachain_collator_stateful_sets
 from app.lib.network_utils import list_substrate_nodes, list_validators, get_session_queued_keys, list_parachains, \
@@ -18,7 +19,7 @@ network = get_network()
 @router.get("/",  response_class=HTMLResponse, include_in_schema=False)
 @router.get("/index.html",  response_class=HTMLResponse, include_in_schema=False)
 async def homepage(request: Request):
-    return templates.TemplateResponse('index.html', {'request': request, 'network': network})
+    return templates.TemplateResponse('index.html', {'request': request, 'network': network, 'version': __version__})
 
 
 @router.get("/nodes", response_class=HTMLResponse, include_in_schema=False)
