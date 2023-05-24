@@ -56,6 +56,11 @@ def update_relay_configuration(new_configuration_key, new_configuration_value):
         return False, err
 
 
+def get_relaychain_metadata():
+    relay_client = get_relay_chain_client()
+    return relay_client.rpc_request(method='state_getMetadata', params=[])['result']
+
+
 def get_parachain_runtime(para_id):
     para_client = get_parachain_node_client(para_id)
     relay_client = get_relay_chain_client()
@@ -64,6 +69,11 @@ def get_parachain_runtime(para_id):
     runtime_info['parachain_head_in_relay'] = relay_client.query('Paras', 'Heads', params=[para_id]).value
     runtime_info['parachain_code_hash_in_relay'] = relay_client.query('Paras', 'CurrentCodeHash', params=[para_id]).value
     return runtime_info
+
+
+def get_parachain_metadata(para_id):
+    para_client = get_parachain_node_client(para_id)
+    return para_client.rpc_request(method='state_getMetadata', params=[])['result']
 
 
 def runtime_upgrade(runtime_name, runtime_wasm, schedule_blocks_wait=None):

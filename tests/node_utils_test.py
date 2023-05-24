@@ -1,6 +1,5 @@
 import time
 import unittest
-import urllib
 
 from testcontainers.core.container import DockerContainer
 from os import environ
