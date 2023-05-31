@@ -17,7 +17,6 @@ parachains/1001/runtime
 collators/1000
 collators/1001
 runtime
-runtime/metadata
 '
 
 for path in $ROUTE;
