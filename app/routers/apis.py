@@ -3,11 +3,12 @@ import logging
 from typing import Any, Dict
 
 from fastapi import APIRouter, Path, Query, HTTPException, File, UploadFile
-from starlette.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, Response
 from substrateinterface import Keypair
 
 from app.config.network_configuration import network_sudo_seed
 from app.lib.balance_utils import teleport_funds, transfer_funds
+from app.lib.cron_tasks import list_cron_tasks, exec_cron_task
 from app.lib.kubernetes_client import list_validator_stateful_sets
 from app.lib.log_utils import get_node_pod_logs
 from app.lib.network_utils import list_substrate_nodes, list_validators, list_parachains, list_parachain_collators, \
@@ -17,11 +18,10 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
     deregister_collator_nodes, add_invulnerable_collators, remove_invulnerable_collators, \
     set_collator_nodes_keys_on_chain
-from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configuration, update_relay_configuration, \
-    get_parachain_runtime, runtime_upgrade
-from app.lib.substrate import get_relay_chain_client
 from app.lib.parachain_manager import parachain_runtime_upgrade
-from app.lib.cron_tasks import list_cron_tasks, exec_cron_task
+from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configuration, update_relay_configuration, \
+    get_parachain_runtime, runtime_upgrade, get_relaychain_metadata, get_parachain_metadata
+from app.lib.substrate import get_relay_chain_client
 
 log = logging.getLogger('router_apis')
 
@@ -89,11 +89,23 @@ async def update_runtime_configuration(new_configuration_keys: Dict[str, Any]):
     return PlainTextResponse("OK")
 
 
+@router.get("/runtime/metadata")
+async def get_relaychain_runtime_metadata():
+    return Response(content=get_relaychain_metadata(), media_type="application/octet-stream")
+
+
 @router.get("/parachains/{para_id}/runtime")
 async def get_runtime_parachain(
     para_id: str = Path(description="ID of the parachain for which to get runtime info")
 ):
     return JSONResponse(get_parachain_runtime(para_id))
+
+
+@router.get("/parachains/{para_id}/runtime/metadata")
+async def get_parachain_runtime_metadata(
+    para_id: str = Path(description="ID of the parachain for which to get runtime metadata")
+):
+    return Response(content=get_parachain_metadata(para_id), media_type="application/octet-stream")
 
 
 @router.post("/validators/register")
