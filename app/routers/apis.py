@@ -21,6 +21,8 @@ from app.lib.network_utils import list_substrate_nodes, list_validators, list_pa
 from app.lib.parachain_manager import parachain_runtime_upgrade
 from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configuration, update_relay_configuration, \
     get_parachain_runtime, runtime_upgrade, get_relaychain_metadata, get_parachain_metadata
+from app.lib.staking_utils import get_validator_nominator_mnemonic, staking_create_nominator, \
+    create_nominators_for_validator_node
 from app.lib.substrate import get_relay_chain_client
 
 log = logging.getLogger('router_apis')
@@ -137,6 +139,7 @@ async def deregister_validators(
         asyncio.create_task(deregister_validator_nodes(node))
     return PlainTextResponse('OK')
 
+
 @router.get("/validators/register_inactive")
 async def register_inactive_validators():
     tasks: list[dict[str, str]] = list_cron_tasks()
@@ -149,6 +152,20 @@ async def register_inactive_validators():
     else:
         raise HTTPException(status_code=404, detail='register_inactive_validators task not found')
     return PlainTextResponse('OK')
+
+
+@router.post("/validators/staking_nominators")
+async def validator_staking_nominators(
+    node: list[str] = Query(default=[], description="Name of validators for which to create nominators"),
+    count: int = Query(default=1, description="Number of nominators to create for each validator"),
+    amount: int = Query(default=1, description="Amount to bound for each nominator")
+):
+    relay_chain_client = get_relay_chain_client()
+    sudo_account_keypair = Keypair.create_from_seed(network_sudo_seed())
+    for validator in node:
+        asyncio.create_task(create_nominators_for_validator_node(relay_chain_client, sudo_account_keypair, validator, count, amount))
+    return PlainTextResponse('OK')
+
 
 @router.post("/rotate_session_keys")
 async def rotate_session_keys(
