@@ -22,11 +22,22 @@ async def create_nominators_for_validator_node(substrate_client, funding_account
     # Fund nominator accounts and execute bound + nominate
     transfer_funds(substrate_client, funding_account_keypair, nominator_accounts, nominate_amount + 1)
     for nominator_seed in nominator_seeds:
-        staking_create_nominator(substrate_client, nominator_seed, [validator_account], nominate_amount)
+        nominator_keypair = Keypair.create_from_uri(nominator_seed)
+        # If account is not already a nominator set up the nomination
+        if not check_is_nominator(substrate_client, nominator_keypair):
+            staking_create_nominator(substrate_client, nominator_keypair, [validator_account], nominate_amount)
 
 
-def staking_create_nominator(substrate_client, nominator_seed, target_validator_addresses, bound_amount=1):
-    nominator_keypair = Keypair.create_from_uri(nominator_seed)
+def get_validator_nominator_mnemonic(validator_name, nominator_index):
+    return f'{network_root_seed()}//{validator_name}//{nominator_index}'
+
+
+def check_is_nominator(substrate_client, nominator_keypair):
+    nominators_for_account = substrate_client.query('Staking', 'Nominators', params=[nominator_keypair.ss58_address])
+    return nominators_for_account and nominators_for_account.value and nominators_for_account.value["targets"] and len(nominators_for_account.value["targets"]) >= 1
+
+
+def staking_create_nominator(substrate_client, nominator_keypair, target_validator_addresses, bound_amount=1):
     nominator_address =  nominator_keypair.ss58_address
     log.info(f"Create nominators for {nominator_address}: target_validators={target_validator_addresses}, bound_amount={bound_amount}")
 
@@ -57,8 +68,3 @@ def staking_create_nominator(substrate_client, nominator_seed, target_validator_
             return False
         else:
             return True
-
-
-
-def get_validator_nominator_mnemonic(validator_name, nominator_index):
-    return f'{network_root_seed()}//{validator_name}//{nominator_index}'

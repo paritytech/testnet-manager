@@ -156,7 +156,7 @@ async def register_inactive_validators():
 
 @router.post("/validators/staking_nominators")
 async def validator_staking_nominators(
-    node: list[str] = Query(default=[], description="Validators for which to create nominators"),
+    node: list[str] = Query(default=[], description="Name of validators for which to create nominators"),
     count: int = Query(default=1, description="Number of nominators to create for each validator"),
     amount: int = Query(default=1, description="Amount to bound for each nominator")
 ):
