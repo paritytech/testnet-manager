@@ -28,14 +28,19 @@ def get_node_logs_link():
         return node_logs_link
 
 
-def relay_chain_rpc_url():
-    return get_var_from_env('RELAY_CHAIN_RPC_URL')
+def get_relay_chain_rpc_url():
+    if environ.get('WS_ENDPOINT'):
+        log.warning('WS_ENDPOINT will be deprecated. Please update to RELAY_CHAIN_RPC_URL.')
+        return get_var_from_env('WS_ENDPOINT')
+    else:
+        return get_var_from_env('RELAY_CHAIN_RPC_URL')
 
 
 # Retain HTTP endpoint until HTTP RPC is completely removed
 def node_http_endpoint(node_name):
     node_http_pattern = get_var_from_env('RPC_NODE_URL_PATTERN')
     return f'http://{node_http_pattern.replace("NODE_NAME", node_name)}'
+
 
 # Retain WS endpoint until HTTP RPC is completely removed
 def node_ws_endpoint(node_name):

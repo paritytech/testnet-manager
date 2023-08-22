@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import datetime, timedelta
 
-from app.config.network_configuration import relay_chain_rpc_url, network_sudo_seed, derivation_root_seed, \
+from app.config.network_configuration import get_relay_chain_rpc_url, network_sudo_seed, derivation_root_seed, \
     node_http_endpoint, get_network, relay_chain_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_account import get_derived_moon_collator_account, get_derived_collator_account, \
@@ -70,7 +70,7 @@ def get_validator_status(node_stash_account_address, validator_set, validators_t
 
 
 def list_validators(stateful_set_name=''):
-    ws_endpoint = relay_chain_rpc_url()
+    ws_endpoint = get_relay_chain_rpc_url()
     external_validators = get_external_validators_from_configmap()
     validator_pods = list_validator_pods(stateful_set_name)
     validator_set = get_validator_set(ws_endpoint)
@@ -203,7 +203,7 @@ def get_substrate_node(node_name):
     node_info = get_node_info_from_pod(pod)
     node_info.update(get_node_info_from_rpc(node_info.get("name")))
     if node_info.get("role") == "authority":
-        ws_endpoint = relay_chain_rpc_url()
+        ws_endpoint = get_relay_chain_rpc_url()
         validator_set = get_validator_set(ws_endpoint)
         validators_to_add = get_validators_pending_addition(ws_endpoint)
         validators_to_retire = get_validators_pending_deletion(ws_endpoint)
@@ -251,7 +251,7 @@ def get_substrate_node(node_name):
 # Setup validator node (rotate + submit session key): returns stash address/empty string depending on success
 async def setup_validators_session_keys(node_name):
     log.info("Setting up validator session key for {}".format(node_name))
-    ws_endpoint = relay_chain_rpc_url()
+    ws_endpoint = get_relay_chain_rpc_url()
     validators_root_seed = derivation_root_seed()
 
     # Rotate session keys
@@ -289,7 +289,7 @@ def is_validator_address_already_registered(address, validator_set, validators_t
 
 def register_validator_addresses(validator_addresses_to_register):
     log.info(f'registering the following validators addresses: {validator_addresses_to_register}')
-    ws_endpoint = relay_chain_rpc_url()
+    ws_endpoint = get_relay_chain_rpc_url()
     sudo_seed = network_sudo_seed()
     register_validators(ws_endpoint, sudo_seed, validator_addresses_to_register)
 
@@ -297,7 +297,7 @@ def register_validator_addresses(validator_addresses_to_register):
 async def register_validator_pods(pods):
     log.info(f'registering validators pods')
 
-    ws_endpoint = relay_chain_rpc_url()
+    ws_endpoint = get_relay_chain_rpc_url()
     substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     validator_set = get_validator_set(ws_endpoint)
@@ -358,7 +358,7 @@ async def register_validator_nodes(nodes):
 
 
 async def deregister_validator_addresses(validator_addresses_to_deregister):
-    ws_endpoint = relay_chain_rpc_url()
+    ws_endpoint = get_relay_chain_rpc_url()
     sudo_seed = network_sudo_seed()
     log.info(
         f'removing {len(validator_addresses_to_deregister)} addresses from the validator set: {validator_addresses_to_deregister}')
@@ -367,7 +367,7 @@ async def deregister_validator_addresses(validator_addresses_to_deregister):
 
 async def deregister_validator_pods(pods):
     log.info(f'deregistering validators pods on {relay_chain_network_name}')
-    ws_endpoint = relay_chain_rpc_url()
+    ws_endpoint = get_relay_chain_rpc_url()
     validator_set = get_validator_set(ws_endpoint)
     validators_to_add = get_validators_pending_addition(ws_endpoint)
     validators_to_retire = get_validators_pending_deletion(ws_endpoint)

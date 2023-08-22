@@ -3,7 +3,7 @@ import logging
 from substrateinterface import SubstrateInterface, Keypair
 from substrateinterface.utils.hasher import blake2_256
 
-from app.config.network_configuration import relay_chain_rpc_url, node_ws_endpoint, network_sudo_seed
+from app.config.network_configuration import get_relay_chain_rpc_url, node_ws_endpoint, network_sudo_seed
 from app.config import ws_pool
 
 log = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ def get_substrate_client(url):
 
 
 def get_relay_chain_client():
-    url = relay_chain_rpc_url()
+    url = get_relay_chain_rpc_url()
     return get_substrate_client(url)
 
 
