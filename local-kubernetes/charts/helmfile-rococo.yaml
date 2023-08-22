@@ -19,7 +19,7 @@ releases:
   - name: localrococo-bootnode
     namespace: rococo
     chart: parity/node
-    version: &node_version 4.5.0
+    version: &node_version 5.1.7
     values:
       - ./values-localrococo-bootnode.yaml
       - node:
@@ -67,7 +67,7 @@ releases:
     values:
       - values-shell-collator.yaml
 
-## Para chain Statemint ##
+# Para chain Statemint ##
   - name: localrococo-statemint-alice
     namespace: rococo
     chart: parity/node
@@ -135,4 +135,3 @@ releases:
     version: *node_version
     values:
       - values-tick-collator.yml
-

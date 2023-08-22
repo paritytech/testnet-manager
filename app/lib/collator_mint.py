@@ -4,7 +4,7 @@ import traceback
 
 from substrateinterface import Keypair
 
-from app.config.network_configuration import network_root_seed, get_network_ss58_format, \
+from app.config.network_configuration import derivation_root_seed, get_relay_chain_ss58_format, \
     network_sudo_seed
 from app.lib.balance_utils import transfer_funds, teleport_funds
 from app.lib.collator_account import get_derived_collator_keypair, get_derived_collator_seed, get_derived_collator_session_keys
@@ -22,7 +22,7 @@ def register_mint_collator(node_name, ss58_format, rotate_key=False):
     try:
         # 1. Generating stash account keypair
         node_client = get_node_client(node_name)
-        keypair_rich = Keypair.create_from_uri(network_root_seed(), ss58_format=int(ss58_format))
+        keypair_rich = Keypair.create_from_uri(derivation_root_seed(), ss58_format=int(ss58_format))
         collator_seed = get_derived_collator_seed(node_name)
         keypair = get_derived_collator_keypair(node_name, ss58_format)
         candidates = node_client.query('CollatorSelection', 'Candidates').value
@@ -118,7 +118,7 @@ def collator_set_keys(node_name, para_id, ss58_format):
             sudo_keypair = Keypair.create_from_seed(network_sudo_seed())
             log.info(f"Funding {collator_account_address}[ss58format={ss58_format}](funds={collator_account_funds}) via Teleport from relay-chain")
             # Get corresponding collator account address on the relay-chain (with the relay-chain ss58 format)
-            relay_chain_collator_account = get_derived_collator_keypair(node_name, get_network_ss58_format()).ss58_address
+            relay_chain_collator_account = get_derived_collator_keypair(node_name, get_relay_chain_ss58_format()).ss58_address
             teleport_result = teleport_funds(relay_chain_client, sudo_keypair, para_id, [relay_chain_collator_account], 1)
             if not teleport_result:
                 log.error("Unable fund account: {}, node: {}".format(

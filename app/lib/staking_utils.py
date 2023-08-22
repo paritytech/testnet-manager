@@ -2,7 +2,7 @@ import logging
 
 from substrateinterface import Keypair
 
-from app.config.network_configuration import network_root_seed
+from app.config.network_configuration import derivation_root_seed
 from app.lib.balance_utils import transfer_funds
 from app.lib.kubernetes_client import get_pod
 from app.lib.network_utils import get_validator_account_from_pod
@@ -29,7 +29,7 @@ async def create_nominators_for_validator_node(substrate_client, funding_account
 
 
 def get_validator_nominator_mnemonic(validator_name, nominator_index):
-    return f'{network_root_seed()}//{validator_name}//{nominator_index}'
+    return f'{derivation_root_seed()}//{validator_name}//{nominator_index}'
 
 
 def check_is_nominator(substrate_client, nominator_keypair):

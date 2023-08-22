@@ -70,7 +70,7 @@ spec:
             polkadot-parachain build-spec --chain statemint-local --disable-default-bootnode > /dir/statemint-plain.json;
             sed 's/"para_id": 1000/"para_id": 1003/' -i /dir/statemint-plain.json;
             sed 's/"parachainId": 1000/"parachainId": 1003/' -i /dir/statemint-plain.json;
-            echo "make 5GmS1wtCfR4tK5SSgnZbVT4kYw5W8NmxmijcsxCQE6oLW6A8 (VALIDATORS_ROOT_SEED) rich";
+            echo "make 5GmS1wtCfR4tK5SSgnZbVT4kYw5W8NmxmijcsxCQE6oLW6A8 (DERIVATION_ROOT_SEED) rich";
             sed 's/5CRmqmsiNFExV6VbdmPJViVxrWmkaXXvBrSX8oqBT8R9vmWk/5GmS1wtCfR4tK5SSgnZbVT4kYw5W8NmxmijcsxCQE6oLW6A8/' -i /dir/statemint-plain.json;
             polkadot-parachain build-spec --chain /dir/statemint-plain.json --disable-default-bootnode --raw  > /dir/statemint.json;
         volumeMounts:
@@ -111,9 +111,9 @@ spec:
             sed 's/5FvikUCHt9tQa98Auqa6mXGuhs3zBs6VsBv1JqfqziS252Ja/5Fnv5ZJJNhxQdQJm43pcGJSQigoZxqgJSoha8SVpXbJ8iknD/' -i /dir/tick-dev-plain.json;
             sed 's/5GsHTRwWBzPixrft2FVYG7SvjFjj3jsBB1Kx6zhEDzgZvczS/5HGJty2oZ8nv1x3JPNtFps11Xw787ZwPdzixX1TtuhbC5Fhq/' -i /dir/tick-dev-plain.json;
             polkadot-parachain build-spec --chain /dir/tick-dev-plain.json --raw > /dir/tick.json;
-        # 5G4849RFENXy6xMyXDZB2aEBs8tNaVsjjkWDQao3CewdFyZm - VALIDATORS_ROOT_SEED//Alice
-        # 5Fnv5ZJJNhxQdQJm43pcGJSQigoZxqgJSoha8SVpXbJ8iknD - VALIDATORS_ROOT_SEED//collator//localrococo-tick-collator-node-0
-        # 5HGJty2oZ8nv1x3JPNtFps11Xw787ZwPdzixX1TtuhbC5Fhq - VALIDATORS_ROOT_SEED//collator//localrococo-tick-collator-node-1
+        # 5G4849RFENXy6xMyXDZB2aEBs8tNaVsjjkWDQao3CewdFyZm - DERIVATION_ROOT_SEED//Alice
+        # 5Fnv5ZJJNhxQdQJm43pcGJSQigoZxqgJSoha8SVpXbJ8iknD - DERIVATION_ROOT_SEED//collator//localrococo-tick-collator-node-0
+        # 5HGJty2oZ8nv1x3JPNtFps11Xw787ZwPdzixX1TtuhbC5Fhq - DERIVATION_ROOT_SEED//collator//localrococo-tick-collator-node-1
         volumeMounts:
           - name: dir
             mountPath: /dir
@@ -126,7 +126,7 @@ spec:
           - name: OVERRIDE_JSON
             # 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY - SEED (//Alice)
             # export SUDO_SEED=0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
-            # export VALIDATORS_ROOT_SEED="test test test test test test test test test test test junk"
+            # export DERIVATION_ROOT_SEED="test test test test test test test test test test test junk"
             # export PREFIX=localwococo-bootnode-
             # scripts/prepare-test-net.sh 4
             value: |

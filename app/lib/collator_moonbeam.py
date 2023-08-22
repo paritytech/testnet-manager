@@ -6,7 +6,7 @@ from app.lib.collator_account import get_moon_root_uri, get_moon_node_collator_u
 from app.lib.substrate import substrate_call
 from app.lib.balance_utils import transfer_funds
 from app.lib.substrate import get_node_client
-from app.config.network_configuration import network_root_seed
+from app.config.network_configuration import derivation_root_seed
 
 log = logging.getLogger('collator_moonbeam')
 
@@ -15,7 +15,7 @@ def register_moon_collator(node_name, rotate_key=False):
     try:
         # init
         node_client = get_node_client(node_name)
-        collator_root_seed = network_root_seed()
+        collator_root_seed = derivation_root_seed()
         rich_key_uri = get_moon_root_uri(collator_root_seed)
         collator_key_uri = get_moon_node_collator_uri(collator_root_seed, node_name)
         keypair = Keypair.create_from_uri(collator_key_uri, crypto_type=KeypairType.ECDSA)

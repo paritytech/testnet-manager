@@ -9,7 +9,7 @@ from tests.test_utils import wait_for_http_ready
 from unittest import mock
 
 
-@mock.patch.dict(os.environ, {"TESTNET_MANAGER_CONSENSUS": "pos"})
+@mock.patch.dict(os.environ, {"RELAY_CHAIN_CONSENSUS": "pos"})
 class ValidatorManagerTestPoS(unittest.TestCase):
 
     def setUp(self):

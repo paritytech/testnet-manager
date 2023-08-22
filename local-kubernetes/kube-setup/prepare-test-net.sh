@@ -9,19 +9,19 @@ if [ "$#" -ne 1 ]; then
 	echo "Please provide the number of initial validators!"
 	echo "Usage: "
 	echo "export SUDO_SEED= sudo account seed" //Alice
-  echo "export VALIDATORS_ROOT_SEED= base seed to derive from "
+  echo "export DERIVATION_ROOT_SEED= base seed to derive from "
 	echo "export PREFIX= derivation prefix "
 	echo "$0 <number of nodes>"
 	echo "Example: "
 	echo "export SUDO_SEED=0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a" //Alice
-  echo "export VALIDATORS_ROOT_SEED='test test test test test test test test test test test junk'"
+  echo "export DERIVATION_ROOT_SEED='test test test test test test test test test test test junk'"
 	echo "export PREFIX=localwococo-bootnode-"
 	echo "$0 4"
 	exit 1
 fi
 
 generate_address() {
-	subkey inspect ${3:-} ${4:-} "$VALIDATORS_ROOT_SEED//$PREFIX$1//$2" | grep "SS58 Address" | awk '{ print $3 }'
+	subkey inspect ${3:-} ${4:-} "$DERIVATION_ROOT_SEED//$PREFIX$1//$2" | grep "SS58 Address" | awk '{ print $3 }'
 }
 
 V_NUM=$(($1 - 1))

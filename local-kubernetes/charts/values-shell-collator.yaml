@@ -28,6 +28,8 @@ node:
     chainData: *chainData
     chainKeystore: *chainKeystore
   persistGeneratedNodeKey: true
+  flags:
+    - "--unsafe-pruning"
 
 extraLabels:
   paraId: "1000"

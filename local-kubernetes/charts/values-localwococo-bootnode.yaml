@@ -28,7 +28,7 @@ node:
   keys:
     - type: "gran"
       scheme: "ed25519"
-      # VALIDATORS_ROOT_SEED
+      # DERIVATION_ROOT_SEED
       seed: "test test test test test test test test test test test junk"
       extraDerivation: "//${HOSTNAME}//grandpa"
     - type: "babe"

@@ -14,15 +14,14 @@ releases:
     values:
       - ./values-testnet-manager.yml
       - configmap:
-          WS_ENDPOINT: "ws://localwococo-bootnode.wococo:9944"
-          NODE_HTTP_PATTERN: "http://NODE_NAME.wococo:9933"
-          NODE_WS_PATTERN: "ws://NODE_NAME.wococo:9944"
-          TESTNET_MANAGER_CONSENSUS: pos
+          RELAY_CHAIN_RPC_URL: "ws://localwococo-bootnode.wococo:9944"
+          RPC_NODE_URL_PATTERN: "NODE_NAME.wococo:9944"
+          RELAY_CHAIN_CONSENSUS: pos
 
   - name: localwococo-bootnode
     namespace: wococo
     chart: parity/node
-    version: &node_version 4.5.0
+    version: &node_version 5.1.7
     values:
       - ./values-localwococo-bootnode.yaml
 

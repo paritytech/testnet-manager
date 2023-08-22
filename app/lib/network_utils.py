@@ -2,8 +2,8 @@ import asyncio
 import logging
 from datetime import datetime, timedelta
 
-from app.config.network_configuration import network_ws_endpoint, network_sudo_seed, network_root_seed, \
-    node_http_endpoint, get_network, network_consensus, node_ws_endpoint
+from app.config.network_configuration import relay_chain_rpc_url, network_sudo_seed, derivation_root_seed, \
+    node_http_endpoint, get_network, relay_chain_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_account import get_derived_moon_collator_account, get_derived_collator_account, \
     get_derived_collator_session_keys
@@ -40,7 +40,7 @@ def get_validator_account_from_pod(pod):
     if validator_account:
         return validator_account
     else:
-        return get_derived_node_stash_account_address(network_root_seed(), node_name)
+        return get_derived_node_stash_account_address(derivation_root_seed(), node_name)
 
 
 def get_collator_account_from_pod(pod):
@@ -70,7 +70,7 @@ def get_validator_status(node_stash_account_address, validator_set, validators_t
 
 
 def list_validators(stateful_set_name=''):
-    ws_endpoint = network_ws_endpoint()
+    ws_endpoint = relay_chain_rpc_url()
     external_validators = get_external_validators_from_configmap()
     validator_pods = list_validator_pods(stateful_set_name)
     validator_set = get_validator_set(ws_endpoint)
@@ -203,7 +203,7 @@ def get_substrate_node(node_name):
     node_info = get_node_info_from_pod(pod)
     node_info.update(get_node_info_from_rpc(node_info.get("name")))
     if node_info.get("role") == "authority":
-        ws_endpoint = network_ws_endpoint()
+        ws_endpoint = relay_chain_rpc_url()
         validator_set = get_validator_set(ws_endpoint)
         validators_to_add = get_validators_pending_addition(ws_endpoint)
         validators_to_retire = get_validators_pending_deletion(ws_endpoint)
@@ -251,8 +251,8 @@ def get_substrate_node(node_name):
 # Setup validator node (rotate + submit session key): returns stash address/empty string depending on success
 async def setup_validators_session_keys(node_name):
     log.info("Setting up validator session key for {}".format(node_name))
-    ws_endpoint = network_ws_endpoint()
-    validators_root_seed = network_root_seed()
+    ws_endpoint = relay_chain_rpc_url()
+    validators_root_seed = derivation_root_seed()
 
     # Rotate session keys
     node_endpoint = node_http_endpoint(node_name)
@@ -289,7 +289,7 @@ def is_validator_address_already_registered(address, validator_set, validators_t
 
 def register_validator_addresses(validator_addresses_to_register):
     log.info(f'registering the following validators addresses: {validator_addresses_to_register}')
-    ws_endpoint = network_ws_endpoint()
+    ws_endpoint = relay_chain_rpc_url()
     sudo_seed = network_sudo_seed()
     register_validators(ws_endpoint, sudo_seed, validator_addresses_to_register)
 
@@ -297,7 +297,7 @@ def register_validator_addresses(validator_addresses_to_register):
 async def register_validator_pods(pods):
     log.info(f'registering validators pods')
 
-    ws_endpoint = network_ws_endpoint()
+    ws_endpoint = relay_chain_rpc_url()
     substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     validator_set = get_validator_set(ws_endpoint)
@@ -305,8 +305,8 @@ async def register_validator_pods(pods):
     validators_to_retire = get_validators_pending_deletion(ws_endpoint)
     node_stash_accounts = []
     nodes_to_register = []
-    consensus = network_consensus()
-    validators_root_seed = network_root_seed()
+    consensus = relay_chain_consensus()
+    validators_root_seed = derivation_root_seed()
 
     for pod in pods:
         node = pod.metadata.name
@@ -358,7 +358,7 @@ async def register_validator_nodes(nodes):
 
 
 async def deregister_validator_addresses(validator_addresses_to_deregister):
-    ws_endpoint = network_ws_endpoint()
+    ws_endpoint = relay_chain_rpc_url()
     sudo_seed = network_sudo_seed()
     log.info(
         f'removing {len(validator_addresses_to_deregister)} addresses from the validator set: {validator_addresses_to_deregister}')
@@ -367,11 +367,11 @@ async def deregister_validator_addresses(validator_addresses_to_deregister):
 
 async def deregister_validator_pods(pods):
     log.info(f'deregistering validators pods on {relay_chain_network_name}')
-    ws_endpoint = network_ws_endpoint()
+    ws_endpoint = relay_chain_rpc_url()
     validator_set = get_validator_set(ws_endpoint)
     validators_to_add = get_validators_pending_addition(ws_endpoint)
     validators_to_retire = get_validators_pending_deletion(ws_endpoint)
-    consensus = network_consensus()
+    consensus = relay_chain_consensus()
 
     accounts_to_deregister = []
     pods_to_deregister = []
@@ -396,7 +396,7 @@ async def deregister_validator_pods(pods):
     if pods_to_deregister and consensus == "pos":
         log.info(f'The following validators will be deregister: {pods_to_deregister}')
         for pod_name in pods_to_deregister:
-            validator_stash_mnemonic = get_node_stash_account_mnemonic(network_root_seed(), pod_name)
+            validator_stash_mnemonic = get_node_stash_account_mnemonic(derivation_root_seed(), pod_name)
             staking_chill(ws_endpoint, validator_stash_mnemonic)
 
 
