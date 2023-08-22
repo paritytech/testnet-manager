@@ -22,6 +22,7 @@ jobs:
           virtualenvs-in-project: true
       - name: Run tests
         run : |
+          pip install pyyaml==5.3.1
           pip install docker-compose
           poetry install --no-interaction --no-ansi
           docker-compose version
