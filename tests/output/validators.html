@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rococo Validators</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+
+<h3>Rococo Validators : 0 External to K8S / 2 Active in K8S / 1 Inactive in K8S </h3>
+
+<select id="statefulset_selection">
+    <option value="/validators" selected>all</option>
+    
+    <option value="/validators?statefulset=local-rococo-bootnode" >local-rococo-bootnode</option>
+    
+    <option value="/validators?statefulset=local-rococo-bootnode-bob" >local-rococo-bootnode-bob</option>
+    
+    <option value="/validators?statefulset=local-rococo-validator-a-node" >local-rococo-validator-a-node</option>
+    
+</select>
+
+<button id="registerValidators" style="display: none">Register</button>
+<button id="deregisterValidators" style="display: none">Deregister</button>
+<button id="rotateSessionKeys">Rotate session keys</button>
+
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Logs</th>
+        <th>Address</th>
+        <th>Subscan</th>
+        <th>Version</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Validator</th>
+        <th>Keys</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            
+            <td><a href="/nodes/local-rococo-bootnode-0">local-rococo-bootnode-0</a></td>
+            <td><a target="_blank" href="/api/nodes/local-rococo-bootnode-0/logs">🔎</a></td>
+            
+            <td>5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY</td>
+            <td><a target="_blank" href="https://rococo.subscan.io/account/5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY">🔗</a></td>
+            <td>parity/polkadot:latest</td>
+            <td>Running</td>
+            <td>in_cluster</td>
+            <td>True</td>
+            <td>
+                <details>
+                    <summary style="list-style:none">🔑</summary>
+                    <p>
+                        <ul>
+                            
+                            <li>grandpa: 0x88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee</li>
+                            
+                            <li>babe: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d</li>
+                            
+                            <li>im_online: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d</li>
+                            
+                            <li>para_validator: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d</li>
+                            
+                            <li>para_assignment: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d</li>
+                            
+                            <li>authority_discovery: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d</li>
+                            
+                            <li>beefy: 0x020a1091341fe5664bfa1782d5e04779689068c916b04cb365ec3153755684d9a1</li>
+                            
+                        </ul>
+                    </p>
+                </details>
+            </td>
+        </tr>
+    
+        <tr>
+            
+            <td><a href="/nodes/local-rococo-bootnode-bob-0">local-rococo-bootnode-bob-0</a></td>
+            <td><a target="_blank" href="/api/nodes/local-rococo-bootnode-bob-0/logs">🔎</a></td>
+            
+            <td>5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc</td>
+            <td><a target="_blank" href="https://rococo.subscan.io/account/5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc">🔗</a></td>
+            <td>parity/polkadot:latest</td>
+            <td>Running</td>
+            <td>in_cluster</td>
+            <td>True</td>
+            <td>
+                <details>
+                    <summary style="list-style:none">🔑</summary>
+                    <p>
+                        <ul>
+                            
+                            <li>grandpa: 0xd17c2d7823ebf260fd138f2d7e27d114c0145d968b5ff5006125f2414fadae69</li>
+                            
+                            <li>babe: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48</li>
+                            
+                            <li>im_online: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48</li>
+                            
+                            <li>para_validator: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48</li>
+                            
+                            <li>para_assignment: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48</li>
+                            
+                            <li>authority_discovery: 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48</li>
+                            
+                            <li>beefy: 0x0390084fdbf27d2b79d26a4f13f0ccd982cb755a661969143c37cbc49ef5b91f27</li>
+                            
+                        </ul>
+                    </p>
+                </details>
+            </td>
+        </tr>
+    
+        <tr>
+            
+            <td><a href="/nodes/local-rococo-validator-a-node-0">local-rococo-validator-a-node-0</a></td>
+            <td><a target="_blank" href="/api/nodes/local-rococo-validator-a-node-0/logs">🔎</a></td>
+            
+            <td>5CAt7Zn3pERnvwNomSmB4KQbJBrd8cr4LA5wPFEjWVAnh3Pk</td>
+            <td><a target="_blank" href="https://rococo.subscan.io/account/5CAt7Zn3pERnvwNomSmB4KQbJBrd8cr4LA5wPFEjWVAnh3Pk">🔗</a></td>
+            <td>parity/polkadot:latest</td>
+            <td>Running</td>
+            <td>in_cluster</td>
+            <td>False</td>
+            <td>
+                <details>
+                    <summary style="list-style:none">🔑</summary>
+                    <p>
+                        <ul>
+                            
+                        </ul>
+                    </p>
+                </details>
+            </td>
+        </tr>
+    
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        $('#statefulset_selection').on('change', function () {
+            var url = $(this).val();
+            if (url) {
+                window.location = url;
+            }
+            return false;
+        });
+
+        const registerButton = document.querySelector("#registerValidators");
+        document.querySelector("#registerValidators").addEventListener("click", () => {
+            registerButton.disabled = true
+            fetch("/api/validators/register?statefulset=", {method: "POST"})
+                .then(() => {
+                    registerButton.textContent = "Registration in progress"
+                    registerButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerButton.textContent = "Registration Failed: " + error
+                    registerButton.style.backgroundColor = 'red'
+                });
+        });
+
+        const deregisterButton = document.querySelector("#deregisterValidators");
+        document.querySelector("#deregisterValidators").addEventListener("click", () => {
+            deregisterButton.disabled = true
+            fetch("/api/validators/deregister?statefulset=", {method: "POST"})
+                .then(() => {
+                    deregisterButton.textContent = "Deregistration in progress"
+                    deregisterButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterButton.textContent = "Deregistration Failed: " + error
+                    deregisterButton.style.backgroundColor = 'red'
+                });
+        });
+
+        const rotateKeysButton = document.querySelector("#rotateSessionKeys");
+        document.querySelector("#rotateSessionKeys").addEventListener("click", () => {
+            if (window.confirm(`Are you sure you want to rotate all validators session keys ?`)) {
+                rotateKeysButton.disabled = true
+                fetch("/api/rotate_session_keys?all=true", {method: "POST"})
+                    .then(() => {
+                        rotateKeysButton.textContent = "Rotation in progress"
+                        rotateKeysButton.style.backgroundColor = 'lightgreen'
+                    })
+                    .catch(error => {
+                        rotateKeysButton.textContent = "Rotation Failed: " + error
+                        rotateKeysButton.style.backgroundColor = 'red'
+                    });
+            }
+        });
+    });
+</script>
+</body>
+</html>

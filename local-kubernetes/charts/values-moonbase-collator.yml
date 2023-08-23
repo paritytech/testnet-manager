@@ -1,8 +1,8 @@
 image:
-  # also update version in manifests/chainspec.yml
-  repository: purestake/moonbeam
+  # also update version in kube-setup/validators-chainspec.yml
+  repository: moonbeamfoundation/moonbeam
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 initContainer:
   debug: true
@@ -19,7 +19,7 @@ node:
   role: collator
   replicas: 1
   command: "/moonbeam/moonbeam"
-  # manifests/chainspec.yml
+  # kube-setup/validators-chainspec.yml
   forceDownloadChainspec: true
   customChainspecUrl:  "http://chainspec.rococo/moonbase.json"
   customChainspecPath: "/chain-data/moonbase.json"
@@ -30,6 +30,9 @@ node:
     chainKeystore: *chainKeystore
   persistGeneratedNodeKey: true
   allowUnsafeRpcMethods: true
+  # To be removed once https://github.com/moonbeam-foundation/moonbeam/pull/2359
+  # is included in release
+  legacyRpcFlags: true
   flags:
     - "--allow-private-ipv4"
 

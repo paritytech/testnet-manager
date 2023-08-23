@@ -77,7 +77,7 @@ spec:
         - name: dir
           mountPath: /dir
       - name: create-chainspec-moonbase
-        image: purestake/moonbeam:latest
+        image: moonbeamfoundation/moonbeam:latest
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh" ]
         args:
@@ -112,8 +112,8 @@ spec:
             sed 's/5GsHTRwWBzPixrft2FVYG7SvjFjj3jsBB1Kx6zhEDzgZvczS/5HGJty2oZ8nv1x3JPNtFps11Xw787ZwPdzixX1TtuhbC5Fhq/' -i /dir/tick-dev-plain.json;
             polkadot-parachain build-spec --chain /dir/tick-dev-plain.json --raw > /dir/tick.json;
         # 5G4849RFENXy6xMyXDZB2aEBs8tNaVsjjkWDQao3CewdFyZm - DERIVATION_ROOT_SEED//Alice
-        # 5Fnv5ZJJNhxQdQJm43pcGJSQigoZxqgJSoha8SVpXbJ8iknD - DERIVATION_ROOT_SEED//collator//localrococo-tick-collator-node-0
-        # 5HGJty2oZ8nv1x3JPNtFps11Xw787ZwPdzixX1TtuhbC5Fhq - DERIVATION_ROOT_SEED//collator//localrococo-tick-collator-node-1
+        # 5Fnv5ZJJNhxQdQJm43pcGJSQigoZxqgJSoha8SVpXbJ8iknD - DERIVATION_ROOT_SEED//collator//local-rococo-tick-collator-node-0
+        # 5HGJty2oZ8nv1x3JPNtFps11Xw787ZwPdzixX1TtuhbC5Fhq - DERIVATION_ROOT_SEED//collator//local-rococo-tick-collator-node-1
         volumeMounts:
           - name: dir
             mountPath: /dir

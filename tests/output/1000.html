@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rococo Para #1000 Collators</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>Shell [Rococo Para #1000] Collators : 0 External / 0 Active in K8S / 1 Inactive in K8S </h3>
+<h4>Runtime: 2, Status: off-boarded</h4>
+<select onchange="location = '/collators/1000?statefulset=' + this.value">
+    <option value="" selected>all</option>
+    
+    <option value="local-rococo-shell-collator-node" >local-rococo-shell-collator-node</option>
+    
+</select>
+
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Logs</th>
+        <th>Account</th>
+        <th>PodStatus</th>
+        <th>CollatorStatus</th>
+        <th>Image</th>
+        <th>Location</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            <td><a href="/nodes/local-rococo-shell-collator-node-0">local-rococo-shell-collator-node-0</a></td>
+            <td><a target="_blank" href="/api/nodes/local-rococo-shell-collator-node-0/logs">🔎</a></td>
+            <td>5HEmETnXC8yHzjPfe3pMLh14wSgG5afJkQG42PkPioqJaaMh</td>
+            <td>Running</td>
+            <td>False</td>
+            <td>parity/polkadot-parachain:latest</td>
+            <td>in_cluster</td>
+        </tr>
+    
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        const registerButton = document.querySelector("#register")
+        document.querySelector("#register").addEventListener("click", () => {
+            registerButton.disabled = true
+            fetch("/api/collators/1000/register?statefulset=", {method: "POST"})
+                .then(() => {
+                    registerButton.textContent = "Registration in progress"
+                    registerButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerButton.textContent = "Registration Failed: " + error
+                    registerButton.style.backgroundColor = 'red'
+                });
+        });
+
+        const deregisterButton = document.querySelector("#deregister")
+        document.querySelector("#deregister").addEventListener("click", () => {
+            deregisterButton.disabled = true
+            fetch("/api/collators/1000/deregister?statefulset=", {method: "POST"})
+                .then(() => {
+                    deregisterButton.textContent = "Deregistration in progress"
+                    deregisterButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterButton.textContent = "Deregistration Failed: " + error
+                    deregisterButton.style.backgroundColor = 'red'
+                });
+        });
+    });
+</script>
+</body>
+</html>

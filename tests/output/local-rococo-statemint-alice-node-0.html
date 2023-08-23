@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>local-rococo-statemint-alice-node-0</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>local-rococo-statemint-alice-node-0</h3>
+
+
+
+<button id="deregisterCollator">Deregister Collator</button>
+
+
+
+
+<table id="table" class="display compact">
+    <thead>
+    <tr>
+        <th>Keys</th>
+        <th>Values</th>
+    </tr>
+    </thead>
+    <tbody>
+
+
+    <tr>
+        <td>Para ID</td>
+        <td>1003</td>
+    </tr>
+    <tr>
+        <td>Collator Account</td>
+        <td>15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5</td>
+    </tr>
+    <tr>
+        <td>Collator Account Funds</td>
+        <td>4096000000000</td>
+    </tr>
+    <tr>
+        <td>Collator Status</td>
+        <td>Invulnerable</td>
+    </tr>
+
+    <tr>
+        <td>Chain</td>
+        <td>statemint</td>
+    </tr>
+    <tr>
+        <td>Roles</td>
+        <td>Authority</td>
+    </tr>
+    <tr>
+        <td>Peer ID</td>
+        <td>12D3KooWL8cdvJosnJCEtGLAW8BqW3ZzenrHGwBB3UAe7zKsiBf4</td>
+    </tr>
+    <tr>
+        <td>Image</td>
+        <td>parity/polkadot-parachain:latest</td>
+    </tr>
+    <tr>
+        <td>Version</td>
+        <td>1.0.0-2306bfb7565</td>
+    </tr>
+    <tr>
+        <td>Ready</td>
+        <td>True</td>
+    </tr>
+    <tr>
+        <td>Substrate Status</td>
+        <td>Running</td>
+    </tr>
+    <tr>
+        <td>Uptime</td>
+        <td>1:10:13</td>
+    </tr>
+    <tr>
+        <td>Sync State</td>
+        <td>{&#39;startingBlock&#39;: 0, &#39;currentBlock&#39;: 0, &#39;highestBlock&#39;: 0}</td>
+    </tr>
+    
+    <tr>
+        <td>Properties</td>
+        <td>{&#39;ss58Format&#39;: 0, &#39;tokenDecimals&#39;: 10, &#39;tokenSymbol&#39;: &#39;DOT&#39;}</td>
+    </tr>
+    <tr>
+        <td>Flags</td>
+        <td>
+            <details>
+                <summary style="list-style:none">⚙️ View</summary>
+                <p>
+                <ul>
+                    
+                    <li>
+                        <pre><code>-c</code></pre>
+                    </li>
+                    
+                    <li>
+                        <pre><code>set -eu
+POD_INDEX=&#34;${HOSTNAME##*-}&#34;
+RELAY_CHAIN_P2P_PORT=&#34;30333&#34;
+echo &#34;RELAY_CHAIN_P2P_PORT=${RELAY_CHAIN_P2P_PORT}&#34;
+PARA_CHAIN_P2P_PORT=&#34;30334&#34;
+echo &#34;PARA_CHAIN_P2P_PORT=${PARA_CHAIN_P2P_PORT}&#34;
+exec /usr/local/bin/polkadot-parachain \
+  --name=${POD_NAME} \
+  --base-path=/chain-data \
+  --keystore-path=/keystore \
+  --chain=/chain-data/chainspec.json \
+  --database=rocksdb \
+  --pruning=1000 \
+  --collator \
+  --prometheus-external \
+  --prometheus-port 9615 \
+  --unsafe-rpc-external \
+  --rpc-port=9944 \
+  --rpc-cors=all \
+  --rpc-methods=unsafe \
+  --listen-addr=/ip4/0.0.0.0/tcp/30334 \
+  --node-key-file /keystore/node-key \
+  --alice \
+  -- \
+  --name=${POD_NAME} \
+  --base-path=/relaychain-data \
+  --keystore-path=/relaychain-keystore \
+  --database=rocksdb \
+  --pruning=1000 \
+  --chain=/relaychain-data/relay_chain_chainspec.json \
+  --listen-addr=/ip4/0.0.0.0/tcp/30333 \
+</code></pre>
+                    </li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    <tr>
+        <td>Labels</td>
+        <td>
+            <details>
+                <summary style="list-style:none">🏷 View</summary>
+                <p>
+                <ul>
+                    
+                    <li>app.kubernetes.io/component: substrate-node</li>
+                    
+                    <li>app.kubernetes.io/instance: local-rococo-statemint-alice</li>
+                    
+                    <li>app.kubernetes.io/managed-by: Helm</li>
+                    
+                    <li>app.kubernetes.io/name: node</li>
+                    
+                    <li>app.kubernetes.io/version: latest</li>
+                    
+                    <li>chain: statemint</li>
+                    
+                    <li>collatorAccount: 15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5</li>
+                    
+                    <li>controller-revision-hash: local-rococo-statemint-alice-node-7fd67cd6b6</li>
+                    
+                    <li>database: rocksdb</li>
+                    
+                    <li>helm.sh/chart: node-5.1.7</li>
+                    
+                    <li>paraId: 1003</li>
+                    
+                    <li>pruning: 1000</li>
+                    
+                    <li>release: local-rococo-statemint-alice</li>
+                    
+                    <li>role: collator</li>
+                    
+                    <li>ss58Format: 0</li>
+                    
+                    <li>statefulset.kubernetes.io/pod-name: local-rococo-statemint-alice-node-0</li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    <tr>
+        <td>Peers Count</td>
+        <td>1</td>
+    </tr>
+    
+    
+    <tr>
+        <td>Peers</td>
+        <td>
+            <details>
+                <summary style="list-style:none">View 👋</summary>
+                <p>
+                <table>
+                    <tr>
+                        <th>Peer ID</th>
+                        <th>Roles</th>
+                        <th>Best Hash</th>
+                        <th>Best Number</th>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWQvkQJ7nPuCHkcqQ33tDoYwdqLJA8XLiYFPWu5HfUbAgz</td>
+                        <td>AUTHORITY</td>
+                        <td>0xfea908e2686c2e44e568e66441212b5ab5fd34ad6e06a4f0270c381b6246d0bd</td>
+                        <td>0</td>
+                    </tr>
+                    
+                </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td>Local Listen Addresses</td>
+        <td>
+            <details>
+                <summary style="list-style:none">📃 View</summary>
+                <p>
+                <ul>
+                    
+                    <li>/ip4/127.0.0.1/tcp/30334/p2p/12D3KooWL8cdvJosnJCEtGLAW8BqW3ZzenrHGwBB3UAe7zKsiBf4</li>
+                    
+                    <li>/ip4/10.244.0.16/tcp/30334/p2p/12D3KooWL8cdvJosnJCEtGLAW8BqW3ZzenrHGwBB3UAe7zKsiBf4</li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td>Session Keys</td>
+        <td>
+            <details>
+            <p>
+                <summary style="list-style:none">🔑 View</summary>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Public Key</th>
+                            <th>In Keystore</th>
+                            <th>On Chain</th>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">aura</td>
+                            <td>0x88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                        </tr>
+                        
+                    </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    </tbody>
+</table>
+
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[-1], ["All"]]
+        });
+        
+
+        
+        
+        const deregisterCollatorButton = document.querySelector("#deregisterCollator");
+        document.querySelector("#deregisterCollator").addEventListener("click", () => {
+            deregisterCollatorButton.disabled = true
+            fetch("/api/collators/1003/deregister?node=local-rococo-statemint-alice-node-0", {method: "POST"})
+                .then(() => {
+                    deregisterCollatorButton.textContent = "Deregistration in progress"
+                    deregisterCollatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterCollatorButton.textContent = "Deregistration Failed: " + error
+                    deregisterCollatorButton.style.backgroundColor = 'red'
+                });
+        });
+        
+        
+        
+    });
+</script>
+</body>
+</html>

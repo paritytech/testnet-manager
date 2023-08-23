@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rococo Parachains</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>Rococo : 4 Paras: 0 Parachains, 0 Parathreads, 4 Others</h3>
+<input type="checkbox" id="selectAll" onclick="window.selectOrUnselectAllParachains(this)">
+<label for="selectAll">Select all visible</label>
+<button onclick="onboardSelectedParachains(this)">Onboard Selected Parachains</button>
+
+<input type="checkbox" id="forceQueueAction" checked>
+<label for="forceQueueAction">Fast (put action into the next session queue)</label>
+<table id="table" class="display compact" style="width:100%">
+    <thead>
+    <tr>
+        <th>ParaID</th>
+        <th>Name</th>
+        <th>Lifecycle</th>
+        <th>Location</th>
+        <th>Leases</th>
+        <th>Runtime</th>
+    </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            <td>
+                <input type="checkbox" id="para_1001" name="para_id" value="1001" />
+                <label for="para_1001"><a href="/collators/1001">1001</a></label>
+            </td>
+            <td>moonbase <a target="_blank" href="https://grafana.parity-mgmt.parity.io/explore?orgId=1&left=%5B%22now-1h%22,%22now%22,%22loki.parity-testnet%22,%7B%22refId%22:%22A%22,%22expr%22:%22%7Bchain%3D%5C%22moonbase%5C%22%7D%22%7D%5D">🔎</a></td>
+            <td></td>
+            <td>in_cluster</td>
+            <td></td>
+            <td><a target="_blank" href="/parachains/1001/runtime">Runtime info</a></td>
+        </tr>
+    
+        <tr>
+            <td>
+                <input type="checkbox" id="para_1003" name="para_id" value="1003" />
+                <label for="para_1003"><a href="/collators/1003">1003</a></label>
+            </td>
+            <td>statemint <a target="_blank" href="https://grafana.parity-mgmt.parity.io/explore?orgId=1&left=%5B%22now-1h%22,%22now%22,%22loki.parity-testnet%22,%7B%22refId%22:%22A%22,%22expr%22:%22%7Bchain%3D%5C%22statemint%5C%22%7D%22%7D%5D">🔎</a></td>
+            <td></td>
+            <td>in_cluster</td>
+            <td></td>
+            <td><a target="_blank" href="/parachains/1003/runtime">Runtime info</a></td>
+        </tr>
+    
+        <tr>
+            <td>
+                <input type="checkbox" id="para_1000" name="para_id" value="1000" />
+                <label for="para_1000"><a href="/collators/1000">1000</a></label>
+            </td>
+            <td>shell <a target="_blank" href="https://grafana.parity-mgmt.parity.io/explore?orgId=1&left=%5B%22now-1h%22,%22now%22,%22loki.parity-testnet%22,%7B%22refId%22:%22A%22,%22expr%22:%22%7Bchain%3D%5C%22shell%5C%22%7D%22%7D%5D">🔎</a></td>
+            <td></td>
+            <td>in_cluster</td>
+            <td></td>
+            <td><a target="_blank" href="/parachains/1000/runtime">Runtime info</a></td>
+        </tr>
+    
+        <tr>
+            <td>
+                <input type="checkbox" id="para_1002" name="para_id" value="1002" />
+                <label for="para_1002"><a href="/collators/1002">1002</a></label>
+            </td>
+            <td>tick <a target="_blank" href="https://grafana.parity-mgmt.parity.io/explore?orgId=1&left=%5B%22now-1h%22,%22now%22,%22loki.parity-testnet%22,%7B%22refId%22:%22A%22,%22expr%22:%22%7Bchain%3D%5C%22tick%5C%22%7D%22%7D%5D">🔎</a></td>
+            <td></td>
+            <td>in_cluster</td>
+            <td></td>
+            <td><a target="_blank" href="/parachains/1002/runtime">Runtime info</a></td>
+        </tr>
+    
+    </tbody>
+</table>
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[30, -1], [30, "All"]]
+        });
+
+        window.selectOrUnselectAllParachains = (element) => {
+            paraInputCheckboxes = document.querySelectorAll('input[name="para_id"]');
+            if (element.checked){
+                paraInputCheckboxes.forEach((paraInput) => paraInput.checked = true)
+            } else {
+                paraInputCheckboxes.forEach((paraInput) => paraInput.checked = false)
+            }
+        }
+
+        window.onboardSelectedParachains = (element) => {
+            paraInputCheckboxes = document.querySelectorAll('input[name="para_id"]');
+            selectedParaIds =  Array.from(paraInputCheckboxes).filter(input => input.checked).map(input => input.value);
+            element.disabled = true
+            console.log(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`)
+            fetch(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`, {method: "POST"})
+                .then(() => {
+                    element.textContent = "Onboarding in progress"
+                    element.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    element.textContent = "Onboarding Failed: " + error
+                    element.style.backgroundColor = 'red'
+                });
+        }
+
+        window.offboardSelectedParachains = (element) => {
+            paraInputCheckboxes = document.querySelectorAll('input[name="para_id"]');
+            selectedParaIds =  Array.from(paraInputCheckboxes).filter(input => input.checked).map(input => input.value);
+            element.disabled = true
+            console.log(`/api/parachains/offboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`)
+            fetch(`/api/parachains/offboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`, {method: "POST"})
+                .then(() => {
+                    element.textContent = "Offboarding in progress"
+                    element.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    element.textContent = "Offboarding Failed: " + error
+                    element.style.backgroundColor = 'red'
+                });
+        }
+    });
+</script>
+</body>
+</html>

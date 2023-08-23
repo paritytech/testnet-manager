@@ -32,7 +32,9 @@ def get_derived_collator_session_keys(node_name):
         }
     except Exception as e:
         log.error("Unable to get_derived_collator_session_keys. Error: {}, stacktrace:\n".format(e, traceback.print_exc()))
-        return None
+        return {
+            'aura': None
+        }
 
 
 def get_moon_node_collator_uri(root_seed, node_name):

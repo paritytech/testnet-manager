@@ -25,7 +25,7 @@ jobs:
           make kube
           make install
           kubectl get pod -n rococo
-          kubectl wait --for=condition=Ready pods --all -n rococo --timeout=900s
+          kubectl wait --for=condition=Ready pods --all -n rococo --timeout=1200s
           kubectl get pod -n rococo
 
       - name: Tests

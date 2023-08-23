@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>local-rococo-validator-a-node-0</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>local-rococo-validator-a-node-0</h3>
+
+
+<button id="registerValidator">Register Validator</button>
+
+
+
+
+
+<table id="table" class="display compact">
+    <thead>
+    <tr>
+        <th>Keys</th>
+        <th>Values</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr>
+        <td>Validator Account</td>
+        <td>5CAt7Zn3pERnvwNomSmB4KQbJBrd8cr4LA5wPFEjWVAnh3Pk</td>
+    </tr>
+    <tr>
+        <td>Validator Account Funds</td>
+        <td>0</td>
+    </tr>
+    <tr>
+        <td>Validator Active</td>
+        <td>False</td>
+    </tr>
+
+
+    <tr>
+        <td>Chain</td>
+        <td>rococo-local</td>
+    </tr>
+    <tr>
+        <td>Roles</td>
+        <td>Authority</td>
+    </tr>
+    <tr>
+        <td>Peer ID</td>
+        <td>12D3KooWLRmxy8AvXZz4oif1yZPARy257u7ct4Z2gY9uD6HSknYh</td>
+    </tr>
+    <tr>
+        <td>Image</td>
+        <td>parity/polkadot:latest</td>
+    </tr>
+    <tr>
+        <td>Version</td>
+        <td>1.0.0-1ed6e2e50a4</td>
+    </tr>
+    <tr>
+        <td>Ready</td>
+        <td>True</td>
+    </tr>
+    <tr>
+        <td>Substrate Status</td>
+        <td>Running</td>
+    </tr>
+    <tr>
+        <td>Uptime</td>
+        <td>1:10:14</td>
+    </tr>
+    <tr>
+        <td>Sync State</td>
+        <td>{&#39;startingBlock&#39;: 0, &#39;currentBlock&#39;: 231, &#39;highestBlock&#39;: 231}</td>
+    </tr>
+    
+    <tr>
+        <td>Properties</td>
+        <td>{}</td>
+    </tr>
+    <tr>
+        <td>Flags</td>
+        <td>
+            <details>
+                <summary style="list-style:none">⚙️ View</summary>
+                <p>
+                <ul>
+                    
+                    <li>
+                        <pre><code>-c</code></pre>
+                    </li>
+                    
+                    <li>
+                        <pre><code>set -eu
+POD_INDEX=&#34;${HOSTNAME##*-}&#34;
+RELAY_CHAIN_P2P_PORT=&#34;30333&#34;
+echo &#34;RELAY_CHAIN_P2P_PORT=${RELAY_CHAIN_P2P_PORT}&#34;
+exec polkadot \
+  --name=${POD_NAME} \
+  --base-path=/chain-data \
+  --keystore-path=/keystore \
+  --chain=/chain-data/chainspec.json \
+  --validator \
+  --database=rocksdb \
+  --pruning=1000 \
+  --prometheus-external \
+  --prometheus-port 9615 \
+  --unsafe-rpc-external \
+  --rpc-port=9944 \
+  --rpc-cors=all \
+  --rpc-methods=unsafe \
+  --listen-addr=/ip4/0.0.0.0/tcp/30333 \
+</code></pre>
+                    </li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    <tr>
+        <td>Labels</td>
+        <td>
+            <details>
+                <summary style="list-style:none">🏷 View</summary>
+                <p>
+                <ul>
+                    
+                    <li>app.kubernetes.io/component: substrate-node</li>
+                    
+                    <li>app.kubernetes.io/instance: local-rococo-validator-a</li>
+                    
+                    <li>app.kubernetes.io/managed-by: Helm</li>
+                    
+                    <li>app.kubernetes.io/name: node</li>
+                    
+                    <li>app.kubernetes.io/version: latest</li>
+                    
+                    <li>chain: rococo-local</li>
+                    
+                    <li>controller-revision-hash: local-rococo-validator-a-node-7d85885944</li>
+                    
+                    <li>database: rocksdb</li>
+                    
+                    <li>helm.sh/chart: node-5.1.7</li>
+                    
+                    <li>pruning: 1000</li>
+                    
+                    <li>release: local-rococo-validator-a</li>
+                    
+                    <li>role: authority</li>
+                    
+                    <li>statefulset.kubernetes.io/pod-name: local-rococo-validator-a-node-0</li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    <tr>
+        <td>Peers Count</td>
+        <td>10</td>
+    </tr>
+    
+    
+    <tr>
+        <td>Peers</td>
+        <td>
+            <details>
+                <summary style="list-style:none">View 👋</summary>
+                <p>
+                <table>
+                    <tr>
+                        <th>Peer ID</th>
+                        <th>Roles</th>
+                        <th>Best Hash</th>
+                        <th>Best Number</th>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWSmVyzoszjZCXAGm6B91vYNFQZZKqEKwixSFkcLdFcUDK</td>
+                        <td>FULL</td>
+                        <td>0x887d83e7e908a115c6a21d08cf5da5731dcd21c232570bd107ecc4788413d29d</td>
+                        <td>225</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWEbcCgZUQBktuHkkx2VUbKcPsmSWe3MVVE7PPSWcW5Zfz</td>
+                        <td>AUTHORITY</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWJhDmqVkvSxqTtq3mHmtwQz8MhUDkMmccG4B2Lq2XVbub</td>
+                        <td>FULL</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWCTx1ueVDDpaHbJz8kurRcQWxEDZH5ZaBjsjZWj3komHa</td>
+                        <td>FULL</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWLwFc5Fbg6zckeuknttF5JFjX5hf9cAjSrhG6y5wc6oHe</td>
+                        <td>FULL</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWLr2MkGzSLNzmUrLgQ15SbjChV1Hubt3avRjeyvHn6Wnx</td>
+                        <td>FULL</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWMa8m78eZKsb7LF3ap2teiVGznq2c1C9XZ2fsiaBf4kg2</td>
+                        <td>AUTHORITY</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWD8E2ETgiw2x8ckaP6ZFNvTF6T6jhXTsEFbuBG4S4NKx1</td>
+                        <td>FULL</td>
+                        <td>0x596b774b0b6cc874cc76c4545313b21dc3b200ca7658982f1e3b365d9d784d69</td>
+                        <td>230</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWLsmrJvfiGp9FaGwntRAvA1NmdELeF9WkhYcu9qivBJS4</td>
+                        <td>FULL</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWFypKtgEmhinZNds2SYrkZi6bpnS7roHPb9SFtDw4eTAM</td>
+                        <td>FULL</td>
+                        <td>0x3f951b12c07402c106e280492a02238c3be9fb93a22c7f98fa45a0d08cca61cc</td>
+                        <td>231</td>
+                    </tr>
+                    
+                </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td>Local Listen Addresses</td>
+        <td>
+            <details>
+                <summary style="list-style:none">📃 View</summary>
+                <p>
+                <ul>
+                    
+                    <li>/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWLRmxy8AvXZz4oif1yZPARy257u7ct4Z2gY9uD6HSknYh</li>
+                    
+                    <li>/ip4/10.244.0.14/tcp/30333/p2p/12D3KooWLRmxy8AvXZz4oif1yZPARy257u7ct4Z2gY9uD6HSknYh</li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td>Session Keys</td>
+        <td>
+            <details>
+            <p>
+                <summary style="list-style:none">🔑 View</summary>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Public Key</th>
+                            <th>In Keystore</th>
+                            <th>On Chain</th>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">babe</td>
+                            <td>0xe6d724d2621cf990e4a505e13a65b94f559c8048fe572c47014133313ccca611</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">im_online</td>
+                            <td>0xe6d724d2621cf990e4a505e13a65b94f559c8048fe572c47014133313ccca611</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">para_validator</td>
+                            <td>0xe6d724d2621cf990e4a505e13a65b94f559c8048fe572c47014133313ccca611</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">para_assignment</td>
+                            <td>0xe6d724d2621cf990e4a505e13a65b94f559c8048fe572c47014133313ccca611</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">authority_discovery</td>
+                            <td>0xe6d724d2621cf990e4a505e13a65b94f559c8048fe572c47014133313ccca611</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">beefy</td>
+                            <td>0xe6d724d2621cf990e4a505e13a65b94f559c8048fe572c47014133313ccca611</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                    </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    </tbody>
+</table>
+
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[-1], ["All"]]
+        });
+        
+        
+        const registerValidatorButton = document.querySelector("#registerValidator");
+        document.querySelector("#registerValidator").addEventListener("click", () => {
+            registerValidatorButton.disabled = true
+            fetch("/api/validators/register?node=local-rococo-validator-a-node-0", {method: "POST"})
+                .then(() => {
+                    registerValidatorButton.textContent = "Registration in progress"
+                    registerValidatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    registerValidatorButton.textContent = "Registration Failed: " + error
+                    registerValidatorButton.style.backgroundColor = 'red'
+                });
+        });
+        
+        
+
+        
+        
+    });
+</script>
+</body>
+</html>

@@ -13,7 +13,7 @@ secret:
 
 configmap:
   LOG_LEVEL: DEBUG
-  RELAY_CHAIN_RPC_URL: "ws://localrococo-bootnode.rococo:9944"
+  RELAY_CHAIN_RPC_URL: "ws://local-rococo-bootnode.rococo:9944"
   RPC_NODE_URL_PATTERN: "NODE_NAME.rococo:9944"
   HEALTHY_MIN_PEER_COUNT: "1"
   TASKS_CRON_SCHEDULE: "0 0 30 2 *" # Every February 30th aka never

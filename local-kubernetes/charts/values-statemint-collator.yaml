@@ -2,7 +2,7 @@ image:
   # also update version in kube-setup/chainspec.yml
   repository: parity/polkadot-parachain
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 initContainer:
   debug: true
@@ -19,7 +19,7 @@ node:
   role: collator
   replicas: 1
   command: "/usr/local/bin/polkadot-parachain"
-  # manifests/chainspec.yml
+  # kube-setup/validators-chainspec.yml
   forceDownloadChainspec: true
   customChainspecUrl:  "http://chainspec.rococo/statemint.json"
   isParachain: true

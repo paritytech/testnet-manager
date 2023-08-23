@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>local-rococo-moonbase-alice-node-0</title>
+    <link rel="stylesheet" type="text/css" href="/static/libs/datatables.min.css">
+</head>
+
+<body>
+<h3>local-rococo-moonbase-alice-node-0</h3>
+
+
+
+<button id="deregisterCollator">Deregister Collator</button>
+
+
+
+
+<table id="table" class="display compact">
+    <thead>
+    <tr>
+        <th>Keys</th>
+        <th>Values</th>
+    </tr>
+    </thead>
+    <tbody>
+
+
+    <tr>
+        <td>Para ID</td>
+        <td>1001</td>
+    </tr>
+    <tr>
+        <td>Collator Account</td>
+        <td>0xf24ff3a9cf04c71dbc94d0b566f7a27b94566cac</td>
+    </tr>
+    <tr>
+        <td>Collator Account Funds</td>
+        <td>1208825819614629174706176</td>
+    </tr>
+    <tr>
+        <td>Collator Status</td>
+        <td>True</td>
+    </tr>
+
+    <tr>
+        <td>Chain</td>
+        <td>moonbase</td>
+    </tr>
+    <tr>
+        <td>Roles</td>
+        <td>Authority</td>
+    </tr>
+    <tr>
+        <td>Peer ID</td>
+        <td>12D3KooWDrH8yhdLhBz8fvDDCTm33WwpwsGukEkpujrEEpGa4DZe</td>
+    </tr>
+    <tr>
+        <td>Image</td>
+        <td>moonbeamfoundation/moonbeam:latest</td>
+    </tr>
+    <tr>
+        <td>Version</td>
+        <td>0.32.2-d3172714146</td>
+    </tr>
+    <tr>
+        <td>Ready</td>
+        <td>True</td>
+    </tr>
+    <tr>
+        <td>Substrate Status</td>
+        <td>Running</td>
+    </tr>
+    <tr>
+        <td>Uptime</td>
+        <td>1:10:10</td>
+    </tr>
+    <tr>
+        <td>Sync State</td>
+        <td>{&#39;startingBlock&#39;: 0, &#39;currentBlock&#39;: 0, &#39;highestBlock&#39;: 0}</td>
+    </tr>
+    
+    <tr>
+        <td>Properties</td>
+        <td>{&#39;SS58Prefix&#39;: 1287, &#39;tokenDecimals&#39;: 18, &#39;tokenSymbol&#39;: &#39;UNIT&#39;}</td>
+    </tr>
+    <tr>
+        <td>Flags</td>
+        <td>
+            <details>
+                <summary style="list-style:none">⚙️ View</summary>
+                <p>
+                <ul>
+                    
+                    <li>
+                        <pre><code>-c</code></pre>
+                    </li>
+                    
+                    <li>
+                        <pre><code>set -eu
+POD_INDEX=&#34;${HOSTNAME##*-}&#34;
+RELAY_CHAIN_P2P_PORT=&#34;30333&#34;
+echo &#34;RELAY_CHAIN_P2P_PORT=${RELAY_CHAIN_P2P_PORT}&#34;
+PARA_CHAIN_P2P_PORT=&#34;30334&#34;
+echo &#34;PARA_CHAIN_P2P_PORT=${PARA_CHAIN_P2P_PORT}&#34;
+exec /moonbeam/moonbeam \
+  --name=${POD_NAME} \
+  --base-path=/chain-data \
+  --keystore-path=/keystore \
+  --chain=/chain-data/moonbase.json \
+  --database=rocksdb \
+  --pruning=1000 \
+  --collator \
+  --prometheus-external \
+  --prometheus-port 9615 \
+  --unsafe-rpc-external \
+  --unsafe-ws-external \
+  --rpc-cors=all \
+  --rpc-methods=unsafe \
+  --listen-addr=/ip4/0.0.0.0/tcp/30334 \
+  --node-key-file /keystore/node-key \
+  --allow-private-ipv4 \
+  --alice \
+  -- \
+  --name=${POD_NAME} \
+  --base-path=/relaychain-data \
+  --keystore-path=/relaychain-keystore \
+  --database=rocksdb \
+  --pruning=1000 \
+  --chain=/relaychain-data/relay_chain_chainspec.json \
+  --listen-addr=/ip4/0.0.0.0/tcp/30333 \
+</code></pre>
+                    </li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    <tr>
+        <td>Labels</td>
+        <td>
+            <details>
+                <summary style="list-style:none">🏷 View</summary>
+                <p>
+                <ul>
+                    
+                    <li>app.kubernetes.io/component: substrate-node</li>
+                    
+                    <li>app.kubernetes.io/instance: local-rococo-moonbase-alice</li>
+                    
+                    <li>app.kubernetes.io/managed-by: Helm</li>
+                    
+                    <li>app.kubernetes.io/name: node</li>
+                    
+                    <li>app.kubernetes.io/version: latest</li>
+                    
+                    <li>chain: moonbase</li>
+                    
+                    <li>collatorAccount: 0xf24ff3a9cf04c71dbc94d0b566f7a27b94566cac</li>
+                    
+                    <li>controller-revision-hash: local-rococo-moonbase-alice-node-6f54d6bd8</li>
+                    
+                    <li>database: rocksdb</li>
+                    
+                    <li>helm.sh/chart: node-5.1.7</li>
+                    
+                    <li>paraId: 1001</li>
+                    
+                    <li>pruning: 1000</li>
+                    
+                    <li>release: local-rococo-moonbase-alice</li>
+                    
+                    <li>role: collator</li>
+                    
+                    <li>statefulset.kubernetes.io/pod-name: local-rococo-moonbase-alice-node-0</li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    <tr>
+        <td>Peers Count</td>
+        <td>1</td>
+    </tr>
+    
+    
+    <tr>
+        <td>Peers</td>
+        <td>
+            <details>
+                <summary style="list-style:none">View 👋</summary>
+                <p>
+                <table>
+                    <tr>
+                        <th>Peer ID</th>
+                        <th>Roles</th>
+                        <th>Best Hash</th>
+                        <th>Best Number</th>
+                    </tr>
+                    
+                    <tr>
+                        <td>12D3KooWHowmHPR7Kn7AspLegFsPKjPpe9mkACydRoj54naLSRFy</td>
+                        <td>AUTHORITY</td>
+                        <td>0x4f06fae3f15b34766d1571aec81675c15392babfd99517d3fbee62360a02d85d</td>
+                        <td>0</td>
+                    </tr>
+                    
+                </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td>Local Listen Addresses</td>
+        <td>
+            <details>
+                <summary style="list-style:none">📃 View</summary>
+                <p>
+                <ul>
+                    
+                    <li>/ip4/127.0.0.1/tcp/30334/p2p/12D3KooWDrH8yhdLhBz8fvDDCTm33WwpwsGukEkpujrEEpGa4DZe</li>
+                    
+                    <li>/ip4/10.244.0.18/tcp/30334/p2p/12D3KooWDrH8yhdLhBz8fvDDCTm33WwpwsGukEkpujrEEpGa4DZe</li>
+                    
+                </ul>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    
+    <tr>
+        <td>Session Keys</td>
+        <td>
+            <details>
+            <p>
+                <summary style="list-style:none">🔑 View</summary>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Public Key</th>
+                            <th>In Keystore</th>
+                            <th>On Chain</th>
+                        </tr>
+                        
+                        <tr>
+                            <td style="font-weight: bold">aura</td>
+                            <td>0x380e8f0fdb292207d6d44563f4d409b62530b98e2697e1ff3ae0e43e1b89e521380e8f0fdb292207d6d44563f4d409b62530b98e2697e1ff3ae0e43e1b89e521</td>
+                            <td>❌</td>
+                            <td>❌</td>
+                        </tr>
+                        
+                    </table>
+                </p>
+            </details>
+        </td>
+    </tr>
+    
+    </tbody>
+</table>
+
+<script
+        src="/static/libs/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
+<script>
+    $(document).ready( function () {
+        $('#table').DataTable({
+            // https://datatables.net/reference/option/
+            "lengthMenu": [[-1], ["All"]]
+        });
+        
+
+        
+        
+        const deregisterCollatorButton = document.querySelector("#deregisterCollator");
+        document.querySelector("#deregisterCollator").addEventListener("click", () => {
+            deregisterCollatorButton.disabled = true
+            fetch("/api/collators/1001/deregister?node=local-rococo-moonbase-alice-node-0", {method: "POST"})
+                .then(() => {
+                    deregisterCollatorButton.textContent = "Deregistration in progress"
+                    deregisterCollatorButton.style.backgroundColor = 'lightgreen'
+                })
+                .catch(error => {
+                    deregisterCollatorButton.textContent = "Deregistration Failed: " + error
+                    deregisterCollatorButton.style.backgroundColor = 'red'
+                });
+        });
+        
+        
+        
+    });
+</script>
+</body>
+</html>

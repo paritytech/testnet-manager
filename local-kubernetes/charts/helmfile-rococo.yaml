@@ -16,36 +16,36 @@ releases:
       - ./values-testnet-manager.yml
 
 ## relay chain Rococo ##
-  - name: localrococo-bootnode
+  - name: local-rococo-bootnode
     namespace: rococo
     chart: parity/node
     version: &node_version 5.1.7
     values:
-      - ./values-localrococo-bootnode.yaml
+      - ./values-local-rococo-bootnode.yaml
       - node:
           flags:
             - "--alice"
         extraLabels:
           validatorAccount: "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY" # Alice address
 
-  - name: localrococo-bootnode-bob
+  - name: local-rococo-bootnode-bob
     namespace: rococo
     chart: parity/node
     version: *node_version
     values:
-      - ./values-localrococo-bootnode.yaml
+      - ./values-local-rococo-bootnode.yaml
       - node:
           flags:
             - "--bob"
         extraLabels:
           validatorAccount: "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc" # Bob address
 
-  - name: localrococo-validator-a
+  - name: local-rococo-validator-a
     namespace: rococo
     chart: parity/node
     version: *node_version
     values:
-      - ./values-localrococo-bootnode.yaml
+      - ./values-local-rococo-bootnode.yaml
       - node:
           replicas: 1
       - node:
@@ -60,7 +60,7 @@ releases:
               extraDerivation: "//validator//${HOSTNAME}"
 
 ## Para chain Shell ##
-  - name: localrococo-shell-collator
+  - name: local-rococo-shell-collator
     namespace: rococo
     chart: parity/node
     version: *node_version
@@ -68,7 +68,7 @@ releases:
       - values-shell-collator.yaml
 
 # Para chain Statemint ##
-  - name: localrococo-statemint-alice
+  - name: local-rococo-statemint-alice
     namespace: rococo
     chart: parity/node
     version: *node_version
@@ -81,7 +81,7 @@ releases:
           paraId: "1003"
           ss58Format: "0"
           collatorAccount: "15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5" # Alice Polkadot address
-  - name: localrococo-statemint-bob
+  - name: local-rococo-statemint-bob
     namespace: rococo
     chart: parity/node
     version: *node_version
@@ -94,7 +94,7 @@ releases:
           paraId: "1003"
           ss58Format: "0"
           collatorAccount: "14E5nqKAp3oAJcmzgZhUD2RcptBeUBScxKHgJKU4HPNcKVf3" # Bob Polkadot address
-  - name: localrococo-statemint-a
+  - name: local-rococo-statemint-a
     namespace: rococo
     chart: parity/node
     version: *node_version
@@ -107,7 +107,7 @@ releases:
               seed: "test test test test test test test test test test test junk"
               extraDerivation: "//collator//${HOSTNAME}"
 ## Para chain Moonbase ##
-  - name: localrococo-moonbase-alice
+  - name: local-rococo-moonbase-alice
     namespace: rococo
     chart: parity/node
     version: *node_version
@@ -120,8 +120,8 @@ releases:
         extraLabels:
           paraId: "1001"
           collatorAccount: "0xf24ff3a9cf04c71dbc94d0b566f7a27b94566cac"
-  # collators
-  - name: localrococo-moonbase-collator
+# collators
+  - name: local-rococo-moonbase-collator
     namespace: rococo
     chart: parity/node
     version: *node_version
@@ -129,9 +129,15 @@ releases:
       - values-moonbase-collator.yml
 
 ## Para chain Tick ##
-  - name: localrococo-tick-collator
+  - name: local-rococo-tick-collator
     namespace: rococo
     chart: parity/node
     version: *node_version
     values:
       - values-tick-collator.yml
+      - node:
+          keys:
+            - type: aura
+              scheme: "sr25519"
+              seed: "test test test test test test test test tick tick tick tick"
+              extraDerivation: "//collator//${HOSTNAME}"
