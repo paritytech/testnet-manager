@@ -64,7 +64,8 @@ class ParachainManagerTest(unittest.TestCase):
         self.assertTrue(result == "Onboarding", 'Parachain onboarding')
 
     def test_cleanup_parachain(self):
-        initialize_parachain(self.relay_substrate, self.alice_key, 101, '0x11', '0x11')
+        wasm = get_chain_wasm(self.parachain_substrate)
+        initialize_parachain(self.relay_substrate, self.alice_key, 101, '0x11', wasm)
         for i in range(30):  # wait 5*30 seconds
             if get_parachain_lifecycles(self.relay_substrate, 101) == 'Parachain':
                 break

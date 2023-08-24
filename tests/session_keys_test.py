@@ -27,8 +27,9 @@ class NodeSessionKeysTest(unittest.TestCase):
 
     def test_set_node_session_keys(self):
         session_key = rotate_node_session_keys(self.polkadot_rpc_http_url)
-        self.assertTrue(set_node_session_key(self.polkadot_rpc_ws_url, '//Alice', session_key),
-                        'SetKeys executed successfully on //Alice')
+        result = set_node_session_key(self.polkadot_rpc_ws_url, '//Alice//stash', session_key)
+        print(result)
+        self.assertTrue(result, 'SetKeys executed successfully on //Alice//stash')
 
     def test_rotate_node_session_keys_bad_url(self):
         session_key = rotate_node_session_keys('http://localhost:1234')

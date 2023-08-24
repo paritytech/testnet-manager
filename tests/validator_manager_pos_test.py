@@ -60,7 +60,7 @@ class ValidatorManagerTestPoS(unittest.TestCase):
 
     def test_deregister_pos_validator(self):
         bob_stash = Keypair.create_from_uri("//Bob//stash", ss58_format=42)
-        staking_chill(self.alice_validator_rpc_ws_url, "//Bob")  # //Bob - is controller
+        staking_chill(self.alice_validator_rpc_ws_url, "//Bob//stash")
         validators_to_retire = get_validators_pending_deletion(self.alice_validator_rpc_ws_url)
         print(validators_to_retire)
         self.assertEqual(validators_to_retire, [bob_stash.ss58_address], "Deregistered validator address successfully added to validators_to_retire")
