@@ -12,7 +12,6 @@ services:
     image: *polkadotimage
     ports:
       - "9944"
-      - "9933"
     volumes: *chainspec
     depends_on: &depends_on_chainspec
       - chainspec
@@ -32,15 +31,13 @@ services:
     command: --chain=/chainspec/rococo-local.json --bob --tmp
 
   collator:
-    image: parity/polkadot-collator:latest
+    image: parity/polkadot-parachain:latest
     volumes: *chainspec
     ports:
       - "9944"
-      - "9933"
     depends_on: *depends_on_chainspec
     command: >
       --chain shell
-      --unsafe-ws-external
       --unsafe-rpc-external
       --rpc-cors=all
       --tmp

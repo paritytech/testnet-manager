@@ -11,10 +11,10 @@ class NodeSessionKeysTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --unsafe-ws-external --rpc-methods=unsafe  --rpc-cors=all')
-        self.polkadot.with_exposed_ports(9933,9944)
+        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
-        self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9933))
+        self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
         self.polkadot_rpc_ws_url = 'ws://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
         wait_for_http_ready(self.polkadot_rpc_http_url + '/health')
 
