@@ -38,14 +38,23 @@ def get_relay_chain_rpc_url():
 
 # Retain HTTP endpoint until HTTP RPC is completely removed
 def node_http_endpoint(node_name):
-    node_http_pattern = get_var_from_env('RPC_NODE_URL_PATTERN')
-    return f'http://{node_http_pattern.replace("NODE_NAME", node_name)}'
-
+    if environ.get('NODE_HTTP_PATTERN'):
+        log.warning('NODE_HTTP_PATTERN will be deprecated. Please update to RPC_NODE_URL_PATTERN.')
+        node_http_pattern = get_var_from_env('NODE_HTTP_PATTERN')
+        return node_http_pattern.replace("NODE_NAME", node_name)
+    else:
+        node_http_pattern = get_var_from_env('RPC_NODE_URL_PATTERN')
+        return f'ws://{node_http_pattern.replace("NODE_NAME", node_name)}'
 
 # Retain WS endpoint until HTTP RPC is completely removed
 def node_ws_endpoint(node_name):
-    node_ws_pattern = get_var_from_env('RPC_NODE_URL_PATTERN')
-    return f'ws://{node_ws_pattern.replace("NODE_NAME", node_name)}'
+    if environ.get('NODE_WS_PATTERN'):
+        log.warning('NODE_WS_PATTERN will be deprecated. Please update to RPC_NODE_URL_PATTERN.')
+        node_ws_pattern = get_var_from_env('NODE_WS_PATTERN')
+        return node_ws_pattern.replace("NODE_NAME", node_name)
+    else:
+        node_ws_pattern = get_var_from_env('RPC_NODE_URL_PATTERN')
+        return f'ws://{node_ws_pattern.replace("NODE_NAME", node_name)}'
 
 
 def derivation_root_seed():
