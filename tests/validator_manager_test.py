@@ -23,7 +23,7 @@ class ValidatorManagerTest(unittest.TestCase):
         # Start Bob validator and connect it to Alice
         self.bob_validator = DockerContainer('parity/polkadot:latest')
         self.bob_validator.with_command("""
-            --chain rococo-local --validator --bob --unsafe-rpc-external --unsafe-rpc-external --rpc-cors=all \
+            --chain rococo-local --validator --bob --unsafe-rpc-external --rpc-cors=all \
             --bootnodes /ip4/127.0.0.1/tcp/{}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6
         """.format(self.alice_validator.get_exposed_port(10333)))
         self.bob_validator.with_exposed_ports(9944)

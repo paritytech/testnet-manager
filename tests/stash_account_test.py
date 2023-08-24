@@ -11,7 +11,7 @@ class StashAccountTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
         self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
 
