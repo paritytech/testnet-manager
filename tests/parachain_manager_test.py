@@ -23,9 +23,9 @@ class ParachainManagerTest(unittest.TestCase):
     def setUp(self):
         self.compose = ParachainManagerTest.compose
         self.relay_rpc_ws_url = 'ws://172.17.0.1:{}'.format(self.compose.get_service_port("node_alice", 9944))
-        self.relay_rpc_http_url = 'http://172.17.0.1:{}'.format(self.compose.get_service_port("node_alice", 9933))
+        self.relay_rpc_http_url = 'http://172.17.0.1:{}'.format(self.compose.get_service_port("node_alice", 9944))
         self.parachain_rpc_ws_url = 'ws://172.17.0.1:{}'.format(self.compose.get_service_port("collator", 9944))
-        self.parachain_rpc_http_url = 'http://172.17.0.1:{}'.format(self.compose.get_service_port("collator", 9933))
+        self.parachain_rpc_http_url = 'http://172.17.0.1:{}'.format(self.compose.get_service_port("collator", 9944))
         wait_for_http_ready(self.relay_rpc_http_url + '/health')
         wait_for_http_ready(self.parachain_rpc_http_url + '/health')
         self.parachain_substrate = SubstrateInterface(url=self.parachain_rpc_ws_url)
@@ -64,7 +64,8 @@ class ParachainManagerTest(unittest.TestCase):
         self.assertTrue(result == "Onboarding", 'Parachain onboarding')
 
     def test_cleanup_parachain(self):
-        initialize_parachain(self.relay_substrate, self.alice_key, 101, '0x11', '0x11')
+        wasm = get_chain_wasm(self.parachain_substrate)
+        initialize_parachain(self.relay_substrate, self.alice_key, 101, '0x11', wasm)
         for i in range(30):  # wait 5*30 seconds
             if get_parachain_lifecycles(self.relay_substrate, 101) == 'Parachain':
                 break

@@ -1,8 +1,8 @@
 image:
-  # also update version in manifests/chainspec.yml
+  # also update version in kube-setup/validators-chainspec.yml
   repository: parity/polkadot
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 initContainer:
   debug: true
@@ -21,7 +21,7 @@ node:
       sizeLimit: 10Mi
   podManagementPolicy: Parallel
   allowUnsafeRpcMethods: true
-  # kube-setup/chainspec.yml
+  # kube-setup/validators-chainspec.yml
   customChainspecUrl: http://chainspec.rococo/rococo-local.json
   forceDownloadChainspec: true
 

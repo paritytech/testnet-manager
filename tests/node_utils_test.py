@@ -14,10 +14,10 @@ class NodeUtilsTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --node-key 4b067400ba508d783ccf86b73aa825ebafea96c95ebdff3f307ab6dd854f0852 --unsafe-rpc-external --unsafe-ws-external --rpc-methods=unsafe  --rpc-cors=all')
-        self.polkadot.with_exposed_ports(9933, 9944)
+        self.polkadot.with_command('--dev --validator --node-key 4b067400ba508d783ccf86b73aa825ebafea96c95ebdff3f307ab6dd854f0852 --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
-        self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9933))
+        self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
         self.polkadot_rpc_ws_url = 'ws://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
         wait_for_http_ready(self.polkadot_rpc_http_url + '/health')
         time.sleep(10)

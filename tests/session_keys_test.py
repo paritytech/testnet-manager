@@ -11,10 +11,10 @@ class NodeSessionKeysTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --unsafe-ws-external --rpc-methods=unsafe  --rpc-cors=all')
-        self.polkadot.with_exposed_ports(9933,9944)
+        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
-        self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9933))
+        self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
         self.polkadot_rpc_ws_url = 'ws://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
         wait_for_http_ready(self.polkadot_rpc_http_url + '/health')
 
@@ -27,8 +27,9 @@ class NodeSessionKeysTest(unittest.TestCase):
 
     def test_set_node_session_keys(self):
         session_key = rotate_node_session_keys(self.polkadot_rpc_http_url)
-        self.assertTrue(set_node_session_key(self.polkadot_rpc_ws_url, '//Alice', session_key),
-                        'SetKeys executed successfully on //Alice')
+        result = set_node_session_key(self.polkadot_rpc_ws_url, '//Alice//stash', session_key)
+        print(result)
+        self.assertTrue(result, 'SetKeys executed successfully on //Alice//stash')
 
     def test_rotate_node_session_keys_bad_url(self):
         session_key = rotate_node_session_keys('http://localhost:1234')

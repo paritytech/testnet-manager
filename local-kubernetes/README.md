@@ -1,3 +1,10 @@
+## Requirements
+
+1. Helm
+    a. Helmdiff
+    b. Helmfile
+2. Minikube or Rancher-desktop
+
 ## How-to: Deploy 
 
 ### Magic version (minikube or rancher-desktop)

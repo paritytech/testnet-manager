@@ -1,8 +1,8 @@
 image:
-  # also update version in manifests/chainspec.yml
+  # also update version in kube-setup/validators-chainspec.yml
   repository: parity/polkadot
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 initContainer:
   debug: true
@@ -28,7 +28,7 @@ node:
   keys:
     - type: "gran"
       scheme: "ed25519"
-      # VALIDATORS_ROOT_SEED
+      # DERIVATION_ROOT_SEED
       seed: "test test test test test test test test test test test junk"
       extraDerivation: "//${HOSTNAME}//grandpa"
     - type: "babe"

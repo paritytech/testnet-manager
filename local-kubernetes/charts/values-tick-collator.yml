@@ -1,8 +1,8 @@
 image:
   # also update version in manifests/chainspec.yml
-  repository: parity/polkadot-collator
+  repository: parity/polkadot-parachain
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 initContainer:
   debug: true
@@ -18,8 +18,8 @@ node:
   chain: tick
   role: collator
   replicas: 2
-  command: "/usr/local/bin/polkadot-collator"
-  # manifests/chainspec.yml
+  command: "/usr/local/bin/polkadot-parachain"
+  # kube-setup/validators-chainspec.yml
   forceDownloadChainspec: true
   customChainspecUrl:  "http://chainspec.rococo/tick.json"
   isParachain: true

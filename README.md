@@ -36,13 +36,12 @@ Set environment variables, eg:
 
     NAMESPACE=rococo
     HEALTHY_MIN_PEER_COUNT="1"
-    WS_ENDPOINT: "wss://rococo-rpc.polkadot.io"
-    NODE_HTTP_PATTERN: "http://NODE_NAME.rococo:9933"
-    NODE_WS_PATTERN: "ws://NODE_NAME.rococo:9944"
+    RELAY_CHAIN_RPC_URL: "wss://rococo-rpc.polkadot.io"
+    RPC_NODE_URL_PATTERN: "NODE_NAME.rococo:9944"
     HEALTHY_MIN_PEER_COUNT: "1"
     SUDO_SEED=***
-    VALIDATORS_ROOT_SEED=***
-    TESTNET_MANAGER_CONSENSUS=poa
+    DERIVATION_ROOT_SEED=***
+    RELAY_CHAIN_CONSENSUS=poa
 
 Start the app:
 

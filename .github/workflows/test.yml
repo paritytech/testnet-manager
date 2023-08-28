@@ -17,11 +17,13 @@ jobs:
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.3.1
+          version: 1.5.1
           virtualenvs-create: true
           virtualenvs-in-project: true
       - name: Run tests
         run : |
+          # PyYaml is required until docker-compose is migrated to v2
+          pip install pyyaml==5.3.1
           pip install docker-compose
           poetry install --no-interaction --no-ansi
           docker-compose version

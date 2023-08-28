@@ -6,7 +6,6 @@ KUBERNETES_CONTEXT = minikube #  minikube or rancher-desktop
 # rococo or wococo (don't put space at the end of the variable it will be used as is)
 CHAIN_NAMESPACE = rococo
 
-
 # ============================================================================================
 
 all: kube check build install
@@ -18,7 +17,7 @@ kube: kube_${KUBERNETES_CONTEXT}
 kube_minikube:
 	@minikube start \
 		--addons ingress --addons metrics-server --addons registry --driver docker \
-		--kubernetes-version=1.23.3 --memory=6g --cpus=2
+		--kubernetes-version=1.27.4 --memory=6g --cpus=2
 
 kube_minikube-podman:
 	@minikube start \

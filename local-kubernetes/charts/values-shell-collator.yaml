@@ -1,8 +1,8 @@
 image:
   # also update version in kube-setup/chainspec.yml
-  repository: parity/polkadot-collator
+  repository: parity/polkadot-parachain
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 initContainer:
   debug: true
@@ -18,7 +18,7 @@ node:
   chain: shell
   role: collator
   replicas: 1
-  command: "/usr/local/bin/polkadot-collator"
+  command: "/usr/local/bin/polkadot-parachain"
   # manifests/chainspec.yml
   forceDownloadChainspec: true
   customChainspecUrl:  "http://chainspec.rococo/shell.json"

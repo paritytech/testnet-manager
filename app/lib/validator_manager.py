@@ -2,7 +2,7 @@ import logging
 from substrateinterface import Keypair, KeypairType
 from app.lib.substrate import substrate_query_url, substrate_sudo_call, get_substrate_client, substrate_call, \
     substrate_batchall_call
-from app.config.network_configuration import network_consensus, network_root_seed
+from app.config.network_configuration import relay_chain_consensus, derivation_root_seed
 from app.lib.session_keys import decode_session_key
 
 log = logging.getLogger('validator_manager')
@@ -28,7 +28,6 @@ def register_validators(ws_endpoint, sudo_seed, stash_account_addresses):
     )
     substrate_sudo_call(substrate_client, keypair, payload)
 
-
 def deregister_validators(ws_endpoint, sudo_seed, stash_account_addresses):
     substrate_client = get_substrate_client(ws_endpoint)
     keypair = Keypair.create_from_seed(sudo_seed)
@@ -43,7 +42,7 @@ def deregister_validators(ws_endpoint, sudo_seed, stash_account_addresses):
 
 
 def get_validators_pending_addition(ws_endpoint):
-    if network_consensus() == "poa":
+    if relay_chain_consensus() == "poa":
         return substrate_query_url(ws_endpoint, "ValidatorManager", "ValidatorsToAdd")
     else:
         active_validators = substrate_query_url(ws_endpoint, "Session", "Validators")
@@ -52,7 +51,7 @@ def get_validators_pending_addition(ws_endpoint):
 
 
 def get_validators_pending_deletion(ws_endpoint):
-    if network_consensus() == "poa":
+    if relay_chain_consensus() == "poa":
         return substrate_query_url(ws_endpoint, "ValidatorManager", "ValidatorsToRetire")
     else:
         active_validators = substrate_query_url(ws_endpoint, "Session", "Validators")
@@ -154,7 +153,7 @@ def staking_validators_set(ws_endpoint):
 
 
 def get_derived_validator_session_keys(node_name):
-    key_seed = network_root_seed()
+    key_seed = derivation_root_seed()
     sr_public_key = Keypair.create_from_uri(key_seed + "//validator//" + node_name, crypto_type=KeypairType.SR25519).public_key.hex()
     # FIXME after https://github.com/polkascan/py-substrate-interface/issues/284
     #ed_public_key = Keypair.create_from_uri(key_seed + "//validator//" + node_name, crypto_type=KeypairType.ED25519).public_key.hex()

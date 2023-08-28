@@ -13,7 +13,7 @@ class BalanceUtilsTest(unittest.TestCase):
     def setUp(self):
         # Start Alice validator
         self.alice_validator = DockerContainer('parity/polkadot:latest')
-        self.alice_validator.with_command('--chain rococo-local --validator --alice --unsafe-ws-external --rpc-cors=all --rpc-methods=unsafe')
+        self.alice_validator.with_command('--chain rococo-local --validator --alice --unsafe-rpc-external --rpc-cors=all --rpc-methods=unsafe')
         self.alice_validator.with_exposed_ports(9944)
         self.alice_validator.start()
         self.alice_validator_rpc_ws_url = 'ws://{}:{}'.format(self.alice_validator.get_container_host_ip(),
@@ -22,10 +22,10 @@ class BalanceUtilsTest(unittest.TestCase):
         # Start Bob validator
         self.bob_validator = DockerContainer('parity/polkadot:latest')
         self.bob_validator.with_command('--chain rococo-local --validator --bob --unsafe-rpc-external --rpc-cors=all --rpc-methods=unsafe')
-        self.bob_validator.with_exposed_ports(9933)
+        self.bob_validator.with_exposed_ports(9944)
         self.bob_validator.start()
         self.bob_validator_http_url = 'http://{}:{}'.format(self.bob_validator.get_container_host_ip(),
-                                                            self.bob_validator.get_exposed_port(9933))
+                                                            self.bob_validator.get_exposed_port(9944))
         # prepare keys
         self.alice_key = '0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a'
         self.alice_key_address = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'
