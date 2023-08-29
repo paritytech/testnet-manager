@@ -18,7 +18,7 @@ default:
 variables:
   IMAGE_NAME:                      "paritytech/testnet-manager"
   DOCKERFILE:                      "Dockerfile"
-  BUILDAH_IMAGE:                   "quay.io/buildah/stable:v1.29"
+  BUILDAH_IMAGE:                   "docker.io/paritytech/buildah:1.31"
   BUILDAH_COMMAND:                 "buildah --storage-driver overlay2"
 
 .test-refs:                        &test-refs
