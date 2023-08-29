@@ -44,7 +44,7 @@ def node_http_endpoint(node_name):
         return node_http_pattern.replace("NODE_NAME", node_name)
     else:
         node_http_pattern = get_var_from_env('RPC_NODE_URL_PATTERN')
-        return f'ws://{node_http_pattern.replace("NODE_NAME", node_name)}'
+        return f'http://{node_http_pattern.replace("NODE_NAME", node_name)}'
 
 # Retain WS endpoint until HTTP RPC is completely removed
 def node_ws_endpoint(node_name):
