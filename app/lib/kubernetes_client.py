@@ -76,6 +76,10 @@ def get_pod_node_details(pod_name):
     for label in ["beta.kubernetes.io/arch", "beta.kubernetes.io/instance-type", "beta.kubernetes.io/os"]:
         if label in node.metadata.labels:
             node_details[label] = node.metadata.labels[label]
+
+    if node.status.node_info.kernel_version:
+        node_details['kernel-version'] = node.status.node_info.kernel_version
+        
     return node_details
 
 
