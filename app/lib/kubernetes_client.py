@@ -18,7 +18,7 @@ def list_validator_stateful_sets(role='authority'):
     return list(map(lambda sts: sts['metadata']['name'], validator_stateful_sets))
 
 
-def list_parachain_collator_stateful_sets(para_id):
+def list_parachain_collator_stateful_sets(para_id: str):
     stateful_sets = kubernetes_client.CustomObjectsApi().list_namespaced_custom_object(group="apps", version="v1", plural="statefulsets", namespace=namespace)
 
     collator_stateful_sets = list(
@@ -50,7 +50,7 @@ def list_validator_pods(stateful_set_name):
     return validator_pods
 
 
-def list_collator_pods(para_id=None, stateful_set_name=None):
+def list_collator_pods(para_id: str = None, stateful_set_name: str = None):
     collator_pods = list_substrate_node_pods('collator')
     if stateful_set_name:
         collator_pods = list(filter(lambda pod: pod.metadata.owner_references[0].name == stateful_set_name, collator_pods))
