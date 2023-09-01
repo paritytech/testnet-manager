@@ -4,7 +4,7 @@ from starlette.templating import Jinja2Templates
 
 from app import __version__
 from app.config.network_configuration import get_node_logs_link, get_network
-from app.lib.kubernetes_client import list_validator_stateful_sets, list_parachain_collator_stateful_sets
+from app.lib.kubernetes_client import get_pod_details, list_validator_stateful_sets, list_parachain_collator_stateful_sets
 from app.lib.network_utils import list_substrate_nodes, list_validators, get_session_queued_keys, list_parachains, \
     list_parachain_collators, get_substrate_node
 from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configuration, get_parachain_runtime
@@ -43,7 +43,7 @@ async def get_nodes(
     request: Request,
     node_name: str = Path(description="Name of the node")
 ):
-    return templates.TemplateResponse('node_info.html', dict(request=request, network=network, node=get_substrate_node(node_name)))
+    return templates.TemplateResponse('node_info.html', dict(request=request, network=network, node=get_substrate_node(node_name), pod=get_pod_details(node_name)))
 
 
 @router.get("/validators", response_class=HTMLResponse, include_in_schema=False)

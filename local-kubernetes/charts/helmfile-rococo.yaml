@@ -67,7 +67,7 @@ releases:
     values:
       - values-shell-collator.yaml
 
-# Para chain Statemint ##
+## Para chain Statemint ##
   - name: local-rococo-statemint-alice
     namespace: rococo
     chart: parity/node

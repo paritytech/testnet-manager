@@ -25,7 +25,8 @@
 <button id="rotateSessionKeys">Rotate session keys</button>
 {% endif %}
 
-<table id="table" class="display compact">
+<h2>Substrate Node Information</h2>
+<table id="table_substrate" class="display compact">
     <thead>
     <tr>
         <th>Keys</th>
@@ -225,6 +226,140 @@
     </tbody>
 </table>
 
+<h2>Kubernetes Pod Information</h2>
+<table id="table_kubernetes" class="display compact">
+    <thead>
+    <tr>
+        <th>Keys</th>
+        <th>Values</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Name</td>
+            <td>{{ pod.name }}</td>
+        </tr>
+        <tr>
+            <td>Namespace</td>
+            <td>{{ pod.namespace }}</td>
+        </tr>
+        <tr>
+            <td>Node</td>
+            <td>{{ pod.node_name }}</td>
+        </tr>
+        {% if pod.node_selector %}
+        <tr>
+            <td>Node Selector</td>
+            <td>{{ pod.node_selector }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Node Tolerations</td>
+            <td>
+                <ul>
+                  {% for toleration in pod.tolerations %}
+                    <li>{{ toleration.key }}={{ toleration.operator }}:{{ toleration.value }}</li>
+                  {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Request CPU</td>
+            <td>{{ pod.request_cpu }}</td>
+        </tr>
+        <tr>
+            <td>Request Memory</td>
+            <td>{{ pod.request_memory }}</td>
+        </tr>
+        <tr>
+            <td>Limit CPU</td>
+            <td>{{ pod.limit_cpu }}</td>
+        </tr>
+        <tr>
+            <td>Limit Memory</td>
+            <td>{{ pod.limit_memory }}</td>
+        </tr>
+        <tr>
+            <td>Restart Count</td>
+            <td>{{ pod.restart_count }}</td>
+        </tr>
+        <tr>
+            <td>Volume Details</td>
+            <td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Size</th>
+                            <th>Storage Class</th>
+                            <th>Storage Phase</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for volume in pod.volume_details %}
+                        <tr>
+                            <td>{{ volume.pvc_name }}</td>
+                            <td>{{ volume.size }}</td>
+                            <td>{{ volume.class }}</td>
+                            <td>{{ volume.phase }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Potential Ready</td>
+            <td>{{ pod.potential_ready }}</td>
+        </tr>
+        {% if pod.affinity %}
+        <tr>
+            <td>Affinity</td>
+            <td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Policy</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in pod.affinity.items() %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ value.policy }}</td>
+                            <td>{{ value.details }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Node Details</td>
+            <td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in pod.node_details.items() %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
 <script
         src="/static/libs/jquery-3.6.0.slim.min.js"
         integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
@@ -232,7 +367,7 @@
 <script type="text/javascript" charset="utf8" src="/static/libs/datatables.min.js"></script>
 <script>
     $(document).ready( function () {
-        $('#table').DataTable({
+        $('#table_substrate, #table_kubernetes').DataTable({
             // https://datatables.net/reference/option/
             "lengthMenu": [[-1], ["All"]]
         });
