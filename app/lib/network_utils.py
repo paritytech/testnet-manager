@@ -451,9 +451,9 @@ def list_parachains():
 
     # retrieve the list of parachains for which we have collators in the cluster
     collator_pods = list_collator_pods()
-    # If the paraId is not set on pod labels, we fallback to 0
+    # If the paraId is not set on pod labels, we fall back to 0
     cluster_parachain_tuple_set = set(
-        map(lambda pod: (int(pod.metadata.labels.get('paraId', 0)), pod.metadata.labels.get('chain')), collator_pods))
+        map(lambda pod: (pod.metadata.labels.get('paraId', '0'), pod.metadata.labels.get('chain')), collator_pods))
 
     parachains = {}
     for cluster_parachain_tuple in cluster_parachain_tuple_set:
