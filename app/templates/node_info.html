@@ -369,7 +369,10 @@
     $(document).ready( function () {
         $('#table_substrate, #table_kubernetes').DataTable({
             // https://datatables.net/reference/option/
-            "lengthMenu": [[-1], ["All"]]
+            "lengthMenu": [[-1], ["All"]],
+            "columnDefs": [
+              { "width": "10%", "targets": 0 }
+            ]
         });
         {% if node.role == "authority" %}
         {% if node.validator_status %}

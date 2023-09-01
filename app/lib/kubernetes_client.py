@@ -18,7 +18,7 @@ def get_pod_details(pod_name):
     for volume in pod.spec.volumes:
         if volume.persistent_volume_claim:
             pvc_name = volume.persistent_volume_claim.claim_name
-            volume_specs = get_pod_pvc_volume_size(namespace, pvc_name)
+            volume_specs = get_pod_pvc_details(namespace, pvc_name)
             volume_details.append({
                 'pvc_name': pvc_name,
                 'size': volume_specs['size'],
@@ -59,7 +59,7 @@ def get_pod_details(pod_name):
     return pod_details
 
 
-def get_pod_pvc_volume_size(namespace, pvc_name):
+def get_pod_pvc_details(namespace, pvc_name):
     pvc = kubernetes_client.CoreV1Api().read_namespaced_persistent_volume_claim(namespace=namespace, name=pvc_name)
     pvc_details = {
         'size': pvc.spec.resources.requests['storage'],
@@ -73,7 +73,7 @@ def get_pod_node_details(pod_name):
     node = kubernetes_client.CoreV1Api().read_node(name=pod_name)
     node_details = {}
 
-    for label in ["beta.kubernetes.io/arch", "beta.kubernetes.io/instance-type", "beta.kubernetes.io/os"]:
+    for label in ["kubernetes.io/arch", "node.kubernetes.io/instance-type", "kubernetes.io/os"]:
         if label in node.metadata.labels:
             node_details[label] = node.metadata.labels[label]
 
