@@ -488,23 +488,25 @@ async def onboard_parachain_by_id(para_id, force_queue_action):
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     parachain_pods = list_collator_pods(para_id)
-    para_node_client = get_node_client(parachain_pods[0].metadata.name)
-    node_para_id = get_parachain_id(parachain_pods[0])
-    if node_para_id == para_id:
-        state = get_parachain_head(para_node_client)
-        wasm = get_chain_wasm(para_node_client)
-
-        if state and wasm:
-            permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
-            log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
-                para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
-            initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action)
+    if parachain_pods:
+        para_node_client = get_node_client(parachain_pods[0].metadata.name)
+        node_para_id = get_parachain_id(parachain_pods[0])
+        if node_para_id == para_id:
+            state = get_parachain_head(para_node_client)
+            wasm = get_chain_wasm(para_node_client)
+            if state and wasm:
+                permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
+                log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
+                    para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
+                initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action)
+            else:
+                log.error(
+                    'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(
+                        para_id, state, wasm[0:64], wasm[-64:-1]))
         else:
-            log.error(
-                'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(
-                    para_id, state, wasm[0:64], wasm[-64:-1]))
+            log.error('Node para_id: {} doesn\'t match the requested offboard para_id {}'.format(node_para_id, para_id))
     else:
-        log.error('Node para_id: {} doesn\'t match the requested offboard para_id {}'.format(node_para_id, para_id))
+        log.error(f"Couldn't find parachain pod for para_id={para_id}")
 
 
 async def offboard_parachain_by_id(para_id, force_queue_action):

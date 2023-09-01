@@ -25,3 +25,8 @@ portForward:
   namespace: rococo
   port: 80
   localPort: 8080
+- resourceType: service
+  resourceName: testnet-manager-task-scheduler
+  namespace: rococo
+  port: 80
+  localPort: 8081
