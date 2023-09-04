@@ -451,9 +451,9 @@ def list_parachains():
 
     # retrieve the list of parachains for which we have collators in the cluster
     collator_pods = list_collator_pods()
-    # If the paraId is not set on pod labels, we fallback to 0
+    # If the paraId is not set on pod labels, we fall back to 0
     cluster_parachain_tuple_set = set(
-        map(lambda pod: (int(pod.metadata.labels.get('paraId', 0)), pod.metadata.labels.get('chain')), collator_pods))
+        map(lambda pod: (pod.metadata.labels.get('paraId', '0'), pod.metadata.labels.get('chain')), collator_pods))
 
     parachains = {}
     for cluster_parachain_tuple in cluster_parachain_tuple_set:
@@ -483,31 +483,33 @@ def list_parachains():
     return parachains
 
 
-async def onboard_parachain_by_id(para_id, force_queue_action):
+async def onboard_parachain_by_id(para_id: str, force_queue_action: bool):
     log.info(f'starting to onboard parachain #{para_id}')
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
     parachain_pods = list_collator_pods(para_id)
-    para_node_client = get_node_client(parachain_pods[0].metadata.name)
-    node_para_id = get_parachain_id(parachain_pods[0])
-    if node_para_id == para_id:
-        state = get_parachain_head(para_node_client)
-        wasm = get_chain_wasm(para_node_client)
-
-        if state and wasm:
-            permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
-            log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
-                para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
-            initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action)
+    if parachain_pods:
+        para_node_client = get_node_client(parachain_pods[0].metadata.name)
+        node_para_id = get_parachain_id(parachain_pods[0])
+        if node_para_id == para_id:
+            state = get_parachain_head(para_node_client)
+            wasm = get_chain_wasm(para_node_client)
+            if state and wasm:
+                permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
+                log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
+                    para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
+                initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action)
+            else:
+                log.error(
+                    'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(
+                        para_id, state, wasm[0:64], wasm[-64:-1]))
         else:
-            log.error(
-                'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(
-                    para_id, state, wasm[0:64], wasm[-64:-1]))
+            log.error('Node para_id: {} doesn\'t match the requested offboard para_id {}'.format(node_para_id, para_id))
     else:
-        log.error('Node para_id: {} doesn\'t match the requested offboard para_id {}'.format(node_para_id, para_id))
+        log.error(f"Couldn't find parachain pod for para_id={para_id}")
 
 
-async def offboard_parachain_by_id(para_id, force_queue_action):
+async def offboard_parachain_by_id(para_id: str, force_queue_action: bool):
     log.info(f'starting to offboard parachain #{para_id}')
     substrate_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
@@ -519,7 +521,7 @@ async def offboard_parachain_by_id(para_id, force_queue_action):
 
 
 # Collators
-def list_parachain_collators(para_id, stateful_set_name=''):
+def list_parachain_collators(para_id: str, stateful_set_name: str = ''):
     collator_pods = list_collator_pods(para_id, stateful_set_name)
     # Read the first collator pod chain metadata for this para_id to retrieve the chain name
     if collator_pods:
@@ -628,7 +630,7 @@ async def deregister_collator_nodes(chain, nodes, ss58_format):
     return accounts_to_deregister
 
 
-async def register_statefulset_collators(para_id, stateful_set_name):
+async def register_statefulset_collators(para_id: str, stateful_set_name: str):
     log.info('starting to register collators in statefulset {}'.format(stateful_set_name))
     collators_pods = list_collator_pods(para_id, stateful_set_name)
     chain = collators_pods[0].metadata.labels['chain']
@@ -637,7 +639,7 @@ async def register_statefulset_collators(para_id, stateful_set_name):
     await register_collator_nodes(chain, collator_node_names, ss58_format)
 
 
-async def deregister_statefulset_collators(para_id, stateful_set_name):
+async def deregister_statefulset_collators(para_id: str, stateful_set_name: str):
     log.info('starting to deregister collators in statefulset {}'.format(stateful_set_name))
     collators_pods = list_collator_pods(para_id, stateful_set_name)
     chain = collators_pods[0].metadata.labels['chain']

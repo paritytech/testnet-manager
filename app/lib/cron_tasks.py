@@ -6,7 +6,8 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.lib.kubernetes_client import list_stateful_sets, list_validator_stateful_sets
 from app.config.network_configuration import get_network, network_tasks_cron_schedule
-from app.lib.network_utils import rotate_nodes_session_keys, register_statefulset_validators
+from app.lib.network_utils import rotate_nodes_session_keys, register_statefulset_validators, list_parachains, \
+    onboard_parachain_by_id
 from app.lib.substrate import get_relay_chain_client
 
 log = logging.getLogger(__name__)
@@ -29,6 +30,10 @@ async def load_cron_tasks():
         register_inactive_validators = register_network_inactive_validators()
         scheduler.add_job(register_inactive_validators,
                           name='register_inactive_validators',
+                          trigger=tasks_cron_trigger)
+        onboard_inactive_parachains = onboard_network_inactive_parachains()
+        scheduler.add_job(onboard_inactive_parachains,
+                          name='onboard_inactive_parachains',
                           trigger=tasks_cron_trigger)
 
 
@@ -90,3 +95,17 @@ def register_network_inactive_validators():
             print(stateful_set)
         log.info('Finished registering inactive validators')
     return register_inactive_validators
+
+
+def onboard_network_inactive_parachains():
+    async def onboard_inactive_parachains():
+        log.info(f'Onboarding inactive parachains for network={network}')
+        parachains = list_parachains()
+        for para_id, para_info in parachains.items():
+            # Onboard parachain if not currently active
+            if not para_info.get('lifecycle', '') in ['Parachain', 'Onboarding']:
+                await onboard_parachain_by_id(para_id, True)
+            else:
+                log.info(F'Parachain #{para_id} already onboarded')
+        log.info('Finished onboarding inactive parachains')
+    return onboard_inactive_parachains
