@@ -453,7 +453,7 @@ def list_parachains():
     collator_pods = list_collator_pods()
     # If the paraId is not set on pod labels, we fall back to 0
     cluster_parachain_tuple_set = set(
-        map(lambda pod: (pod.metadata.labels.get('paraId', '0'), pod.metadata.labels.get('chain')), collator_pods))
+        map(lambda pod: (int(pod.metadata.labels.get('paraId', '0')), pod.metadata.labels.get('chain')), collator_pods))
 
     parachains = {}
     for cluster_parachain_tuple in cluster_parachain_tuple_set:
@@ -469,16 +469,20 @@ def list_parachains():
     parachain_leases_count = get_all_parachain_leases_count(substrate_client)
     parachain_current_code_hashes = get_all_parachain_current_code_hashes(substrate_client)
     parachain_heads = get_all_parachain_heads(substrate_client)
-
     for para_id in para_ids:
+        if para_id in parachains and 'name' in parachains[para_id]:
+            para_name = parachains[para_id]['name']
+            para_location = parachains[para_id]['location']
+        else:
+            para_name = relay_chain_network_name + '-para-' + para_id
+            para_location = 'external'
         parachains[para_id] = {
-            'name': relay_chain_network_name + '-para-' + str(para_id) if not parachains.get(para_id) else parachains[para_id][
-                'name'],
+            'name': para_name,
+            'location': para_location,
             'lifecycle': parachain_lifecycles.get(para_id),
             'leases_count': parachain_leases_count.get(para_id),
             'current_code_hash': parachain_current_code_hashes.get(para_id),
-            'head': parachain_heads.get(para_id),
-            'location': 'external ' if not parachains.get(para_id) else parachains[para_id]['location'],
+            'head': parachain_heads.get(para_id)
         }
     return parachains
 
