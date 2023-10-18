@@ -108,4 +108,4 @@ uninstall: check
 	@kubectl --context ${KUBERNETES_CONTEXT} delete pvc -n ${CHAIN_NAMESPACE} --all
 
 cleanup: check
-	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace rococo wococo
