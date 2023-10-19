@@ -1,14 +1,22 @@
 # ============================================================================================
-# Validator-manager Quick Deploy Makefile for Development and Testing
+# Testnet Manager Quick Deploy Makefile for Development and Testing
 # ============================================================================================
 
 KUBERNETES_CONTEXT = minikube #  minikube or rancher-desktop
 # rococo or wococo (don't put space at the end of the variable it will be used as is)
 CHAIN_NAMESPACE = rococo
+# docker or podman
+MINIKUBE_DRIVER = docker
 
 # ============================================================================================
 
-all: kube check build install
+ifeq ($(MINIKUBE_DRIVER),podman)
+	TARGETS := kube_minikube-podman check install
+else
+	TARGETS := kube check install
+endif
+
+all: $(TARGETS)
 
 # ============================================================================================
 
@@ -37,39 +45,43 @@ setup: setup_${KUBERNETES_CONTEXT}
 
 setup_minikube:
 	@kubectl --context ${KUBERNETES_CONTEXT} apply -f ./kube-setup
+	@echo "Waiting 20 seconds for chainspec pod readiness before continuing"
+	@sleep 20
 
 setup_rancher-desktop:
 	@kubectl --context ${KUBERNETES_CONTEXT} apply -f ./kube-setup -f ./rancher-desktop/kube-setup
+	@echo "Waiting 20 seconds for chainspec pod readiness before continuing"
+	@sleep 20
 
 build: check build_${KUBERNETES_CONTEXT}
 
 build_minikube:
-	cd ../. && minikube image build . -t local/testnet-manager
+	cd ../. && minikube image build . -t localhost/testnet-manager
 
 build_rancher-desktop:
-	cd ../. && docker image build -t local/testnet-manager:latest .
+	cd ../. && docker image build -t localhost/testnet-manager:latest .
 
 # ============================================================================================
 
 rpc:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-bootnode 9944:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-bootnode 9944:9944 -n ${CHAIN_NAMESPACE}
 
 para-shell:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9948#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-shell-collator-node 9948:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-shell-collator-node 9948:9944 -n ${CHAIN_NAMESPACE}
 
 para-moon:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9949#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-moonbase-alice-node 9949:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-moonbase-alice-node 9949:9944 -n ${CHAIN_NAMESPACE}
 
 para-mint:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9950#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-statemint-alice-node 9950:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-statemint-alice-node 9950:9944 -n ${CHAIN_NAMESPACE}
 
 para-tick:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9951#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-tick-collator-node 9951:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-tick-collator-node 9951:9944 -n ${CHAIN_NAMESPACE}
 
 web:
 	@xdg-open 'http://localhost:8080/'
@@ -108,4 +120,4 @@ uninstall: check
 	@kubectl --context ${KUBERNETES_CONTEXT} delete pvc -n ${CHAIN_NAMESPACE} --all
 
 cleanup: check
-	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace rococo wococo

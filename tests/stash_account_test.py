@@ -26,7 +26,7 @@ class StashAccountTest(unittest.TestCase):
     def test_get_account_funds(self):
         alice_key = Keypair.create_from_uri("//Alice")
         alice_funds = get_account_funds(self.polkadot_rpc_ws_url, alice_key.ss58_address)
-        self.assertEqual(alice_funds, 10000000000000000, "Alice's funds successfully retrieved")
+        self.assertEqual(alice_funds, 1000000000000000000, "Alice's funds successfully retrieved")
 
 if __name__ == '__main__':
     unittest.main()

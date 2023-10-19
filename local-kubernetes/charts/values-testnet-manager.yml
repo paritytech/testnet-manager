@@ -1,5 +1,5 @@
 image:
-  repository: "local/testnet-manager"
+  repository: "localhost/testnet-manager"
   tag: latest
   pullPolicy: IfNotPresent
 

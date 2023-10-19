@@ -1,7 +1,7 @@
 ## Requirements
 
 1. Helm
-    a. Helmdiff
+    a. Helm diff plugin
     b. Helmfile
 2. Minikube or Rancher-desktop
 
@@ -46,7 +46,7 @@ make rpc
 This command will open browser and port-forward the 9944
 > Note: you should have port `9944` free in your host before running `make rpc`
 
-### Validator-manager web endpoint
+### Testnet Manager web endpoint
 Run:
 ```
 make web
