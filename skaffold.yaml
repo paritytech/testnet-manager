@@ -4,7 +4,7 @@ metadata:
   name: testnet-manager
 build:
   artifacts:
-    - image: local/testnet-manager
+    - image: localhost/testnet-manager
       docker: {}
   local:
     useBuildkit: true
