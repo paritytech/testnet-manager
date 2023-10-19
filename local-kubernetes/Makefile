@@ -6,7 +6,7 @@ KUBERNETES_CONTEXT = minikube #  minikube or rancher-desktop
 # rococo or wococo (don't put space at the end of the variable it will be used as is)
 CHAIN_NAMESPACE = rococo
 # docker or podman
-MINIKUBE_DRIVER = podman
+MINIKUBE_DRIVER = docker
 
 # ============================================================================================
 
