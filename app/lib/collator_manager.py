@@ -115,3 +115,43 @@ async def set_collator_selection_invulnerables(para_id, invulnerables):
     else:
         log.error(f'Failed to run xcm call para_id {para_id}, message: {encoded_call}, err: {invulnerables}')
         return None
+
+async def add_collator_selection_invulnerable(para_id, invulnerable):
+    log.info(f'Add the collator as Invulnerable for for para #{para_id}')
+    node_client = get_parachain_rpc_client(para_id)
+    call = node_client.compose_call(
+        call_module='CollatorSelection',
+        call_function='add_invulnerable',
+        call_params={
+            'who': invulnerable
+        }
+    )
+    encoded_call = call.encode()
+    weight = get_query_weight(node_client, call)
+    log.info("call: {}, weight: {}".format(call, weight))
+    receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call, weight)
+    if receipt and receipt.is_success:
+        log.info(f'✅ Success: Add a new invulnerable via XCM to para #{para_id}')
+    else:
+        log.error(f'Failed to run xcm call para_id {para_id}, message: {encoded_call}, err: {invulnerable}')
+        return None
+
+async def remove_collator_selection_invulnerable(para_id, invulnerable):
+    log.info(f'Remove the collator as Invulnerable for para #{para_id}')
+    node_client = get_parachain_rpc_client(para_id)
+    call = node_client.compose_call(
+        call_module='CollatorSelection',
+        call_function='remove_invulnerable',
+        call_params={
+            'who': invulnerable
+        }
+    )
+    encoded_call = call.encode()
+    weight = get_query_weight(node_client, call)
+    log.info("call: {}, weight: {}".format(call, weight))
+    receipt = substrate_sudo_relay_xcm_call(para_id, encoded_call, weight)
+    if receipt and receipt.is_success:
+        log.info(f'✅ Success: Remove invulnerable via XCM to para #{para_id}')
+    else:
+        log.error(f'Failed to run xcm call para_id {para_id}, message: {encoded_call}, err: {invulnerable}')
+        return None

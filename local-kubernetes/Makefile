@@ -53,23 +53,23 @@ build_rancher-desktop:
 
 rpc:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-bootnode 9944:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-bootnode 9944:9944 -n ${CHAIN_NAMESPACE}
 
 para-shell:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9948#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-shell-collator-node 9948:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-shell-collator-node 9948:9944 -n ${CHAIN_NAMESPACE}
 
 para-moon:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9949#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-moonbase-alice-node 9949:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-moonbase-alice-node 9949:9944 -n ${CHAIN_NAMESPACE}
 
 para-mint:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9950#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-statemint-alice-node 9950:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-statemint-alice-node 9950:9944 -n ${CHAIN_NAMESPACE}
 
 para-tick:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9951#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local${CHAIN_NAMESPACE}-tick-collator-node 9951:9944 -n ${CHAIN_NAMESPACE}
+	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-tick-collator-node 9951:9944 -n ${CHAIN_NAMESPACE}
 
 web:
 	@xdg-open 'http://localhost:8080/'
