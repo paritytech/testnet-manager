@@ -30,9 +30,6 @@ node:
     chainKeystore: *chainKeystore
   persistGeneratedNodeKey: true
   allowUnsafeRpcMethods: true
-  # To be removed once https://github.com/moonbeam-foundation/moonbeam/pull/2359
-  # is included in release
-  legacyRpcFlags: true
   flags:
     - "--allow-private-ipv4"
 

@@ -43,7 +43,7 @@
             <td><a href="/nodes/{{ validator.name }}">{{ validator.name }}</a></td>
             <td><a target="_blank" href="{{ node_logs_link | replace('{node}',validator.name) }}">🔎</a></td>
             {% else %}
-            <td>{{ validator.name }}/td>
+            <td>{{ validator.name }}</td>
             <td></td>
             {% endif %}
             <td>{{ validator.address }}</td>
