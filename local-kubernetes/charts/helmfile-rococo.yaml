@@ -19,7 +19,7 @@ releases:
   - name: local-rococo-bootnode
     namespace: rococo
     chart: parity/node
-    version: &node_version 5.1.7
+    version: &node_version 5.4.0
     values:
       - ./values-local-rococo-bootnode.yaml
       - node:

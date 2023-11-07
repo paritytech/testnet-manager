@@ -9,7 +9,8 @@ from app.lib.collator_account import get_derived_moon_collator_account, get_deri
     get_derived_collator_session_keys
 from app.lib.collator_manager import get_collator_status, \
     collator_register, collator_deregister, get_moon_collator_status, \
-    set_collator_selection_invulnerables, get_collator_selection_invulnerables
+    add_collator_selection_invulnerable, remove_collator_selection_invulnerable, \
+    get_collator_selection_invulnerables, set_collator_selection_invulnerables
 from app.lib.collator_mint import collator_set_keys
 from app.lib.kubernetes_client import list_validator_pods, get_external_validators_from_configmap, \
     list_collator_pods, get_pod, list_substrate_node_pods
@@ -651,7 +652,7 @@ async def deregister_statefulset_collators(para_id: str, stateful_set_name: str)
     collator_node_names = list(map(lambda pod: pod.metadata.name, collators_pods))
     await deregister_collator_nodes(chain, collator_node_names, ss58_format)
 
-
+# To be deprecated next version
 async def add_invulnerable_collators(para_id, nodes=[], addresses=[]):
     log.info(f'Adding invulnerables collators to parachain #{para_id}; nodes={nodes} and addresses={addresses}')
     current_invulnerables = get_collator_selection_invulnerables(para_id)
@@ -665,7 +666,7 @@ async def add_invulnerable_collators(para_id, nodes=[], addresses=[]):
     invulnerables = list(set(current_invulnerables).union(set(invulnerables_to_add)))
     await set_collator_selection_invulnerables(para_id, invulnerables)
 
-
+# To be deprecated next version
 async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
     log.info(f'Removing invulnerables collators to parachain #{para_id}; nodes={nodes} and addresses={addresses}')
     current_invulnerables = get_collator_selection_invulnerables(para_id)
@@ -678,6 +679,23 @@ async def remove_invulnerable_collators(para_id, nodes=[], addresses=[]):
         invulnerables_to_remove.append(account_address)
     invulnerables = list(set(current_invulnerables).difference(set(invulnerables_to_remove)))
     await set_collator_selection_invulnerables(para_id, invulnerables)
+
+async def add_invulnerable_collator(para_id, node, address):
+    log.info(f'Adding invulnerable collator of parachain #{para_id}; node={node} and address={address}')
+    if node:
+        invulnerable = get_substrate_node(node).get("collator_account")
+    elif address:
+        invulnerable = address
+    await add_collator_selection_invulnerable(para_id, invulnerable)
+
+
+async def remove_invulnerable_collator(para_id, node, address):
+    log.info(f'Removing invulnerable collator of parachain #{para_id}; node={node} and address={address}')
+    if node:
+        invulnerable = get_substrate_node(node).get("collator_account")
+    elif address:
+        invulnerable = address
+    await remove_collator_selection_invulnerable(para_id, invulnerable)
 
 
 async def set_collator_nodes_keys_on_chain(para_id, nodes=[], statefulset=''):
