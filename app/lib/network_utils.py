@@ -475,7 +475,7 @@ def list_parachains():
             para_name = parachains[para_id]['name']
             para_location = parachains[para_id]['location']
         else:
-            para_name = relay_chain_network_name + '-para-' + para_id
+            para_name = f'{relay_chain_network_name}-para-{str(para_id)}'
             para_location = 'external'
         parachains[para_id] = {
             'name': para_name,
