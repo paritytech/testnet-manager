@@ -36,9 +36,9 @@ Set environment variables, eg:
 
     NAMESPACE=rococo
     HEALTHY_MIN_PEER_COUNT="1"
-    RELAY_CHAIN_RPC_URL: "wss://rococo-rpc.polkadot.io"
-    RPC_NODE_URL_PATTERN: "NODE_NAME.rococo:9944"
-    HEALTHY_MIN_PEER_COUNT: "1"
+    RELAY_CHAIN_RPC_URL="wss://rococo-rpc.polkadot.io"
+    RPC_NODE_URL_PATTERN="NODE_NAME.rococo:9944"
+    HEALTHY_MIN_PEER_COUNT="1"
     SUDO_SEED=***
     DERIVATION_ROOT_SEED=***
     RELAY_CHAIN_CONSENSUS=poa
@@ -46,7 +46,7 @@ Set environment variables, eg:
 Start the app:
 
     # Dev
-    python -m uvicorn main:app --reload
+    poetry run uvicorn main:app --reload
     # Prod
     python -m gunicorn -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:5000 --timeout=3600 --capture-output --enable-stdio-inheritance --workers 4
 
