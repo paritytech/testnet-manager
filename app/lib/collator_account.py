@@ -33,7 +33,7 @@ def get_derived_collator_session_keys(node_name):
     except Exception as e:
         log.error("Unable to get_derived_collator_session_keys. Error: {}, stacktrace:\n".format(e, traceback.print_exc()))
         return {
-            'aura': None
+            'aura': '0x' + get_derived_collator_keypair(node_name).public_key.hex()
         }
 
 
