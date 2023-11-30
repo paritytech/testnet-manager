@@ -14,7 +14,8 @@ services:
       - "9944"
     volumes: *chainspec
     depends_on: &depends_on_chainspec
-      - chainspec
+      chainspec:
+        condition: service_completed_successfully
     command: >
       --chain=/chainspec/rococo-local.json
       --rpc-port 9944
