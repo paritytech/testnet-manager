@@ -25,9 +25,10 @@ When provided with the relay-chain Sudo account, the **testnet-manager** can per
 Note that running with those commands will fail to connect to your Kubernetes cluster and running nodes without adapting them to your setup.
 As such, it is recommended to refer to the next section for instructions to run a complete local stack in Kubernetes.
 
-Setup the local environment:
+Set up the local environment:
 
 ```shell
+poetry config virtualenvs.in-project true
 poetry install
 poetry shell
 ```
