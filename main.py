@@ -3,13 +3,14 @@ from logging.config import dictConfig
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import PlainTextResponse
+from kubernetes import config as kubernetes_config
+from starlette.responses import JSONResponse
 
 from app import __version__
-from app.routers import views, apis
 from app.config import log_config
+from app.config.network_configuration import sudo_mode
 from app.config.settings import settings
-from kubernetes import config as kubernetes_config
+from app.routers import views, read_apis, sudo_apis
 
 
 # Disable health check logs (https://stackoverflow.com/a/70810102)
@@ -18,7 +19,11 @@ class EndpointFilter(logging.Filter):
         return record.args and len(record.args) >= 3 and record.args[2] != "/health"
 
 app = FastAPI(title=settings.APP_NAME, version=__version__)
-app.include_router(apis.router)
+
+app.include_router(read_apis.router)
+if sudo_mode():
+    app.include_router(sudo_apis.router)
+
 app.include_router(views.router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -35,4 +40,4 @@ except:
 
 @app.get("/health")
 async def health():
-    return PlainTextResponse('UP')
+    return JSONResponse({'status': 'UP', 'sudoMode': sudo_mode})

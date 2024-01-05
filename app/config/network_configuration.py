@@ -65,6 +65,14 @@ def network_sudo_seed():
     return get_var_from_env('SUDO_SEED')
 
 
+def sudo_mode():
+    return network_sudo_seed() is not None
+
+
+def derivation_seed_mode():
+    return derivation_root_seed() is not None
+
+
 def get_relay_chain_ss58_format():
     relay_chain_ss58_format = get_var_from_env('RELAY_CHAIN_SS58_FORMAT')
     if relay_chain_ss58_format is None:
