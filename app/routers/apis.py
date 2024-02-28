@@ -333,11 +333,12 @@ async def teleport_funds_from_sudo(
 @router.post("/parachains/{para_id}/runtime/upgrade")
 async def parachain_upload_runtime_and_upgrade(
     runtime: UploadFile = File(description="File with runtime: *.compact.compressed.wasm"),
-    para_id: str = Path(description="Parachain ID on which to upgrade runtime")
+    para_id: str = Path(description="Parachain ID on which to upgrade runtime"),
+    check_version: bool = Query(default=True, description="Check runtime version before upgrading"),
 ):
     runtime_name = runtime.filename.split('.')[0]
     runtime_bytes = await runtime.read()
-    status, txt = parachain_runtime_upgrade(runtime_name, para_id, runtime_bytes)
+    status, txt = parachain_runtime_upgrade(runtime_name, para_id, runtime_bytes, check_version)
     if not status:
         raise HTTPException(status_code=500, detail=txt)
     else:
