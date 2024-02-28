@@ -1,7 +1,9 @@
 import logging
 from math import floor
 
-from app.lib.substrate import substrate_sudo_call, substrate_batchall_call, get_node_client, \
+from substrateinterface.exceptions import StorageFunctionNotFound
+
+from app.lib.substrate import substrate_batchall_call, get_node_client, \
     substrate_sudo_relay_xcm_call, substrate_call, get_query_weight
 from substrateinterface import Keypair
 from app.lib.kubernetes_client import list_collator_pods
@@ -245,7 +247,12 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
     log.info('Waiting 30s for parachain to receive AuthorizedUpgrade XCM')
     for i in range(30):
         time.sleep(2)
-        if para_client.query('ParachainSystem', 'AuthorizedUpgrade').value:
+        try:
+            authorized_upgrade = para_client.query('System', 'AuthorizedUpgrade')
+        except StorageFunctionNotFound:
+            # Fall back to legacy authorized upgrade location
+            authorized_upgrade = para_client.query('ParachainSystem', 'AuthorizedUpgrade')
+        if authorized_upgrade.value:
             break
         if i == 29:
             err = "Timeout, parachain did not received AuthorizedUpgrade message"
