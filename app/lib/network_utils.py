@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timedelta
 
 from app.config.network_configuration import get_relay_chain_rpc_url, network_sudo_seed, derivation_root_seed, \
-    node_http_endpoint, get_network, relay_chain_consensus, node_ws_endpoint
+    node_http_endpoint, get_network, relay_chain_consensus, node_ws_endpoint, derivation_seed_mode
 from app.lib.balance_utils import fund_accounts
 from app.lib.collator_account import get_derived_moon_collator_account, get_derived_collator_account, \
     get_derived_collator_session_keys
@@ -33,7 +33,7 @@ from app.lib.validator_manager import get_validator_set, get_validators_pending_
 log = logging.getLogger(__name__)
 
 relay_chain_network_name = get_network()
-
+is_derivation_seed_mode = derivation_seed_mode()
 
 def get_validator_account_from_pod(pod):
     node_name = pod.metadata.name
@@ -41,7 +41,10 @@ def get_validator_account_from_pod(pod):
     if validator_account:
         return validator_account
     else:
-        return get_derived_node_stash_account_address(derivation_root_seed(), node_name)
+        if is_derivation_seed_mode:
+            return get_derived_node_stash_account_address(derivation_root_seed(), node_name)
+        else:
+            return None
 
 
 def get_collator_account_from_pod(pod):
@@ -52,12 +55,15 @@ def get_collator_account_from_pod(pod):
         return collator_account
     else:
         chain = pod.metadata.labels['chain']
-        if chain.startswith("moon"):
-            return get_derived_moon_collator_account(node_name)
+        if is_derivation_seed_mode:
+            if chain.startswith("moon"):
+                return get_derived_moon_collator_account(node_name)
+            else:
+                # 42 is the ss58 format default value, see https://polkadot.js.org/docs/keyring/start/ss58/
+                ss58_format = pod.metadata.labels.get('ss58Format','42')
+                return get_derived_collator_account(node_name, ss58_format)
         else:
-            # 42 is the ss58 format default value, see https://polkadot.js.org/docs/keyring/start/ss58/
-            ss58_format = pod.metadata.labels.get('ss58Format','42')
-            return get_derived_collator_account(node_name, ss58_format)
+            return None
 
 
 def get_validator_status(node_stash_account_address, validator_set, validators_to_add, validators_to_retire):
