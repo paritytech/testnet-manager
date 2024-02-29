@@ -97,6 +97,43 @@ def substrate_call(substrate_client, keypair, call, wait=True):
         return False
 
 
+def substrate_proxy_call(substrate_client, keypair, run_as, payload, wait=True):
+    call = substrate_client.compose_call(
+        call_module='Proxy',
+        call_function='proxy',
+        call_params={
+            'real': run_as,
+            'call': payload.value,
+            'force_proxy_type': None
+        }
+    )
+    return substrate_call(substrate_client, keypair, call, wait)
+
+
+def get_sudo_keys(substrate_client):
+    sudo = substrate_client.query('Sudo', 'Key', params=[]).value
+    proxies = []
+    try:
+        # proxy_result has two element list of proxies and deposit.
+        proxy_result = substrate_client.query('Proxy', 'Proxies', params=[sudo]).value
+        for proxy in proxy_result[0]:
+            proxies.append(proxy['delegate'])
+    except Exception as e:
+        print("ERROR: unable to get proxies, error:", e)
+    return {'sudo': sudo, 'proxies': proxies}
+
+
+def substrate_check_sudo_key_and_call(substrate_client, keypair, payload, wait=True):
+    sudo_keys = get_sudo_keys(substrate_client)
+    provided_key = keypair.ss58_address
+    if provided_key == sudo_keys['sudo']:
+        return substrate_call(substrate_client, keypair, payload, wait)
+    elif provided_key in sudo_keys['proxies']:
+        return substrate_proxy_call(substrate_client, keypair, sudo_keys['sudo'], payload, wait)
+    else:
+        log.error(f"Failed to execute sudo call: {getattr(substrate_client, 'url', 'NO_URL')} {payload.value['call_module']}.{payload.value['call_function']}, Error: Provided wrong sudo key {provided_key}, expected {sudo_keys}")
+        return None
+
 def substrate_sudo_call(substrate_client, keypair, payload, wait=True):
     call = substrate_client.compose_call(
         call_module='Sudo',
@@ -105,7 +142,7 @@ def substrate_sudo_call(substrate_client, keypair, payload, wait=True):
             'call': payload.value,
         }
     )
-    return substrate_call(substrate_client, keypair, call, wait)
+    return substrate_check_sudo_key_and_call(substrate_client, keypair, call, wait)
 
 
 def substrate_sudo_unchecked_weight_call(substrate_client, keypair, payload, wait=True):
@@ -120,7 +157,7 @@ def substrate_sudo_unchecked_weight_call(substrate_client, keypair, payload, wai
             }
         }
     )
-    return substrate_call(substrate_client, keypair, call, wait)
+    return substrate_check_sudo_key_and_call(substrate_client, keypair, call, wait)
 
 
 def substrate_batchall_call(substrate_client, keypair, batch_call, wait=True, sudo=False):
