@@ -1,6 +1,6 @@
 # Get an extrinsic call in python's substrate-interface format
 # usage:
-#   poetry run python scripts/get-call-extrinsic.py wss://rococo-rpc.polkadot.io 0x4b495cc8aece8dd54b401bbbc504c960312d3a8da3541e86ef2a617d6e76cc3f 0xabe991d8d0384056cadabeec8827b012b8330114fa0d5489dc6af10bcb105834
+#   poetry run python scripts/get-extrinsic-call.py wss://rococo-rpc.polkadot.io 0x4b495cc8aece8dd54b401bbbc504c960312d3a8da3541e86ef2a617d6e76cc3f 0xabe991d8d0384056cadabeec8827b012b8330114fa0d5489dc6af10bcb105834
 import json
 import sys
 from json import JSONDecodeError
