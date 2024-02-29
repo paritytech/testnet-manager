@@ -204,7 +204,7 @@ def cleanup_parachain(substrate_client, sudo_seed, para_id, force_queue_action=T
     return substrate_batchall_call(substrate_client, keypair, batch_call, True, True)
 
 
-def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
+def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm, check_version=True):
     log.info(f'Upgrading para-chain #{para_id} runtime to {runtime_name}')
     # Doc: https://github.com/paritytech/cumulus/issues/764
     para_client = get_parachain_node_client(para_id)
@@ -217,8 +217,7 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm):
     if len(call_function_metadata['fields']) == 2:
         call_params = {
             'code_hash': code_hash,
-            # Since the authorization only has a hash, it cannot actually perform the verification.
-            'check_version': False
+            'check_version': check_version
         }
     else:
         call_params = {'code_hash': code_hash}

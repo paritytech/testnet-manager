@@ -67,7 +67,7 @@ spec:
           - -c
           - >
             set -xe;
-            polkadot-parachain build-spec --chain statemint-local --disable-default-bootnode > /dir/statemint-plain.json;
+            polkadot-parachain build-spec --chain asset-hub-westend-local --disable-default-bootnode > /dir/statemint-plain.json;
             sed 's/"para_id": 1000/"para_id": 1003/' -i /dir/statemint-plain.json;
             sed 's/"parachainId": 1000/"parachainId": 1003/' -i /dir/statemint-plain.json;
             echo "make 5GmS1wtCfR4tK5SSgnZbVT4kYw5W8NmxmijcsxCQE6oLW6A8 (DERIVATION_ROOT_SEED) rich";
