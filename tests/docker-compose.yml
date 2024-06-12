@@ -16,19 +16,29 @@ services:
     depends_on: &depends_on_chainspec
       chainspec:
         condition: service_completed_successfully
-    command: >
+    command: |
       --chain=/chainspec/rococo-local.json
       --rpc-port 9944
       --rpc-cors all
       --unsafe-rpc-external
+      --unsafe-force-node-key-generation
       --alice
       --tmp
 
   node_bob:
     image: *polkadotimage
+    ports:
+      - "9944"
     volumes: *chainspec
     depends_on: *depends_on_chainspec
-    command: --chain=/chainspec/rococo-local.json --bob --tmp
+    command: |
+      --chain=/chainspec/rococo-local.json
+      --rpc-port 9944
+      --rpc-cors all
+      --unsafe-rpc-external
+      --unsafe-force-node-key-generation
+      --bob
+      --tmp
 
   collator:
     image: parity/polkadot-parachain:latest
@@ -36,10 +46,12 @@ services:
     ports:
       - "9944"
     depends_on: *depends_on_chainspec
-    command: >
+    command: |
       --chain shell
       --unsafe-rpc-external
       --rpc-cors=all
+      --rpc-methods=unsafe
+      --unsafe-force-node-key-generation
       --tmp
       --
       --chain /chainspec/rococo-local.json
