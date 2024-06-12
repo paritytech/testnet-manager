@@ -22,6 +22,8 @@ services:
       --rpc-cors all
       --unsafe-rpc-external
       --unsafe-force-node-key-generation
+      --validator
+      --insecure-validator-i-know-what-i-do
       --alice
       --tmp
 
@@ -37,6 +39,8 @@ services:
       --rpc-cors all
       --unsafe-rpc-external
       --unsafe-force-node-key-generation
+      --validator
+      --insecure-validator-i-know-what-i-do
       --bob
       --tmp
 
@@ -52,6 +56,7 @@ services:
       --rpc-cors=all
       --rpc-methods=unsafe
       --unsafe-force-node-key-generation
+      --collator
       --tmp
       --
       --chain /chainspec/rococo-local.json
