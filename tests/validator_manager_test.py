@@ -5,6 +5,7 @@ from substrateinterface import Keypair
 
 from app.lib.validator_manager import get_validator_set, register_validators, get_validators_pending_addition, deregister_validators, \
     get_validators_pending_deletion
+from tests.test_constants import RPC_DEV_FLAGS
 from tests.test_utils import wait_for_http_ready
 
 
@@ -13,25 +14,22 @@ class ValidatorManagerTest(unittest.TestCase):
     def setUp(self):
         # Start Alice validator
         self.alice_validator = DockerContainer('parity/polkadot:latest')
-        self.alice_validator.with_command('--chain rococo-local --validator --alice --unsafe-rpc-external --rpc-cors=all')
+        self.alice_validator.with_command(f'--chain rococo-local --validator --alice {RPC_DEV_FLAGS}')
         self.alice_validator.with_exposed_ports(9944, 10333)
         self.alice_validator.start()
 
-        self.alice_validator_rpc_ws_url = 'ws://{}:{}'.format(self.alice_validator.get_container_host_ip(),
-                                                              self.alice_validator.get_exposed_port(9944))
+        self.alice_validator_rpc_ws_url = f'ws://{self.alice_validator.get_container_host_ip()}:{self.alice_validator.get_exposed_port(9944)}'
 
         # Start Bob validator and connect it to Alice
         self.bob_validator = DockerContainer('parity/polkadot:latest')
-        self.bob_validator.with_command("""
-            --chain rococo-local --validator --bob --unsafe-rpc-external --rpc-cors=all \
-            --bootnodes /ip4/127.0.0.1/tcp/{}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6
-        """.format(self.alice_validator.get_exposed_port(10333)))
+        self.bob_validator.with_command(f"""
+            --chain rococo-local --validator --bob {RPC_DEV_FLAGS} \
+            --bootnodes /ip4/127.0.0.1/tcp/{self.alice_validator.get_exposed_port(10333)}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6
+        """)
         self.bob_validator.with_exposed_ports(9944)
         self.bob_validator.start()
-        self.bob_validator_http_url = 'http://{}:{}'.format(self.bob_validator.get_container_host_ip(),
-                                                            self.bob_validator.get_exposed_port(9944))
-        self.bob_validator_rpc_ws_url = 'ws://{}:{}'.format(self.bob_validator.get_container_host_ip(),
-                                                            self.bob_validator.get_exposed_port(9944))
+        self.bob_validator_http_url = f'http://{self.bob_validator.get_container_host_ip()}:{self.bob_validator.get_exposed_port(9944)}'
+        self.bob_validator_rpc_ws_url = f'ws://{self.bob_validator.get_container_host_ip()}:{self.bob_validator.get_exposed_port(9944)}'
         self.alice_key = '0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a'
 
         wait_for_http_ready(self.bob_validator_http_url + '/health')

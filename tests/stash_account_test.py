@@ -4,6 +4,7 @@ from testcontainers.core.container import DockerContainer
 from substrateinterface import Keypair
 
 from app.lib.stash_accounts import get_account_funds
+from tests.test_constants import RPC_DEV_FLAGS
 from tests.test_utils import wait_for_http_ready
 
 
@@ -11,7 +12,7 @@ class StashAccountTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_command(f'--dev --validator {RPC_DEV_FLAGS}')
         self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
 

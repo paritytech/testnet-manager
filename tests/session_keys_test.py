@@ -4,6 +4,7 @@ import unittest
 from testcontainers.core.container import DockerContainer
 
 from app.lib.session_keys import rotate_node_session_keys, set_node_session_key
+from tests.test_constants import RPC_DEV_FLAGS
 from tests.test_utils import wait_for_http_ready
 
 
@@ -11,7 +12,7 @@ class NodeSessionKeysTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_command(f'--dev --validator {RPC_DEV_FLAGS}')
         self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
         self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))

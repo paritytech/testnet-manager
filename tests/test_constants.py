@@ -1,0 +1,1 @@
+RPC_DEV_FLAGS = '--unsafe-rpc-external --rpc-cors=all --rpc-methods=unsafe --unsafe-force-node-key-generation'

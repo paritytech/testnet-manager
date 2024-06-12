@@ -7,6 +7,7 @@ from os import environ
 from app.lib.node_utils import is_node_ready, get_node_health, is_node_ready_ws, get_node_version, \
     get_node_sync_state
 from app.lib.substrate import get_substrate_client, substrate_rpc_request
+from tests.test_constants import RPC_DEV_FLAGS
 from tests.test_utils import wait_for_http_ready
 
 
@@ -14,7 +15,7 @@ class NodeUtilsTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --node-key 4b067400ba508d783ccf86b73aa825ebafea96c95ebdff3f307ab6dd854f0852 --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_command(f'--dev --validator --node-key 4b067400ba508d783ccf86b73aa825ebafea96c95ebdff3f307ab6dd854f0852 {RPC_DEV_FLAGS}')
         self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
         self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
