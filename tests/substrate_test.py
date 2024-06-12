@@ -7,6 +7,7 @@ from substrateinterface import Keypair
 
 from app.lib.substrate import get_substrate_client, get_sudo_keys, substrate_call, substrate_proxy_call, substrate_check_sudo_key_and_call
 from app.lib.balance_utils import get_funds
+from tests.test_constants import RPC_DEV_FLAGS
 from tests.test_utils import wait_for_http_ready
 
 
@@ -14,7 +15,7 @@ class SubstrateTest(unittest.TestCase):
 
     def setUp(self):
         self.polkadot = DockerContainer('parity/polkadot:latest')
-        self.polkadot.with_command('--dev --validator --unsafe-rpc-external --rpc-methods=unsafe  --rpc-cors=all')
+        self.polkadot.with_command(f'--dev --validator {RPC_DEV_FLAGS}')
         self.polkadot.with_exposed_ports(9944)
         self.polkadot.start()
         self.polkadot_rpc_http_url = 'http://{}:{}'.format(self.polkadot.get_container_host_ip(), self.polkadot.get_exposed_port(9944))
