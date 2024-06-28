@@ -212,7 +212,7 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm, check_version
     code_hash = f'0x{blake2_256(runtime_wasm).hex()}'
 
     log.info('Code hash: {}'.format(code_hash))
-    # Construct parachainSystem.authorizeUpgrade(hash) call on the parachain and grab the encoded call
+    # Construct System.authorizeUpgrade(hash) call on the parachain and grab the encoded call
     call_function_metadata = para_client.get_metadata_call_function("System", "authorize_upgrade")
     if len(call_function_metadata['fields']) == 2:
         call_params = {
@@ -221,18 +221,18 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm, check_version
         }
     else:
         call_params = {'code_hash': code_hash}
-    call = para_client.compose_call(
+    authorize_upgrade = para_client.compose_call(
         call_module='System',
         call_function='authorize_upgrade',
         call_params=call_params
     )
-    weight = get_query_weight(para_client, call)
-    receipt = substrate_sudo_relay_xcm_call(para_id, call.encode(), weight)
+    weight = get_query_weight(para_client, authorize_upgrade)
+    receipt = substrate_sudo_relay_xcm_call(para_id, authorize_upgrade.encode(), weight)
     if receipt and receipt.is_success:
-        log.info('Successfully sent parachainSystem.authorizeUpgrade(hash) on Relaychain')
+        log.info('Successfully sent System.authorizeUpgrade(hash) on Relaychain')
         log.info('https://polkadot.js.org/apps/#/explorer/query/{}'.format(receipt.block_hash))
     else:
-        err = "Unable to send parachainSystem.authorizeUpgrade(hash) on Relaychain. Error: {}".format(
+        err = "Unable to send System.authorizeUpgrade(hash) on Relaychain. Error: {}".format(
             getattr(receipt, 'error_message', None))
         log.error(err)
         return False, err
@@ -246,11 +246,7 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm, check_version
     log.info('Waiting 30s for parachain to receive AuthorizedUpgrade XCM')
     for i in range(30):
         time.sleep(2)
-        try:
-            authorized_upgrade = para_client.query('System', 'AuthorizedUpgrade')
-        except StorageFunctionNotFound:
-            # Fall back to legacy authorized upgrade location
-            authorized_upgrade = para_client.query('ParachainSystem', 'AuthorizedUpgrade')
+        authorized_upgrade = para_client.query('System', 'AuthorizedUpgrade')
         if authorized_upgrade.value:
             break
         if i == 29:
@@ -259,22 +255,22 @@ def parachain_runtime_upgrade(runtime_name, para_id, runtime_wasm, check_version
             return False, err
 
     # After dispatch, submit the compact.compressed.wasm file using the unsigned transaction
-    # parachainSystem.enactAuthorizedUpgrade. Anyone can submit this extrinsic.
-    call2 = para_client.compose_call(
-        call_module='ParachainSystem',
-        call_function='enact_authorized_upgrade',
+    # system.applyAuthorizedUpgrade. Anyone can submit this extrinsic.
+    apply_upgrade = para_client.compose_call(
+        call_module='System',
+        call_function='apply_authorized_upgrade',
         call_params={
             'code': code
         }
     )
-    receipt = substrate_call(para_client, None, call2)
+    receipt = substrate_call(para_client, None, apply_upgrade)
     if receipt and receipt.is_success:
-        msg = f'Successfully sent parachainSystem.enactAuthorizedUpgrade on Parachain #{para_id} for {runtime_name} \n' \
+        msg = f'Successfully sent system.applyAuthorizedUpgrade on Parachain #{para_id} for {runtime_name} \n' \
               f'Check results here: https://polkadot.js.org/apps/#/explorer/query/{receipt.block_hash}'
         log.info(msg)
         return True, msg
     else:
-        err = f'Unable to sent parachainSystem.enactAuthorizedUpgrade on Parachain #{para_id} for {runtime_name} \n' \
+        err = f'Unable to sent system.applyAuthorizedUpgrade on Parachain #{para_id} for {runtime_name} \n' \
               f'Error: {getattr(receipt, "error_message", None)}'
         log.error(err)
         return False, err
