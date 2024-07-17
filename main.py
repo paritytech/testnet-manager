@@ -18,19 +18,21 @@ class EndpointFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         return record.args and len(record.args) >= 3 and record.args[2] != "/health"
 
+# Setup Logging
+dictConfig(log_config.logger_config)
+log = logging.getLogger(__name__)
+logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+
 app = FastAPI(title=settings.APP_NAME, version=__version__)
 
 app.include_router(read_apis.router)
 if sudo_mode():
+    log.info('sudo mode enabled')
     app.include_router(sudo_apis.router)
 
 app.include_router(views.router)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Setup Logging
-dictConfig(log_config.logger_config)
-log = logging.getLogger(__name__)
-logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
 # Connect to Kubernetes
 try:
