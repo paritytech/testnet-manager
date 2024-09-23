@@ -9,6 +9,7 @@ from app.lib.substrate import get_node_client
 
 log = logging.getLogger(__name__)
 
+
 def get_derived_collator_seed(node_name):
     root_seed = derivation_root_seed()
     return root_seed + "//collator//" + node_name

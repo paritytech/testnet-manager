@@ -1,86 +1,32 @@
 import asyncio
 import logging
-from typing import Any, Dict
+from typing import Dict, Any
 
 from fastapi import APIRouter, Path, Query, HTTPException, File, UploadFile
-from fastapi.responses import JSONResponse, PlainTextResponse, Response
+from fastapi.responses import PlainTextResponse
 from substrateinterface import Keypair
 
 from app.config.network_configuration import network_sudo_seed
 from app.lib.balance_utils import teleport_funds, transfer_funds
 from app.lib.cron_tasks import list_cron_tasks, exec_cron_task
 from app.lib.kubernetes_client import list_validator_stateful_sets
-from app.lib.log_utils import get_node_pod_logs
-from app.lib.network_utils import list_substrate_nodes, list_validators, list_parachains, list_parachain_collators, \
-    register_statefulset_validators, deregister_statefulset_validators, deregister_validator_addresses, \
+from app.lib.network_utils import list_parachains, register_statefulset_validators, deregister_statefulset_validators, \
+    deregister_validator_addresses, \
     rotate_nodes_session_keys, register_statefulset_collators, onboard_parachain_by_id, \
     offboard_parachain_by_id, deregister_statefulset_collators, get_substrate_node, \
     register_validator_nodes, register_validator_addresses, deregister_validator_nodes, register_collator_nodes, \
     deregister_collator_nodes, add_invulnerable_collator, remove_invulnerable_collator, \
     set_collator_nodes_keys_on_chain, add_invulnerable_collators, remove_invulnerable_collators
 from app.lib.parachain_manager import parachain_runtime_upgrade
-from app.lib.runtime_utils import get_relay_runtime, get_relay_active_configuration, update_relay_configuration, \
-    get_parachain_runtime, runtime_upgrade, get_relaychain_metadata, get_parachain_metadata
-from app.lib.staking_utils import get_validator_nominator_mnemonic, staking_create_nominator, \
-    create_nominators_for_validator_node
+from app.lib.runtime_utils import update_relay_configuration, \
+    runtime_upgrade
+from app.lib.staking_utils import create_nominators_for_validator_node
 from app.lib.substrate import get_relay_chain_client
 
-log = logging.getLogger('router_apis')
+log = logging.getLogger('router_read_apis')
 
+log = logging.getLogger('router_update_apis')
 router = APIRouter(prefix="/api")
-
-
-@router.get("/nodes")
-async def get_nodes(
-    statefulset: str = Query(default="", description="To restrict the displayed nodes to a single StatefulSet")
-):
-    return JSONResponse(list_substrate_nodes(statefulset))
-
-
-@router.get("/nodes/{node_name}")
-async def get_nodes(
-    node_name: str = Path(description="Name of the node"),
-):
-    return JSONResponse(get_substrate_node(node_name))
-
-
-@router.get("/nodes/{node_name}/logs", response_class=PlainTextResponse, )
-async def get_node_logs(
-    node_name: str = Path(description="Name of the node"),
-):
-    node_logs = await get_node_pod_logs(node_name)
-    return PlainTextResponse(node_logs)
-
-
-@router.get("/validators")
-async def get_validators(
-    statefulset: str = Query(default="", description="To restrict the displayed nodes to a single StatefulSet")
-):
-    return JSONResponse(list_validators(statefulset))
-
-
-@router.get("/parachains")
-async def get_parachains():
-    return JSONResponse(list_parachains())
-
-
-@router.get("/collators/{para_id}")
-async def get_collators(
-    para_id: str = Path(description="ID of the parachain for which to get collators"),
-    statefulset: str = Query(default="", description="To restrict the displayed nodes to a single StatefulSet")
-):
-    return JSONResponse(list_parachain_collators(para_id, statefulset))
-
-
-@router.get("/runtime")
-async def get_runtime():
-    return JSONResponse(get_relay_runtime())
-
-
-@router.get("/runtime/configuration")
-async def get_runtime_configuration():
-    return JSONResponse(get_relay_active_configuration())
-
 
 @router.post("/runtime/configuration")
 async def update_runtime_configuration(new_configuration_keys: Dict[str, Any]):
@@ -89,25 +35,6 @@ async def update_runtime_configuration(new_configuration_keys: Dict[str, Any]):
         if not status:
             raise HTTPException(status_code=500, detail=message)
     return PlainTextResponse("OK")
-
-
-@router.get("/runtime/metadata")
-async def get_relaychain_runtime_metadata():
-    return Response(content=get_relaychain_metadata(), media_type="application/octet-stream")
-
-
-@router.get("/parachains/{para_id}/runtime")
-async def get_runtime_parachain(
-    para_id: str = Path(description="ID of the parachain for which to get runtime info")
-):
-    return JSONResponse(get_parachain_runtime(para_id))
-
-
-@router.get("/parachains/{para_id}/runtime/metadata")
-async def get_parachain_runtime_metadata(
-    para_id: str = Path(description="ID of the parachain for which to get runtime metadata")
-):
-    return Response(content=get_parachain_metadata(para_id), media_type="application/octet-stream")
 
 
 @router.post("/validators/register")
