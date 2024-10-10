@@ -53,7 +53,7 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: |
-            ${{ env.IMAGE_NAME }}:${VERSION}
+            ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.IMAGE_NAME }}:latest
 
   push_to_registry:
@@ -81,5 +81,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_NAME }}:${VERSION}
+            ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.IMAGE_NAME }}:latest
