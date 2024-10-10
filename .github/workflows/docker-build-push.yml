@@ -26,11 +26,13 @@ jobs:
         run: |
           export COMMIT_SHA=${{ github.sha }}
           export COMMIT_SHA_SHORT=${COMMIT_SHA:0:8}
-          if [[ ${{ github.ref_name }} == "main" ]]
+          export REF_NAME=${{ github.ref_name }}
+          export REF_SLUG=${REF_NAME//\//_}
+          if [[ ${REF_SLUG} == "main" ]]
           then
-            echo "VERSION=${{ github.ref_name }}-${COMMIT_SHA_SHORT}" >> $GITHUB_OUTPUT
+            echo "VERSION=${REF_SLUG}-${COMMIT_SHA_SHORT}" >> $GITHUB_OUTPUT
           else
-            export VERSION=${{ github.ref_name }} >> $GITHUB_OUTPUT
+            export VERSION=${REF_SLUG} >> $GITHUB_OUTPUT
           fi
           echo "set VERSION=${VERSION}"
 
