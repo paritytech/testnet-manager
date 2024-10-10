@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: check-semver-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: paritytech/testnet-manager
+
+jobs:
+  set-variables:
+    name: Set variables
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+    steps:
+      - name: Define version
+        id: version
+        run: |
+          export COMMIT_SHA=${{ github.sha }}
+          export COMMIT_SHA_SHORT=${COMMIT_SHA:0:8}
+          if [[ ${{ github.ref_name }} == "main" ]]
+          then
+            echo "VERSION=${{ github.ref_name }}-${COMMIT_SHA_SHORT}" >> $GITHUB_OUTPUT
+          else
+            export VERSION=${{ github.ref_name }} >> $GITHUB_OUTPUT
+          fi
+          echo "set VERSION=${VERSION}"
+
+  build_image:
+    name: Build docker image
+    runs-on: parity-default
+    needs: [set-variables]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Build and push Docker image from main
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+            ${{ env.IMAGE_NAME }}:latest
+
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: parity-default
+    needs: [set-variables]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: main
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+
+      - name: Build and push Docker image from main
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+            ${{ env.IMAGE_NAME }}:latest
