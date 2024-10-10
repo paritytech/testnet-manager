@@ -32,7 +32,7 @@ jobs:
           then
             echo "VERSION=${REF_SLUG}-${COMMIT_SHA_SHORT}" >> $GITHUB_OUTPUT
           else
-            export VERSION=${REF_SLUG} >> $GITHUB_OUTPUT
+            echo "VERSION=${REF_SLUG}" >> $GITHUB_OUTPUT
           fi
           echo "set VERSION=${VERSION}"
 
