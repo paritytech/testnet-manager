@@ -2,6 +2,9 @@ name: Run smoke test
 
 on: [push]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   smoke_test:
@@ -9,8 +12,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name:  Install minikube helmfile and plugins
-        run : |
+      - name: Install minikube helmfile and plugins
+        run: |
           curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
           install minikube-linux-amd64 /usr/local/bin/minikube
           minikube version
@@ -20,7 +23,7 @@ jobs:
           helm plugin install https://github.com/databus23/helm-diff
 
       - name: setup
-        run : |
+        run: |
           cd local-kubernetes
           make kube
           make install
@@ -29,7 +32,7 @@ jobs:
           kubectl get pod -n rococo
 
       - name: Tests
-        run : |
+        run: |
           pwd
           (cd local-kubernetes && make web-ci)
           pwd
@@ -39,4 +42,3 @@ jobs:
         with:
           name: web
           path: output
-
