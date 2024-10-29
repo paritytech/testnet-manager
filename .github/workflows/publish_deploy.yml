@@ -1,4 +1,4 @@
-name: CI
+name: Deploy
 
 on:
   push:
@@ -8,6 +8,11 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+#to use reusable workflow
+permissions:
+  id-token: write
+  contents: read
 
 env:
   IMAGE_NAME: paritytech/testnet-manager
@@ -96,8 +101,8 @@ jobs:
         with:
           environment: "parity-stg"
           tag: "${{ env.VERSION }}"
-          app_name: "${{ env.APP }}"
-          app_packages: "${{ env.APP }}"
+          app_name: "testnet-manager-westend"
+          app_packages: "testnet-manager-westend"
           argocd_server: ${{ env.ARGOCD_SERVER }}
           teleport_token: ${{ env.APP }}
           teleport_app_name: "argocd-stg"
