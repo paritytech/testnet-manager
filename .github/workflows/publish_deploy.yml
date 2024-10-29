@@ -43,11 +43,10 @@ jobs:
   docker-publish:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    environment: main
     needs: [set-variables]
     env:
       VERSION: ${{ needs.set-variables.outputs.VERSION }}
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment: main
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -71,6 +70,7 @@ jobs:
   deploy-versi:
     name: Deploy Versi
     runs-on: ubuntu-latest
+    environment: parity-versi
     needs: [set-variables, docker-publish]
     env:
       VERSION: ${{ needs.set-variables.outputs.VERSION }}
@@ -91,6 +91,7 @@ jobs:
   deploy-westend:
     name: Deploy Westend
     runs-on: ubuntu-latest
+    environment: parity-testnet
     needs: [set-variables, docker-publish]
     env:
       VERSION: ${{ needs.set-variables.outputs.VERSION }}
