@@ -79,13 +79,13 @@ jobs:
       - name: Deploy to ArgoCD
         uses: paritytech/argocd-deployment-action@main
         with:
-          environment: "parity-stg"
+          environment: "parity-versi"
           tag: "${{ env.VERSION }}"
           app_name: "${{ env.APP }}"
           app_packages: "${{ env.APP }}"
           argocd_server: ${{ env.ARGOCD_SERVER }}
           teleport_token: ${{ env.APP }}
-          teleport_app_name: "parity-versi"
+          teleport_app_name: "versi-argocd"
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
 
   deploy-westend:
@@ -100,7 +100,7 @@ jobs:
       - name: Deploy to ArgoCD
         uses: paritytech/argocd-deployment-action@main
         with:
-          environment: "parity-stg"
+          environment: "parity-testnet"
           tag: "${{ env.VERSION }}"
           app_name: "testnet-manager-westend"
           app_packages: "testnet-manager-westend"
