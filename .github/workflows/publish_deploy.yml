@@ -85,7 +85,7 @@ jobs:
           app_packages: "${{ env.APP }}"
           argocd_server: ${{ env.ARGOCD_SERVER }}
           teleport_token: ${{ env.APP }}
-          teleport_app_name: "argocd-stg"
+          teleport_app_name: "parity-versi"
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
 
   deploy-westend:
@@ -106,5 +106,5 @@ jobs:
           app_packages: "testnet-manager-westend"
           argocd_server: ${{ env.ARGOCD_SERVER }}
           teleport_token: ${{ env.APP }}
-          teleport_app_name: "argocd-stg"
+          teleport_app_name: "argocd-testnet"
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
