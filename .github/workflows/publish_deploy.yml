@@ -85,7 +85,7 @@ jobs:
           app_packages: "${{ env.APP }}"
           argocd_server: ${{ env.ARGOCD_SERVER }}
           teleport_token: ${{ env.APP }}
-          teleport_app_name: "versi-argocd"
+          teleport_app_name: "argocd-versi"
           argocd_auth_token: ${{ secrets.ARGOCD_AUTH_TOKEN }}
 
   deploy-westend:
