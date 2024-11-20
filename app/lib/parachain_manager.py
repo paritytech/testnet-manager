@@ -141,7 +141,7 @@ def get_permanent_slot_lease_period_length(substrate_client):
     return substrate_client.get_constant("AssignedSlots", "PermanentSlotLeasePeriodLength").value
 
 
-def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, lease_period_count=0, force_queue_action=True):
+def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, lease_period_count=0, force_queue_action=True, is_parachain=True):
     batch_call = []
     keypair = Keypair.create_from_seed(sudo_seed)
     batch_call.append(substrate_client.compose_call(
@@ -152,8 +152,8 @@ def initialize_parachain(substrate_client, sudo_seed, para_id, state, wasm, leas
             'genesis': {
                 'genesis_head': state,
                 'validation_code': wasm,
-                'parachain': True, # legacy param
-                'para_kind': True # new param introduced in https://github.com/paritytech/polkadot/pull/6198
+                'parachain': is_parachain, # legacy param
+                'para_kind': is_parachain # new param introduced in https://github.com/paritytech/polkadot/pull/6198
             }
         }
     ))

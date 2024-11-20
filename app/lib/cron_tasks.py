@@ -104,7 +104,7 @@ def onboard_network_inactive_parachains():
         for para_id, para_info in parachains.items():
             # Onboard parachain if not currently active
             if not para_info.get('lifecycle', '') in ['Parachain', 'Onboarding']:
-                await onboard_parachain_by_id(para_id, True)
+                await onboard_parachain_by_id(para_id, True, False)
             else:
                 log.info(F'Parachain #{para_id} already onboarded')
         log.info('Finished onboarding inactive parachains')

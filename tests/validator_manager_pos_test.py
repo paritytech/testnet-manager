@@ -16,7 +16,7 @@ class ValidatorManagerTestPoS(unittest.TestCase):
     def setUp(self):
         # Start Alice validator
         self.alice_validator = DockerContainer('parity/polkadot:latest')
-        self.alice_validator.with_command(f'--chain westend-local --validator --alice {RPC_DEV_FLAGS}')
+        self.alice_validator.with_command(f'--chain westend-local --validator --insecure-validator-i-know-what-i-do --alice {RPC_DEV_FLAGS}')
         self.alice_validator.with_exposed_ports(9944, 10333)
         self.alice_validator.start()
 
@@ -24,7 +24,7 @@ class ValidatorManagerTestPoS(unittest.TestCase):
 
         # Start Bob validator and connect it to Alice
         self.bob_validator = DockerContainer('parity/polkadot:latest')
-        self.bob_validator.with_command(f'-chain westend-local --validator --bob --unsafe-rpc-external {RPC_DEV_FLAGS} --bootnodes /ip4/127.0.0.1/tcp/{self.alice_validator.get_exposed_port(10333)}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6')
+        self.bob_validator.with_command(f'--chain westend-local --validator --insecure-validator-i-know-what-i-do --bob {RPC_DEV_FLAGS} --bootnodes /ip4/127.0.0.1/tcp/{self.alice_validator.get_exposed_port(10333)}/p2p/12D3KooWAvdwXzjmRpkHpz8PzUTaX1o23SdpgAWVyTGMSQ68QXK6')
         self.bob_validator.with_exposed_ports(9944)
         self.bob_validator.start()
         self.bob_validator_http_url = f'http://{self.bob_validator.get_container_host_ip()}:{self.bob_validator.get_exposed_port(9944)}'

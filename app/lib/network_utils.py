@@ -488,7 +488,7 @@ def list_parachains():
     return parachains
 
 
-async def onboard_parachain_by_id(para_id: str, force_queue_action: bool):
+async def onboard_parachain_by_id(para_id: str, force_queue_action: bool, parathread: bool):
     log.info(f'starting to onboard parachain #{para_id}')
     relay_chain_client = get_relay_chain_client()
     sudo_seed = network_sudo_seed()
@@ -500,10 +500,10 @@ async def onboard_parachain_by_id(para_id: str, force_queue_action: bool):
             state = get_parachain_head(para_node_client)
             wasm = get_chain_wasm(para_node_client)
             if state and wasm:
-                permanent_slot_lease_period_length = get_permanent_slot_lease_period_length(relay_chain_client)
+                permanent_slot_lease_period_length = 0 if parathread else get_permanent_slot_lease_period_length(relay_chain_client)
                 log.info('Scheduling parachain #{}, state:{}, wasm: {}...{}, lease: {}'.format(
                     para_id, state, wasm[0:64], wasm[-64:], permanent_slot_lease_period_length))
-                initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action)
+                initialize_parachain(relay_chain_client, sudo_seed, para_id, state, wasm, permanent_slot_lease_period_length, force_queue_action, not parathread)
             else:
                 log.error(
                     'Error: Not enough parameters to Scheduling parachain para_id: {}, state:{}, wasm: {}...{}'.format(

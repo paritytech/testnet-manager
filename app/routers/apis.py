@@ -188,12 +188,13 @@ async def rotate_session_keys(
 async def onboard_parachains(
     para_id: list[str] = Query(description="Parachain ID(s) to onboard"),
     force: bool = Query(default=True, description="Put a parachain directly into the next session's action queue."),
+    parathread: bool = Query(default=False, description="Register a parathread instead of a full para"),
 ):
     parachains = list_parachains()
     for id in para_id:
         # Onboard parachain if not currently active
         if not parachains.get(int(id), {}).get('lifecycle') in ['Parachain', 'Onboarding']:
-            asyncio.create_task(onboard_parachain_by_id(id, force))
+            asyncio.create_task(onboard_parachain_by_id(id, force, parathread))
         else:
             log.info(F'Parachain #{id} already onboarded')
     return PlainTextResponse('OK')
