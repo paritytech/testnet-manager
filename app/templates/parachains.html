@@ -15,6 +15,8 @@
 {% endif %}
 <input type="checkbox" id="forceQueueAction" checked>
 <label for="forceQueueAction">Fast (put action into the next session queue)</label>
+<input type="checkbox" id="parathread" >
+<label for="parathread">Register a parathread instead of a full para</label>
 <table id="table" class="display compact" style="width:100%">
     <thead>
     <tr>
@@ -67,8 +69,8 @@
             paraInputCheckboxes = document.querySelectorAll('input[name="para_id"]');
             selectedParaIds =  Array.from(paraInputCheckboxes).filter(input => input.checked).map(input => input.value);
             element.disabled = true
-            console.log(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`)
-            fetch(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}`, {method: "POST"})
+            console.log(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}&parathread=${document.getElementById("parathread").checked}`)
+            fetch(`/api/parachains/onboard?${selectedParaIds.map(para_id => "para_id=" + para_id).join("&")}&force=${document.getElementById("forceQueueAction").checked}&parathread=${document.getElementById("parathread").checked}`, {method: "POST"})
                 .then(() => {
                     element.textContent = "Onboarding in progress"
                     element.backgroundColor = 'lightgreen'
