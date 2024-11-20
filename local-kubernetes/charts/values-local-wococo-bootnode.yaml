@@ -23,6 +23,7 @@ node:
   allowUnsafeRpcMethods: true
   customChainspecUrl: http://chainspec.rococo/wococo-local.json
   forceDownloadChainspec: true
+  persistGeneratedNodeKey: true
   flags:
     - "--allow-private-ipv4"
   keys:

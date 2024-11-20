@@ -24,6 +24,7 @@ node:
   # kube-setup/validators-chainspec.yml
   customChainspecUrl: http://chainspec.rococo/rococo-local.json
   forceDownloadChainspec: true
+  persistGeneratedNodeKey: true
 
 extraInitContainers:
   - name: dump-session-keys
