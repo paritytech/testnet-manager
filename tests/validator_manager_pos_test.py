@@ -16,7 +16,7 @@ class ValidatorManagerTestPoS(unittest.TestCase):
     def setUp(self):
         # Start Alice validator
         self.alice_validator = DockerContainer('parity/polkadot:latest')
-        self.alice_validator.with_command(f'--chain westend-local --validator --insecure-validator-i-know-what-i-do--alice {RPC_DEV_FLAGS}')
+        self.alice_validator.with_command(f'--chain westend-local --validator --insecure-validator-i-know-what-i-do --alice {RPC_DEV_FLAGS}')
         self.alice_validator.with_exposed_ports(9944, 10333)
         self.alice_validator.start()
 
