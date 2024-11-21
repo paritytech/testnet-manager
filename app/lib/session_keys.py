@@ -11,7 +11,7 @@ def rotate_node_session_keys(node_http_endpoint):
     try:
         rotate_keys = requests.post(node_http_endpoint,
                                     data='{"id":1, "jsonrpc":"2.0", "method": "author_rotateKeys", "params":[]}',
-                                    headers={'Content-type': 'application/json'})
+                                    headers={'Content-type': 'application/json'}, timeout=10)
         if rotate_keys.status_code == 200:
             log.info("{} session keys rotated successfully".format(node_http_endpoint))
             return rotate_keys.json()['result']
