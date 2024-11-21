@@ -10,7 +10,7 @@ log = logging.getLogger('node_utils')
 
 def get_node_health(node_http_endpoint):
     try:
-        return requests.get(node_http_endpoint + '/health', headers={'Content-type': 'application/json'})
+        return requests.get(node_http_endpoint + '/health', headers={'Content-type': 'application/json'}, timeout=1)
     except Exception as err:
         log.error("Failed to call /health on {}; Error: {}".format(node_http_endpoint, err))
         return False
