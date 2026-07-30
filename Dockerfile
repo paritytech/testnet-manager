@@ -19,6 +19,6 @@ COPY poetry.lock pyproject.toml /app/
 WORKDIR /app
 RUN pip install poetry && \
     poetry config virtualenvs.in-project true && \
-    poetry install --no-interaction --no-ansi
+    poetry install --no-interaction --no-ansi --no-root
 COPY . /app
 EXPOSE 5000
