@@ -59,7 +59,7 @@ def get_validators_pending_deletion(ws_endpoint):
         return list(set(active_validators) - set(staking_validators))
 
 
-def setup_pos_validator(ws_endpoint, stash_seed, session_key=None, controller_seed=None):
+def setup_pos_validator(ws_endpoint, stash_seed, session_key=None, controller_seed=None, proof='0x'):
     batch_call = []
     substrate_client = get_substrate_client(ws_endpoint)
     stash_keypair = Keypair.create_from_uri(stash_seed)
@@ -91,7 +91,10 @@ def setup_pos_validator(ws_endpoint, stash_seed, session_key=None, controller_se
                 call_function='set_keys',
                 call_params={
                     'keys': session_key,
-                    'proof': ''
+                    # `proof` (Vec<u8>) is the ownership proof from
+                    # `rotateKeysWithOwner`; verified by runtimes carrying
+                    # polkadot-sdk#1739, ignored by older ones.
+                    'proof': proof
                 }
             )
         )

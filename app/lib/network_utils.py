@@ -2,6 +2,8 @@ import asyncio
 import logging
 from datetime import datetime, timedelta
 
+from substrateinterface import Keypair
+
 from app.config.network_configuration import get_relay_chain_rpc_url, network_sudo_seed, derivation_root_seed, \
     node_http_endpoint, get_network, relay_chain_consensus, node_ws_endpoint
 from app.lib.balance_utils import fund_accounts
@@ -264,12 +266,16 @@ async def setup_validators_session_keys(node_name):
         return ''
     else:
         log.info("Rotating session key on {} ({}) session key".format(node_name, stash_account_address))
-        node_session_key = rotate_node_session_keys(node_endpoint)
+        node_stash_account_mnemonic = get_node_stash_account_mnemonic(validators_root_seed, node_name)
+        # `owner` binds the ownership proof to the stash calling `set_keys`: the
+        # SCALE-encoded account id = the raw 32-byte public key (polkadot-sdk#1739).
+        owner = '0x' + Keypair.create_from_uri(node_stash_account_mnemonic).public_key.hex()
+        node_session_key = rotate_node_session_keys(node_endpoint, owner=owner)
         # If rotate_key result from node is not empty, set session key and mark account to be registered
         if node_session_key:
-            log.info("Setting session key for {} ({})".format(stash_account_address, node_session_key))
-            node_stash_account_mnemonic = get_node_stash_account_mnemonic(validators_root_seed, node_name)
-            session_key_set_status = set_node_session_key(ws_endpoint, node_stash_account_mnemonic, node_session_key)
+            log.info("Setting session key for {} ({})".format(stash_account_address, node_session_key['keys']))
+            session_key_set_status = set_node_session_key(ws_endpoint, node_stash_account_mnemonic,
+                                                          node_session_key['keys'], proof=node_session_key['proof'])
             # Don't add the account to the validator set if the setKey operation failed
             if session_key_set_status:
                 log.info('Successfully set session keys'.format(stash_account_address))
@@ -334,12 +340,20 @@ async def register_validator_pods(pods):
     else:
         for node in nodes_to_register:
             validator_stash_mnemonic = get_node_stash_account_mnemonic(validators_root_seed, node)
+            # `owner` binds the ownership proof to the account calling `set_keys`
+            # (the stash); it is the SCALE-encoded account id = the raw 32-byte
+            # public key. Required by runtimes carrying polkadot-sdk#1739.
+            owner = '0x' + Keypair.create_from_uri(validator_stash_mnemonic).public_key.hex()
 
             log.info(f'Rotate node session keys for {node}')
-            node_session_key = rotate_node_session_keys(node_http_endpoint(node))
+            rotated = rotate_node_session_keys(node_http_endpoint(node), owner=owner)
+            if not rotated:
+                log.error(f'Fail to set up PoS Validator: {node} (session key rotation failed)')
+                continue
 
             log.info(f'Registering PoS Validator: {node}')
-            status = setup_pos_validator(ws_endpoint, validator_stash_mnemonic, node_session_key)
+            status = setup_pos_validator(ws_endpoint, validator_stash_mnemonic,
+                                         rotated['keys'], proof=rotated['proof'])
             if status:
                 log.info(f'Successfully set up PoS Validator: {node}')
             else:

@@ -3,7 +3,7 @@
 # ============================================================================================
 
 KUBERNETES_CONTEXT = minikube #  minikube or rancher-desktop
-# rococo or wococo (don't put space at the end of the variable it will be used as is)
+# don't put a space at the end of the variable, it will be used as is
 CHAIN_NAMESPACE = rococo
 # docker or podman
 MINIKUBE_DRIVER = docker
@@ -25,7 +25,7 @@ kube: kube_${KUBERNETES_CONTEXT}
 kube_minikube:
 	@minikube start \
 		--addons ingress --addons metrics-server --addons registry --driver docker \
-		--kubernetes-version=1.27.4 --memory=6g --cpus=2
+		--kubernetes-version=1.31.0 --memory=6g --cpus=2
 
 kube_minikube-podman:
 	@minikube start \
@@ -66,14 +66,6 @@ build_rancher-desktop:
 rpc:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer'
 	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-bootnode 9944:9944 -n ${CHAIN_NAMESPACE}
-
-para-shell:
-	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9948#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-shell-collator-node 9948:9944 -n ${CHAIN_NAMESPACE}
-
-para-moon:
-	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9949#/explorer'
-	@kubectl --context ${KUBERNETES_CONTEXT} port-forward service/local-${CHAIN_NAMESPACE}-moonbase-alice-node 9949:9944 -n ${CHAIN_NAMESPACE}
 
 para-mint:
 	@xdg-open 'https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9950#/explorer'
@@ -120,4 +112,4 @@ uninstall: check
 	@kubectl --context ${KUBERNETES_CONTEXT} delete pvc -n ${CHAIN_NAMESPACE} --all
 
 cleanup: check
-	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace rococo wococo
+	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace rococo
