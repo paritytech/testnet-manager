@@ -25,7 +25,7 @@ kube: kube_${KUBERNETES_CONTEXT}
 kube_minikube:
 	@minikube start \
 		--addons ingress --addons metrics-server --addons registry --driver docker \
-		--kubernetes-version=1.27.4 --memory=6g --cpus=2
+		--kubernetes-version=1.31.0 --memory=6g --cpus=2
 
 kube_minikube-podman:
 	@minikube start \
