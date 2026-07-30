@@ -3,7 +3,7 @@
 # ============================================================================================
 
 KUBERNETES_CONTEXT = minikube #  minikube or rancher-desktop
-# rococo or wococo (don't put space at the end of the variable it will be used as is)
+# don't put a space at the end of the variable, it will be used as is
 CHAIN_NAMESPACE = rococo
 # docker or podman
 MINIKUBE_DRIVER = docker
@@ -120,4 +120,4 @@ uninstall: check
 	@kubectl --context ${KUBERNETES_CONTEXT} delete pvc -n ${CHAIN_NAMESPACE} --all
 
 cleanup: check
-	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace rococo wococo
+	@kubectl --context ${KUBERNETES_CONTEXT} delete namespace rococo

@@ -59,14 +59,6 @@ releases:
               seed: "test test test test test test test test test test test junk"
               extraDerivation: "//validator//${HOSTNAME}"
 
-## Para chain Shell ##
-  - name: local-rococo-shell-collator
-    namespace: rococo
-    chart: parity/node
-    version: *node_version
-    values:
-      - values-shell-collator.yaml
-
 ## Para chain Statemint ##
   - name: local-rococo-statemint-alice
     namespace: rococo

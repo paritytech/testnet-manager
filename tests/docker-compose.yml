@@ -50,7 +50,7 @@ services:
       - "9944"
     depends_on: *depends_on_chainspec
     command: |
-      --chain shell
+      --chain tick
       --unsafe-rpc-external
       --rpc-cors=all
       --rpc-methods=unsafe

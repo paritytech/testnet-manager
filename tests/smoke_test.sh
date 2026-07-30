@@ -8,7 +8,6 @@ ROUTE='index.html
 nodes
 nodes/local-rococo-bootnode-0
 nodes/local-rococo-moonbase-alice-node-0
-nodes/local-rococo-shell-collator-node-0
 nodes/local-rococo-statemint-alice-node-0
 nodes/local-rococo-tick-collator-node-0
 nodes/local-rococo-validator-a-node-0
