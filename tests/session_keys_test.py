@@ -4,7 +4,8 @@ import unittest
 from substrateinterface import Keypair
 from testcontainers.core.container import DockerContainer
 
-from app.lib.session_keys import rotate_node_session_keys, set_node_session_key
+from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, \
+    generate_and_insert_session_keys
 from tests.test_constants import RPC_DEV_FLAGS
 from tests.test_utils import wait_for_http_ready
 
@@ -40,6 +41,16 @@ class NodeSessionKeysTest(unittest.TestCase):
                                       rotated['keys'], proof=rotated['proof'])
         print(result)
         self.assertTrue(result, 'SetKeys executed successfully on //Alice//stash')
+
+    def test_offline_session_keys_accepted_by_runtime(self):
+        # The offline path (author_insertKey + offline ownership proof) must produce
+        # a proof the post-#1739 runtime accepts in set_keys — end-to-end proof that
+        # the per-scheme signing (incl. the ecdsa/beefy blake2 prehash) is correct.
+        inserted = generate_and_insert_session_keys(self.polkadot_rpc_http_url, '//Alice//stash')
+        self.assertTrue(inserted, "Offline key insertion succeeded")
+        result = set_node_session_key(self.polkadot_rpc_ws_url, '//Alice//stash',
+                                      inserted['keys'], proof=inserted['proof'])
+        self.assertTrue(result, 'set_keys accepts the offline-generated ownership proof')
 
     def test_rotate_node_session_keys_bad_url(self):
         session_key = rotate_node_session_keys('http://localhost:1234', owner=_owner('//Alice//stash'))

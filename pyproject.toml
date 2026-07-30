@@ -12,6 +12,9 @@ gunicorn = "^20.1.0"
 uvicorn = "^0.21.1"
 kubernetes = "^27.2.0"
 substrate-interface = "^1.7.9"
+# Direct dep (also pulled by substrate-interface): used for BEEFY/ecdsa
+# proof-of-possession signing over a blake2_256 prehash in the offline key path.
+eth-keys = "^0.5.1"
 Jinja2 = "^3.1.3"
 fastapi = "^0.109.1"
 python-multipart = "^0.0.7"
