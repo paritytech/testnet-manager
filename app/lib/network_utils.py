@@ -23,7 +23,8 @@ from app.lib.parachain_manager import get_parachain_id, get_all_parachain_lifecy
     initialize_parachain, cleanup_parachain, get_chain_wasm, get_parachain_head, get_parathreads_ids, \
     get_parachains_ids, get_all_parachain_leases_count, get_all_parachain_current_code_hashes, \
     get_permanent_slot_lease_period_length, get_all_parachain_heads, get_parachain_node_client
-from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys
+from app.lib.session_keys import rotate_node_session_keys, set_node_session_key, get_queued_keys, \
+    generate_and_insert_session_keys
 from app.lib.stash_accounts import get_derived_node_stash_account_address, get_node_stash_account_mnemonic, \
     get_account_funds
 from app.lib.substrate import get_relay_chain_client, get_node_client, substrate_rpc_request
@@ -271,6 +272,11 @@ async def setup_validators_session_keys(node_name):
         # SCALE-encoded account id = the raw 32-byte public key (polkadot-sdk#1739).
         owner = '0x' + Keypair.create_from_uri(node_stash_account_mnemonic).public_key.hex()
         node_session_key = rotate_node_session_keys(node_endpoint, owner=owner)
+        if not node_session_key:
+            # Node whose generate_session_keys traps (stable2512 on a post-#1739
+            # runtime): insert keys + build the proof offline instead.
+            log.warning("RPC key rotation failed on {}; trying offline author_insertKey path".format(node_name))
+            node_session_key = generate_and_insert_session_keys(node_endpoint, node_stash_account_mnemonic)
         # If rotate_key result from node is not empty, set session key and mark account to be registered
         if node_session_key:
             log.info("Setting session key for {} ({})".format(stash_account_address, node_session_key['keys']))
@@ -348,7 +354,13 @@ async def register_validator_pods(pods):
             log.info(f'Rotate node session keys for {node}')
             rotated = rotate_node_session_keys(node_http_endpoint(node), owner=owner)
             if not rotated:
-                log.error(f'Fail to set up PoS Validator: {node} (session key rotation failed)')
+                # A node whose `generate_session_keys` runtime API traps (e.g. a
+                # stable2512 binary on a post-#1739 runtime) can't rotate; fall back
+                # to inserting deterministic keys and building the proof offline.
+                log.warning(f'RPC key rotation failed for {node}; trying offline author_insertKey path')
+                rotated = generate_and_insert_session_keys(node_http_endpoint(node), validator_stash_mnemonic)
+            if not rotated:
+                log.error(f'Fail to set up PoS Validator: {node} (could not obtain session keys)')
                 continue
 
             log.info(f'Registering PoS Validator: {node}')
