@@ -67,24 +67,6 @@ spec:
         volumeMounts:
         - name: dir
           mountPath: /dir
-      - name: create-chainspec-moonbase
-        image: moonbeamfoundation/moonbeam:latest
-        imagePullPolicy: IfNotPresent
-        command: [ "/bin/sh" ]
-        args:
-          - -c
-          - >
-            set -xe;
-            /moonbeam/moonbeam build-spec --chain moonbase-dev > /dir/moonbase-dev-plain.json;
-            sed 's/"id": "moonbase_dev"/"id": "moonbase"/' -i /dir/moonbase-dev-plain.json;
-            sed 's/"chainType": "Development"/"chainType": "Live"/' -i /dir/moonbase-dev-plain.json;
-            sed 's/"relayChain": "dev-service"/"relayChain": "rococo"/' -i /dir/moonbase-dev-plain.json;
-            sed 's/"paraId": 0/"paraId": 1001/' -i /dir/moonbase-dev-plain.json;
-            sed 's/"parachainId": 0/"parachainId": 1001/' -i /dir/moonbase-dev-plain.json;
-            /moonbeam/moonbeam build-spec --chain /dir/moonbase-dev-plain.json --raw > /dir/moonbase.json;
-        volumeMounts:
-          - name: dir
-            mountPath: /dir
       - name: create-chainspec-tick
         image: parity/polkadot-parachain:latest
         command: [ "/bin/sh" ]
