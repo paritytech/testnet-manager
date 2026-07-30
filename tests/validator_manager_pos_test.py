@@ -45,8 +45,11 @@ class ValidatorManagerTestPoS(unittest.TestCase):
     def test_register_pos_validator(self):
         charlie_stash = Keypair.create_from_uri('//Charlie//stash', ss58_format=42)
         substrate_client = get_substrate_client(self.alice_validator_rpc_ws_url)
-        session_key = substrate_client.rpc_request(method="author_rotateKeys", params=[])['result']
-        setup_pos_validator(self.alice_validator_rpc_ws_url, "//Charlie//stash", session_key, "//Charlie")
+        # `owner` = the stash account id the runtime binds the proof to (polkadot-sdk#1739).
+        owner = '0x' + charlie_stash.public_key.hex()
+        rotated = substrate_client.rpc_request(method="author_rotateKeysWithOwner", params=[owner])['result']
+        setup_pos_validator(self.alice_validator_rpc_ws_url, "//Charlie//stash", rotated['keys'],
+                            "//Charlie", proof=rotated['proof'])
         validators_to_add = get_validators_pending_addition(self.alice_validator_rpc_ws_url)
         print(validators_to_add)
         self.assertEqual(validators_to_add, [charlie_stash.ss58_address], "Registered validator address successfully added to validators_to_add")
