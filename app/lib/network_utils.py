@@ -110,18 +110,56 @@ def list_validators(stateful_set_name=''):
         for validator in validators:
             if validator['is_validator']:
                 known_validators_addresses.append(validator['address'])
+        unclaimed_addresses = [address for address in validator_set
+                               if address not in known_validators_addresses]
+
+        # Before declaring these addresses unknown, try to attribute each one to an
+        # in-cluster pod by checking which node holds the session keys registered
+        # on-chain for it. This covers validators whose stash account is not derived
+        # from the pod name (e.g. genesis authorities such as bootnodes) and which
+        # don't carry a validatorAccount label.
+        if unclaimed_addresses:
+            queued_session_keys = get_queued_keys(get_relay_chain_client())
+            unmatched_pod_validators = [validator for validator in validators
+                                        if validator['location'] == 'in_cluster' and not validator['is_validator']]
+            for validator_address in list(unclaimed_addresses):
+                account_session_keys = queued_session_keys.get(validator_address)
+                if not account_session_keys:
+                    continue
+                for validator in unmatched_pod_validators:
+                    if node_has_session_keys(validator['name'], account_session_keys):
+                        log.info('matched validator address {} to pod {} via session keys'.format(
+                            validator_address, validator['name']))
+                        validator['address'] = validator_address
+                        validator['is_validator'] = get_validator_status(validator_address, validator_set,
+                                                                         validators_to_add, validators_to_retire)
+                        unclaimed_addresses.remove(validator_address)
+                        unmatched_pod_validators.remove(validator)
+                        break
+
         i = 0
-        for validator_address in validator_set:
-            if not validator_address in known_validators_addresses:
-                is_validator = get_validator_status(validator_address, validator_set, validators_to_add,
-                                                            validators_to_retire)
-                validators.append(
-                    {'name': 'unknown-validator-' + str(i), 'location': 'unknown',
-                     'address': validator_address,
-                     # 'funds': node_stash_account_funds,
-                     'is_validator': is_validator, 'status': 'Missing', 'version': '?'})
-                i = i + 1
+        for validator_address in unclaimed_addresses:
+            is_validator = get_validator_status(validator_address, validator_set, validators_to_add,
+                                                        validators_to_retire)
+            validators.append(
+                {'name': 'unknown-validator-' + str(i), 'location': 'unknown',
+                 'address': validator_address,
+                 # 'funds': node_stash_account_funds,
+                 'is_validator': is_validator, 'status': 'Missing', 'version': '?'})
+            i = i + 1
     return validators
+
+
+def node_has_session_keys(node_name, account_session_keys):
+    try:
+        node_client = get_node_client(node_name)
+        if not node_client:
+            return False
+        has_keys = check_has_session_keys(node_client, account_session_keys)
+        return bool(has_keys) and all(has_keys.values())
+    except Exception as err:
+        log.warning('failed to check session keys on {}: {}'.format(node_name, err))
+        return False
 
 
 def get_node_info_from_pod(pod):

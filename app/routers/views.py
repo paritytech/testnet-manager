@@ -60,7 +60,7 @@ async def validators(
     inactive_validator_count = len(
         list(filter(lambda val: not val['is_validator'] and val['location'] == 'in_cluster', validators)))
     unknown_validator_count = len(
-        list(filter(lambda val: val['is_validator'] and val['location'] == 'deleted_from_cluster', validators)))
+        list(filter(lambda val: val['is_validator'] and val['location'] == 'unknown', validators)))
 
     session_keys = get_session_queued_keys()
     for index in range(len(validators)):
